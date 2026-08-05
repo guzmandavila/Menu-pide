@@ -90,13 +90,11 @@
 
   /* Category pills */
   .cats{
-    display:flex; gap:8px; overflow-x:auto;
+    display:flex; flex-wrap:wrap; gap:9px;
     padding:14px 16px; position:sticky; top:96px; z-index:19;
     background:var(--bg);
     border-bottom:1px solid var(--line);
-    -ms-overflow-style:none; scrollbar-width:none;
   }
-  .cats::-webkit-scrollbar{display:none;}
   .cat-btn{
     flex:0 0 auto;
     font-family:'Doughie','Inter',sans-serif;
@@ -493,19 +491,20 @@ function changeQty(id, delta){
   const next = Math.max(0, current + delta);
   if(next===0){ delete cart[id]; }
   else { cart[id] = { qty: next, note: cart[id]?.note || '', milk: cart[id]?.milk || '', scoop: cart[id]?.scoop || '' }; }
-  document.getElementById('qty-'+id).textContent = next;
+  const qtyEl = document.getElementById('qty-'+id);
+  if(qtyEl) qtyEl.textContent = next;
   updateBars();
 }
 
 function setMilk(id, value){
   if(cart[id]) cart[id].milk = value;
-  else { cart[id] = { qty:1, note:'', milk: value, scoop:'' }; document.getElementById('qty-'+id).textContent = 1; }
+  else { cart[id] = { qty:1, note:'', milk: value, scoop:'' }; const qtyEl = document.getElementById('qty-'+id); if(qtyEl) qtyEl.textContent = 1; }
   updateBars();
 }
 
 function setScoop(id, value){
   if(cart[id]) cart[id].scoop = value;
-  else { cart[id] = { qty:1, note:'', milk:'', scoop: value }; document.getElementById('qty-'+id).textContent = 1; }
+  else { cart[id] = { qty:1, note:'', milk:'', scoop: value }; const qtyEl = document.getElementById('qty-'+id); if(qtyEl) qtyEl.textContent = 1; }
   updateBars();
 }
 
@@ -516,10 +515,12 @@ function toggleNote(id){
 }
 function saveNote(id, val){
   if(cart[id]) cart[id].note = val.trim();
-  else if(val.trim()){ cart[id] = { qty:1, note: val.trim(), milk:'', scoop:'' }; document.getElementById('qty-'+id).textContent = 1; }
+  else if(val.trim()){ cart[id] = { qty:1, note: val.trim(), milk:'', scoop:'' }; const qtyEl = document.getElementById('qty-'+id); if(qtyEl) qtyEl.textContent = 1; }
   const btn = document.getElementById('notebtn-'+id);
-  if(val.trim()){ btn.textContent = '✎ '+truncate(val.trim()); btn.classList.add('has-note'); }
-  else { btn.textContent = '+ nota'; btn.classList.remove('has-note'); }
+  if(btn){
+    if(val.trim()){ btn.textContent = '✎ '+truncate(val.trim()); btn.classList.add('has-note'); }
+    else { btn.textContent = '+ nota'; btn.classList.remove('has-note'); }
+  }
   updateBars();
 }
 
@@ -544,7 +545,7 @@ function packagingReasons(){
     const item = MENU.find(m=>m.id===id);
     return sum + (item && DRINK_CATS.includes(item.cat) ? c.qty : 0);
   },0);
-  if(drinkQty > 1) reasons.push({label:'portavasos', fee:0.5});
+  if(drinkQty > 1) reasons.push({label:'portavasos', fee:0.25});
   return reasons;
 }
 function packagingFee(){ return packagingReasons().reduce((s,r)=>s+r.fee,0); }
@@ -619,20 +620,28 @@ function sendOrder(){
   const entries = Object.entries(cart);
   if(entries.length===0) return;
 
-  let msg = `*Pedido Clowder*\n`;
+  const now = new Date();
+  const hh = String(now.getHours()).padStart(2,'0');
+  const mm = String(now.getMinutes()).padStart(2,'0');
+  const orderCode = String(now.getTime()).slice(-4);
+  const totalItems = entries.reduce((s,[,c])=>s+c.qty,0);
+
+  let msg = `*Pedido Clowder* #${orderCode}\n`;
   msg += `Cliente: ${name}\n`;
-  msg += mode==='mesa' ? `Para servir\n` : `Para llevar\n`;
+  msg += mode==='mesa' ? `Para servir` : `Para llevar`;
+  msg += ` · ${hh}:${mm}\n`;
   msg += `-----------------------------\n`;
   entries.forEach(([id,c])=>{
     const item = MENU.find(m=>m.id===id);
-    msg += `${c.qty}x ${item.name} — $${(unitPrice(id)*c.qty).toFixed(2)}\n`;
+    msg += `${c.qty}x *${item.name}* — $${(unitPrice(id)*c.qty).toFixed(2)}\n`;
     if(c.milk) msg += `   + leche vegetal (${c.milk})\n`;
     if(c.scoop) msg += `   + bola de helado de vainilla Madagascar\n`;
     if(c.note) msg += `   nota: ${c.note}\n`;
   });
   msg += `-----------------------------\n`;
   packagingReasons().forEach(r => { msg += `${r.label}: $${r.fee.toFixed(2)}\n`; });
-  msg += `*Total: $${grandTotal().toFixed(2)}*`;
+  msg += `${totalItems} producto${totalItems===1?'':'s'} · *Total: $${grandTotal().toFixed(2)}*\n\n`;
+  msg += `¡Gracias por tu pedido!`;
 
   /* EDITA ESTE NÚMERO: código de país + número, sin + ni espacios */
   const WHATSAPP_NUMBER = '593979982241';
