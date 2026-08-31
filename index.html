@@ -468,6 +468,10 @@
     color:var(--gold); opacity:.9; margin-top:6px; display:inline-block;
     text-decoration:underline; cursor:pointer;
   }
+  .footer-version{
+    font-family:'IBM Plex Mono',monospace; font-size:10px;
+    color:var(--cream-dim); opacity:.5; margin-top:10px;
+  }
   .footer-suggestion-link{
     display:block; margin:10px auto 0; background:none; border:none;
     font-family:'IBM Plex Mono',monospace; font-size:12px; letter-spacing:.5px;
@@ -614,6 +618,7 @@
   <div class="footer-ig-cta">Ayúdanos a crecer: síguenos y comparte tu compra favorita</div>
   <a class="footer-mascot-ig" href="https://www.instagram.com/clowdercoffeehouse/" target="_blank" rel="noopener">IG @clowdercoffeehouse</a>
   <button class="footer-suggestion-link" onclick="openSuggestions()">Buzón de sugerencias</button>
+  <div class="footer-version">v5 &middot; <span id="emojiCheck"></span></div>
 </div>
 
 <div class="cartbar" id="cartbar">
@@ -1398,6 +1403,13 @@ function sendOrder(){
   }
   orderSentCount++;
 }
+
+// Prueba visible de emojis: si aqui se ven rombos, el navegador o la fuente es el problema.
+// Si se ven bien aqui pero rotos en WhatsApp, el problema es otro.
+(function(){
+  const el = document.getElementById('emojiCheck');
+  if(el) el.textContent = '\u{1F9FE}\u{1F464}\u{1F6D2}\u{2615}';
+})();
 
 renderCats();
 renderMenu();
