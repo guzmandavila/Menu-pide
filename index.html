@@ -35,8 +35,6 @@
     --sage:#f8f3e7;
     --line:rgba(248,243,231,0.22);
     --line-solid:#362e27;
-    --frame-ink:#D96C4F;
-    --frame-bg:#181310;
     --radius:14px;
     --theme-transition: background .25s ease, color .25s ease, border-color .25s ease;
   }
@@ -51,12 +49,9 @@
     --sage:#221a14;
     --line:rgba(34,26,20,0.16);
     --line-solid:#e2d9c6;
-    --frame-ink:#D96C4F;
-    --frame-bg:#f8f4ea;
   }
   *{box-sizing:border-box;}
   html,body{margin:0;padding:0;}
-  body{border-left:10px solid transparent; border-right:10px solid transparent;}
   body{
     background:var(--bg);
     color:var(--cream);
@@ -67,20 +62,6 @@
     transition:var(--theme-transition);
     position:relative;
   }
-  /* Marco retro a cuadros, el mismo lenguaje de los flyers de Clowder */
-  .retro-frame{
-    position:fixed; z-index:35; pointer-events:none;
-    background-image:
-      linear-gradient(45deg, var(--frame-ink) 25%, transparent 25%, transparent 75%, var(--frame-ink) 75%),
-      linear-gradient(45deg, var(--frame-ink) 25%, transparent 25%, transparent 75%, var(--frame-ink) 75%);
-    background-size:20px 20px;
-    background-position:0 0, 10px 10px;
-    background-color:var(--frame-bg);
-  }
-  .retro-frame-top{ top:0; left:0; right:0; height:10px; }
-  .retro-frame-bottom{ bottom:0; left:0; right:0; height:10px; }
-  .retro-frame-left{ top:0; bottom:0; left:0; width:10px; }
-  .retro-frame-right{ top:0; bottom:0; right:0; width:10px; }
   body::before{
     content:'';
     position:fixed; inset:0; z-index:0; pointer-events:none;
@@ -91,7 +72,7 @@
   header, main, .cats, .cartbar, .overlay, .footer-mascot{ position:relative; z-index:1; }
   /* Header */
   .sticky-top{
-    position:sticky; top:10px; z-index:20;
+    position:sticky; top:0; z-index:20;
     background:var(--bg);
   }
   .header-actions{
@@ -568,7 +549,7 @@
   }
 
   .cartbar{
-    position:fixed; left:16px; right:16px; bottom:22px; z-index:30;
+    position:fixed; left:16px; right:16px; bottom:16px; z-index:30;
     background:#3F854A; color:#fff;
     border-radius:16px; padding:16px 18px;
     display:flex; justify-content:space-between; align-items:center;
@@ -698,10 +679,6 @@
 </style>
 </head>
 <body class="light-theme">
-<div class="retro-frame retro-frame-top"></div>
-<div class="retro-frame retro-frame-bottom"></div>
-<div class="retro-frame retro-frame-left"></div>
-<div class="retro-frame retro-frame-right"></div>
 
 <div class="sticky-top">
 <header>
