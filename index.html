@@ -502,6 +502,33 @@
     color:var(--gold); opacity:.9; margin-top:6px; display:inline-block;
     text-decoration:underline; cursor:pointer;
   }
+  .dev-card{
+    max-width:560px; margin:26px auto 0; text-align:left;
+    background:#EDE3D0;
+    border:1px solid rgba(0,0,0,0.1);
+    border-left:5px solid #442C19;
+    border-radius:18px;
+    padding:16px 18px;
+  }
+  .dev-hook{
+    font-family:'Doughie','Inter',sans-serif; font-weight:400; font-size:27px;
+    color:#1a1310; line-height:1.15; margin-bottom:8px;
+  }
+  .dev-desc{
+    font-size:14px; color:#4a4032; line-height:1.5; font-weight:600;
+  }
+  .dev-sign{
+    font-family:'IBM Plex Mono',monospace; font-size:11px; font-weight:600;
+    color:#4a4032; opacity:.7; margin-top:12px; letter-spacing:.3px;
+  }
+  .dev-links{ display:flex; gap:8px; margin-top:12px; }
+  .dev-btn{
+    flex:1; text-align:center; text-decoration:none; border-radius:10px;
+    padding:11px 8px; font-family:'Inter',sans-serif; font-size:13px; font-weight:800;
+    border:2px solid #1a1310;
+  }
+  .dev-btn-wa{ background:#1a1310; color:#faf6ec; }
+  .dev-btn-gh{ background:#faf6ec; color:#1a1310; }
   .footer-version{
     font-family:'IBM Plex Mono',monospace; font-size:10px;
     color:var(--cream-dim); opacity:.5; margin-top:10px;
@@ -654,6 +681,15 @@
   <div class="footer-ig-cta">Ayúdanos a crecer: síguenos y comparte tu compra favorita</div>
   <a class="footer-mascot-ig" href="https://www.instagram.com/clowdercoffeehouse/" target="_blank" rel="noopener">IG @clowdercoffeehouse</a>
   <button class="footer-suggestion-link" onclick="openSuggestions()">Buzón de sugerencias</button>
+  <div class="dev-card">
+    <div class="dev-hook">¿Tienes una idea<br>y no sabes por dónde empezar?</div>
+    <div class="dev-desc">Yo hice esta app. Puedo hacer la herramienta que tu negocio necesita.</div>
+    <div class="dev-links">
+      <a class="dev-btn dev-btn-wa" href="https://wa.me/593979864314" target="_blank" rel="noopener">Cuéntame tu idea</a>
+      <a class="dev-btn dev-btn-gh" href="https://github.com/guzmandavila" target="_blank" rel="noopener">GitHub</a>
+    </div>
+    <div class="dev-sign">&lt;/&gt; Ronald Guzmán Dávila</div>
+  </div>
   <div class="footer-version">v6 &middot; <span id="emojiCheck"></span></div>
 </div>
 
