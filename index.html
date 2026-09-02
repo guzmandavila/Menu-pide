@@ -104,7 +104,7 @@
   }
   /* El logo nunca se comprime ni se deja tapar por las categorías */
   .sticky-top.compact header{ z-index:2; }
-  .sticky-top.compact header .logo{ max-width:34vw; object-fit:contain; }
+  .sticky-top.compact header .logo{ max-width:46vw; object-fit:contain; }
   /* Si la categoría es larga, se recorta con puntos en vez de desbordarse */
   .sticky-top.compact .cat-btn{
     max-width:100%; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;
@@ -119,7 +119,7 @@
     display:none;
   }
   .sticky-top.compact header .logo{
-    height:42px; margin:0;
+    height:50px; margin:0;
   }
   header .logo{
     height:84px;
@@ -335,7 +335,7 @@
   .section-label{
     font-family:'Doughie','Inter',sans-serif;
     font-weight:400;
-    font-size:32px;
+    font-size:38px;
     color:var(--gold);
     margin:24px 4px 12px;
     display:flex; align-items:center;
@@ -1047,8 +1047,8 @@ function renderCats(){
   const el = document.getElementById('cats');
   if(catsCollapsed){
     const c = activeCat;
-    const color = catColor(c);
-    const pill = `<button class="cat-btn active" style="background:${color}; border-color:${color}; color:${textColorFor(color)};" onclick="selectCat('${c}')"><span class="cat-dot" style="background:${textColorFor(color)}"></span>${c}</button>`;
+    // La categoría activa ya se ve como título grande abajo: aquí solo va "Ver todo"
+    const pill = '';
     const otherColors = CATS.filter(cc=>cc!==c).map(cc=>catColor(cc)).filter(cc=>cc!=='transparent').slice(0,4);
     const dots = otherColors.map((dc,i) => `<span class="cats-expand-dot" style="background:${dc}; z-index:${otherColors.length-i};"></span>`).join('');
     const expandBtn = `<button class="cats-expand-btn" onclick="expandCats()" aria-label="Ver todas las categorías">
