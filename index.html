@@ -270,9 +270,12 @@
     border-bottom:1px solid var(--line-solid);
     overflow-x:auto; scrollbar-width:none; -webkit-overflow-scrolling:touch;
     scroll-snap-type:x proximity;
+    scroll-padding-left:16px; /* el imán respeta el margen del borde */
   }
   .cats::-webkit-scrollbar{ display:none; }
   .cats .cat-btn{ scroll-snap-align:start; }
+  /* En contenedores con scroll el padding derecho se pierde: se compensa así */
+  .cats::after{ content:''; flex:0 0 6px; }
   /* Sombra al borde derecho: pista de que hay más categorías al costado */
   .cats-wrap{ position:relative; }
   .cats-wrap::after{
