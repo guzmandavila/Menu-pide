@@ -1614,6 +1614,19 @@ function sendOrder(){
   if(el) el.textContent = '\u{1F9FE}\u{1F464}\u{1F6D2}\u{2615}';
 })();
 
+/* Contador de visitas (Abacus, gratis y sin cuenta).
+   Cuenta 1 por sesión, no por cada vez que se toca algo.
+   Si el servicio falla, la app sigue funcionando igual. */
+(function contarVisita(){
+  try{
+    if(sessionStorage.getItem('clowder_visita_contada')) return;
+    fetch('https://abacus.jasoncameron.dev/hit/clowder-menu-pide/visitas')
+      .then(r => r.ok ? r.json() : null)
+      .then(() => { try{ sessionStorage.setItem('clowder_visita_contada','1'); }catch(e){} })
+      .catch(() => {});
+  }catch(e){}
+})();
+
 renderCats();
 renderMenu();
 updateBars();
