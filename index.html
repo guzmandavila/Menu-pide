@@ -320,6 +320,13 @@
     color:var(--bg);
     background:var(--gold);
     border-color:var(--gold);
+    /* Refuerzos para que se note cuál está elegida, más allá del color */
+    font-weight:700;
+    transform:scale(1.04);
+  }
+  /* Contorno grueso en la activa: se lee aunque el color no se distinga bien */
+  .cat-btn.active{
+    box-shadow:0 3px 10px rgba(0,0,0,0.22), 0 0 0 3px var(--bg), 0 0 0 5px var(--cream);
   }
   .cat-btn-promo{
     border-style:dashed !important;
@@ -1062,11 +1069,12 @@ function renderCats(){
     const active = c===activeCat;
     const color = catColor(c);
     const isPromo = c === 'Bebida del Mes';
-    // Solo la activa lleva color; las inactivas van neutras (incluida la promo,
-    // para que no parezca seleccionada cuando no lo está)
+    // Todas llevan su color: la lista solo se ve al elegir, así que no hay
+    // riesgo de confundir cuál está seleccionada.
+    // La activa va con el color pleno; las demás con una versión suave del mismo.
     const style = active
       ? `style="background:${color}; border-color:${color}; color:${textColorFor(color)};"`
-      : `style="background:var(--bg-alt); border-color:var(--line-solid); color:var(--cream-dim);"`;
+      : `style="background:${lighten(color,0.62)}; border-color:${lighten(color,0.25)}; color:#3a3229;"`;
     return `<button class="cat-btn ${active?'active':''} ${isPromo?'cat-btn-promo':''}" ${style} onclick="selectCat('${c}')"><span class="cat-dot" style="background:${active?textColorFor(color):color}"></span>${c}</button>`;
   }).join('');
 }
@@ -1075,7 +1083,16 @@ function syncHeaderCompact(){
   if(!stickyTop) return;
   stickyTop.classList.toggle('compact', catsCollapsed);
 }
-function expandCats(){ catsCollapsed = false; renderCats(); syncHeaderCompact(); }
+function expandCats(){
+  catsCollapsed = false;
+  renderCats();
+  syncHeaderCompact();
+  // Desplazar la lista hasta la categoría en la que estás, para no perder la referencia
+  const activa = document.querySelector('#cats .cat-btn.active');
+  if(activa && activa.scrollIntoView){
+    activa.scrollIntoView({ block:'nearest', inline:'center' });
+  }
+}
 function selectCat(c){
   activeCat = c;
   catsCollapsed = true;
