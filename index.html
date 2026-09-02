@@ -96,11 +96,18 @@
     padding:0; flex:0 0 auto;
     display:flex; align-items:center;
   }
-  .sticky-top.compact .cats-wrap{ flex:1 1 auto; min-width:0; }
+  .sticky-top.compact .cats-wrap{ flex:1 1 auto; min-width:0; overflow:hidden; }
   .sticky-top.compact .cats-wrap::after{ display:none; }
   .sticky-top.compact .cats{
     padding:0; border-bottom:none;
-    justify-content:flex-end; overflow:visible;
+    justify-content:flex-end; overflow-x:auto;
+  }
+  /* El logo nunca se comprime ni se deja tapar por las categorías */
+  .sticky-top.compact header{ z-index:2; }
+  .sticky-top.compact header .logo{ max-width:34vw; object-fit:contain; }
+  /* Si la categoría es larga, se recorta con puntos en vez de desbordarse */
+  .sticky-top.compact .cat-btn{
+    max-width:100%; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;
   }
   .sticky-top.compact header .tag,
   .sticky-top.compact header .doodle-star,
