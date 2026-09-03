@@ -442,6 +442,11 @@
     color:#faf6ec; background:#A33422; border-color:#A33422;
     padding:7px 16px; letter-spacing:.3px;
   }
+  .item-price.closed-price{
+    font-family:'Inter',sans-serif; font-size:13.5px; font-weight:800;
+    color:#faf6ec; background:#5C6B73; border-color:#5C6B73;
+    padding:7px 16px; letter-spacing:.3px;
+  }
   .item-controls{
     display:flex; align-items:center; justify-content:space-between;
     margin-top:14px; gap:10px;
@@ -860,17 +865,18 @@
     <div class="hours-list">
       <div class="hours-row">
         <div class="hours-days">Lunes a domingo</div>
-        <div class="hours-time">Café todo el día</div>
+        <div class="hours-time">☕ Solo café · disponible todo el día</div>
       </div>
       <div class="hours-row">
         <div class="hours-days">Lunes a sábado</div>
-        <div class="hours-time">Menú 17h00 – 23h00</div>
+        <div class="hours-time">Menú completo: 19h00 – 23h00</div>
       </div>
       <div class="hours-row">
         <div class="hours-days">Domingos</div>
-        <div class="hours-time">Menú 16h00 – 22h00</div>
+        <div class="hours-time">Menú completo: 18h30 – 22h30</div>
       </div>
     </div>
+    <div class="modal-hint" style="text-align:center; margin:0 0 12px;">Fuera de esas franjas, solo se pueden pedir Bebidas Calientes.</div>
     <button class="send-btn" onclick="closeHours()">¡Listo!</button>
   </div>
 </div>
@@ -1198,9 +1204,10 @@ function renderMenu(){
     const scoop = inCart ? (inCart.scoop || '') : '';
     const flavorColor = FLAVOR_COLORS[i.flavor] || '#1a1310';
     const flavorText = textColorFor(flavorColor);
-    const badgeText = i.comingSoon ? 'Próximamente' : (i.soldOut ? 'Agotado' : null);
-    const badgeClass = i.comingSoon ? 'coming-soon-price' : (i.soldOut ? 'sold-out-price' : '');
-    const unavailableNote = i.comingSoon ? 'Todavía no está disponible para pedir.' : (i.soldOut ? 'Se agotó por hoy — vuelve pronto.' : '');
+    const closedNow = !i.comingSoon && !i.soldOut && !isCatOrderable(i.cat);
+    const badgeText = i.comingSoon ? 'Próximamente' : (i.soldOut ? 'Agotado' : (closedNow ? 'Cerrado' : null));
+    const badgeClass = i.comingSoon ? 'coming-soon-price' : (i.soldOut ? 'sold-out-price' : (closedNow ? 'closed-price' : ''));
+    const unavailableNote = i.comingSoon ? 'Todavía no está disponible para pedir.' : (i.soldOut ? 'Se agotó por hoy — vuelve pronto.' : (closedNow ? 'Fuera de horario · el menú abre lunes a sábado 19h00–23h00, domingos 18h30–22h30.' : ''));
     const variantSelect = i.__isGroup ? `
       <select class="variant-select" style="background-color:${flavorColor}; color:${flavorText}; background-image:${arrowSvg(flavorText)};" onchange="selectVariant('${i.__group}', this.value)">
         ${i.__variants.map(v=>`<option value="${v.id}" ${v.id===i.id?'selected':''}>${v.flavor}</option>`).join('')}
@@ -1344,6 +1351,20 @@ const SNACK_CATS = ['Snack Sal','Snack Dulce'];
 // Categorías de tienda: no se preparan, no llevan empaque de comida
 const STORE_CATS = ['Congelados y Más','Merch Clowder'];
 function isStoreCat(c){ return STORE_CATS.includes(c); }
+
+// Bebidas Calientes se puede pedir a cualquier hora; el resto solo dentro
+// del horario del menú (lunes a sábado 19h00-23h00, domingos 18h30-22h30).
+const ALWAYS_OPEN_CAT = 'Bebidas Calientes';
+function isMenuOpenNow(){
+  const now = new Date();
+  const day = now.getDay(); // 0=domingo, 1=lunes, ... 6=sábado
+  const mins = now.getHours()*60 + now.getMinutes();
+  if(day === 0) return mins >= (18*60+30) && mins <= (22*60+30);
+  return mins >= (19*60) && mins <= (23*60);
+}
+function isCatOrderable(cat){
+  return cat === ALWAYS_OPEN_CAT || isMenuOpenNow();
+}
 
 const PREP_TIME = {
   'Bebida del Mes': [5, 10],
