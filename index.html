@@ -1048,7 +1048,7 @@ const CAT_BANNERS = {
 };
 // Categorías ocultas temporalmente: sus productos siguen en MENU (por si se reactivan),
 // pero no aparecen como pestaña hasta sacarlas de esta lista.
-const HIDDEN_CATS = ['Merch Clowder']; // sin productos reales todavía
+const HIDDEN_CATS = ['Merch Clowder', 'Congelados y Más']; // sin productos reales todavía
 const CATS = [...new Set(MENU.map(i=>i.cat))].filter(c => !HIDDEN_CATS.includes(c));
 
 /* Colores secundarios de marca — uno por categoría de sabor */
