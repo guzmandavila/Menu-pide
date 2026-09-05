@@ -1079,7 +1079,7 @@ let mode = '';
 let payMethod = '';
 let lastCartCount = 0;
 
-let catsCollapsed = false;
+let catsCollapsed = true; // arranca enfocada en la categoría de entrada, sin la lista completa
 function renderCats(){
   const el = document.getElementById('cats');
   if(catsCollapsed){
@@ -1779,6 +1779,7 @@ function sendOrder(){
 renderCats();
 renderMenu();
 updateBars();
+syncHeaderCompact();
 </script>
 </body>
 </html>
