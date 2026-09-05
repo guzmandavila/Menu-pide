@@ -1071,8 +1071,8 @@ function lighten(hex, amt){
 }
 function pastelBg(c){ const hex = catColor(c); return hex==='transparent' ? 'transparent' : lighten(hex, 0.45); }
 
-// Arranca en la Bebida del Mes; si esa categoría ya no existe, cae en Bebidas Calientes
-let activeCat = MENU.some(i=>i.cat==='Bebida del Mes') ? 'Bebida del Mes'
+// Arranca en Bebidas Frías (por el clima); si no existe, cae en Calientes, y si tampoco, en la primera visible
+let activeCat = MENU.some(i=>i.cat==='Bebidas Frías') ? 'Bebidas Frías'
               : (MENU.some(i=>i.cat==='Bebidas Calientes') ? 'Bebidas Calientes' : CATS[0]);
 let cart = {}; // id -> {qty, note}
 let mode = '';
