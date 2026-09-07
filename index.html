@@ -741,11 +741,32 @@
     border-bottom:1px solid var(--line); padding:14px 0;
     display:flex; justify-content:space-between; gap:10px;
   }
-  .cart-row .info{flex:1;}
+  .cart-row .info{flex:1; min-width:0;}
   .cart-row .info .n{font-weight:600; font-size:16px;}
   .cart-row .info .note{font-size:13.5px; color:var(--sage); margin-top:3px;}
   .cart-row .price{font-family:'IBM Plex Mono',monospace; font-size:16px; color:var(--gold); white-space:nowrap;}
+  .cart-row .price-breakdown{display:block; margin-top:3px; font-family:'Inter',sans-serif; font-size:11px; line-height:1.45; color:var(--cream-dim); text-align:right;}
+  .cart-row .price-breakdown div{display:flex; justify-content:flex-end; gap:5px; white-space:nowrap;}
+  .cart-row .price-breakdown b{font-family:'IBM Plex Mono',monospace; font-weight:600; color:var(--cream);}
+  .cart-row .price-total{display:block; margin-top:3px; font-size:17px; font-weight:800; color:var(--gold);}
+  .cart-modifiers{display:flex; flex-wrap:wrap; gap:5px; margin-top:7px;}
+  .modifier-chip{
+    display:inline-flex; align-items:center; gap:5px; max-width:100%;
+    border:1px solid var(--line); border-radius:999px; padding:5px 8px;
+    background:var(--bg-alt); color:var(--cream-dim); font:inherit; font-size:12px;
+    overflow-wrap:anywhere;
+  }
+  .modifier-chip strong{font-family:'IBM Plex Mono',monospace; color:var(--cream); font-size:11px;}
+  .modifier-chip button{border:0; background:none; color:var(--cream-dim); cursor:pointer; padding:0 0 0 2px; font-size:16px; line-height:1;}
   .cart-row .rm{background:none;border:none;color:var(--cream-dim);font-size:13.5px;text-decoration:underline;cursor:pointer;margin-top:5px;}
+  @media(max-width:560px){
+    .drawer{padding:18px 14px 22px;}
+    .cart-row{gap:8px;}
+    .cart-row .price{min-width:84px; font-size:14px;}
+    .cart-row .price-breakdown{font-size:10.5px;}
+    .cart-row .price-total{font-size:15px;}
+    .modifier-chip{font-size:11px; padding:4px 7px;}
+  }
   .empty-cart{text-align:center; padding:22px 10px 30px; color:var(--cream-dim); font-size:15px;}
   .prep-time{
     display:flex; align-items:center; gap:8px;
@@ -1511,6 +1532,13 @@ function setScoop(id, value){
   updateBars();
 }
 
+function removeExtra(id, type){
+  if(!cart[id]) return;
+  cart[id][type] = '';
+  renderMenu();
+  updateBars();
+}
+
 function toggleNote(id){
   const box = document.getElementById('note-'+id);
   box.classList.toggle('open');
@@ -1686,20 +1714,24 @@ function renderCartList(){
   }
   el.innerHTML = entries.map(([id,c])=>{
     const item = MENU.find(m=>m.id===id);
-    const milkLabel = c.milk ? `+ leche vegetal (${c.milk === 'almendra' ? 'almendra' : 'avena'})` : '';
-    const scoopLabel = c.scoop ? `+ bola de helado de vainilla Madagascar` : '';
-    const syrupLabel = c.syrup ? `+ sirope de ${SYRUP_LABELS[c.syrup]}` : '';
+    const baseTotal = item.price * c.qty;
+    const extrasTotal = (unitPrice(id) - item.price) * c.qty;
+    const modifierChips = [];
+    if(c.milk) modifierChips.push(`<span class="modifier-chip">Leche vegetal (${c.milk === 'almendra' ? 'almendra' : 'avena'}) <strong>+$0.50</strong><button aria-label="Quitar leche vegetal" onclick="removeExtra('${id}','milk')">×</button></span>`);
+    if(c.scoop) modifierChips.push(`<span class="modifier-chip">Bola de helado <strong>+$0.75</strong><button aria-label="Quitar bola de helado" onclick="removeExtra('${id}','scoop')">×</button></span>`);
+    if(c.syrup) modifierChips.push(`<span class="modifier-chip">Sirope de ${SYRUP_LABELS[c.syrup]} <strong>+$0.50</strong><button aria-label="Quitar sirope" onclick="removeExtra('${id}','syrup')">×</button></span>`);
+    const priceHtml = extrasTotal > 0.001
+      ? `<div class="price-breakdown"><div><span>Precio base</span><b>$${baseTotal.toFixed(2)}</b></div><div><span>Extras</span><b>+$${extrasTotal.toFixed(2)}</b></div></div><strong class="price-total">Total $${(baseTotal + extrasTotal).toFixed(2)}</strong>`
+      : `$${baseTotal.toFixed(2)}`;
     return `
     <div class="cart-row">
       <div class="info">
         <div class="n">${c.qty}x ${item.name}</div>
-        ${milkLabel ? `<div class="note">${milkLabel}</div>` : ''}
-        ${scoopLabel ? `<div class="note">${scoopLabel}</div>` : ''}
-        ${syrupLabel ? `<div class="note">${syrupLabel}</div>` : ''}
+        ${modifierChips.length ? `<div class="cart-modifiers">${modifierChips.join('')}</div>` : ''}
         ${c.note ? `<div class="note">nota: ${c.note}</div>` : ''}
-        <button class="rm" onclick="changeQty('${id}', -${c.qty})">quitar</button>
+        <button class="rm" onclick="changeQty('${id}', -${c.qty})">Quitar producto</button>
       </div>
-      <div class="price">$${(unitPrice(id)*c.qty).toFixed(2)}</div>
+      <div class="price">${priceHtml}</div>
     </div>`;
   }).join('');
 }
@@ -1794,6 +1826,25 @@ function setMode(m){
 }
 
 let orderSentCount = 0;
+let currentOrderCode = '';
+try { currentOrderCode = sessionStorage.getItem('clowder_active_order_code') || ''; } catch(e) {}
+
+// Código legible y ordenado: CL-AAAAMMDD-HHMM-001.
+// El consecutivo se reinicia automáticamente al cambiar el día.
+function createOrderCode(now){
+  const dateKey = `${now.getFullYear()}${String(now.getMonth()+1).padStart(2,'0')}${String(now.getDate()).padStart(2,'0')}`;
+  const timeKey = `${String(now.getHours()).padStart(2,'0')}${String(now.getMinutes()).padStart(2,'0')}`;
+  const counterKey = `clowder_order_sequence_${dateKey}`;
+  let sequence = 1;
+  try {
+    sequence = Number(localStorage.getItem(counterKey) || 0) + 1;
+    localStorage.setItem(counterKey, String(sequence));
+  } catch(e) {
+    // Respaldo si el navegador bloquea el almacenamiento local.
+    sequence = Number(String(now.getMilliseconds()).slice(-3)) || 1;
+  }
+  return `CL-${dateKey}-${timeKey}-${String(sequence).padStart(3,'0')}`;
+}
 
 function sendOrder(){
   const name = document.getElementById('customerName').value.trim() || 'Sin nombre';
@@ -1808,7 +1859,11 @@ function sendOrder(){
   const now = new Date();
   const hh = String(now.getHours()).padStart(2,'0');
   const mm = String(now.getMinutes()).padStart(2,'0');
-  const orderCode = String(now.getTime()).slice(-4);
+  if(!currentOrderCode){
+    currentOrderCode = createOrderCode(now);
+    try { sessionStorage.setItem('clowder_active_order_code', currentOrderCode); } catch(e) {}
+  }
+  const orderCode = currentOrderCode;
   const totalItems = entries.reduce((s,[,c])=>s+c.qty,0);
 
   let msg = orderSentCount > 0
