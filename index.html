@@ -563,7 +563,7 @@
     display:flex; align-items:center; justify-content:center; gap:8px; width:100%;
     margin:18px auto 0; padding:13px 15px; border:1px solid #D7A85E;
     border-radius:14px; background:linear-gradient(135deg,#fff4bd,#f6d58a);
-    color:#3b2819; font-family:'Doughie','Inter',sans-serif; font-size:19px;
+    color:#3b2819; text-decoration:none; font-family:'Doughie','Inter',sans-serif; font-size:19px;
     cursor:pointer; box-shadow:0 6px 15px rgba(81,49,20,.12); transition:transform .2s ease, box-shadow .2s ease;
   }
   .footer-suggestion-link:hover{ transform:translateY(-2px); box-shadow:0 9px 20px rgba(81,49,20,.18); }
@@ -729,7 +729,25 @@
   .send-btn:disabled{background:var(--bg-alt); color:var(--cream-dim); cursor:not-allowed;}
 </style>
 </head>
-<body class="light-theme">
+<body>
+<script>
+  // Tema automático: claro durante el día y oscuro por la noche.
+  // Se vuelve a comprobar al cambiar de hora si la app queda abierta.
+  (function autoTheme(){
+    function applyTheme(){
+      const hour = new Date().getHours();
+      document.body.classList.toggle('light-theme', hour >= 7 && hour < 19);
+    }
+    function scheduleNextCheck(){
+      const nextHour = new Date();
+      nextHour.setMinutes(0, 0, 0);
+      nextHour.setHours(nextHour.getHours() + 1);
+      setTimeout(function(){ applyTheme(); scheduleNextCheck(); }, Math.max(1000, nextHour - new Date()));
+    }
+    applyTheme();
+    scheduleNextCheck();
+  })();
+</script>
 
 <div class="sticky-top">
 <header>
@@ -772,7 +790,7 @@
     <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><defs><linearGradient id="igGradient" x1="2" y1="22" x2="22" y2="2"><stop stop-color="#feda75"/><stop offset=".35" stop-color="#fa7e1e"/><stop offset=".7" stop-color="#d62976"/><stop offset="1" stop-color="#4f5bd5"/></linearGradient></defs><rect x="3" y="3" width="18" height="18" rx="5" stroke="url(#igGradient)" stroke-width="2.2"/><circle cx="12" cy="12" r="4.2" stroke="url(#igGradient)" stroke-width="2.2"/><circle cx="17.4" cy="6.7" r="1.1" fill="#d62976"/></svg>
     @clowdercoffeehouse
   </a>
-  <button class="footer-suggestion-link" onclick="openSuggestions()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 11.5a8.4 8.4 0 0 1-9 8.5 9.3 9.3 0 0 1-4.2-1L3 20l1.5-4.4A8.1 8.1 0 0 1 3 11.5 8.4 8.4 0 0 1 12 3a8.4 8.4 0 0 1 9 8.5Z"/><path d="M8 11.5h8M12 7.5v8"/></svg><span>Buzón de sugerencias<span class="suggestion-caption">Tu idea puede hacer más bonita la experiencia</span></span></button>
+  <a class="footer-suggestion-link" href="https://share.forms.app/form/6a9ef996fdd4755e6a546004" target="_blank" rel="noopener noreferrer"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 11.5a8.4 8.4 0 0 1-9 8.5 9.3 9.3 0 0 1-4.2-1L3 20l1.5-4.4A8.1 8.1 0 0 1 3 11.5 8.4 8.4 0 0 1 12 3a8.4 8.4 0 0 1 9 8.5Z"/><path d="M8 11.5h8M12 7.5v8"/></svg><span>Buzón de sugerencias<span class="suggestion-caption">Tu idea puede hacer más bonita la experiencia</span></span></a>
   <div class="dev-card">
     <div class="dev-hook">¿Te gusta esta app?</div>
     <div class="dev-hook-sub">¿Tienes algo en mente? Cuéntame.</div>
@@ -911,21 +929,6 @@
     </div>
     <div class="modal-hint" style="text-align:center; margin:0 0 12px;">Fuera de esas franjas, solo se pueden pedir Bebidas Calientes.</div>
     <button class="send-btn" onclick="closeHours()">¡Listo!</button>
-  </div>
-</div>
-
-<div class="overlay" id="suggestionOverlay">
-  <div class="drawer">
-    <div class="drawer-head">
-      <h2>Buzón de sugerencias</h2>
-      <button onclick="closeSuggestions()">✕</button>
-    </div>
-    <p class="modal-hint">Cuéntanos qué mejorarías del menú o del local. Se envía a nuestro correo — no queda ligado a tu nombre ni a este pedido.</p>
-    <div class="fields">
-      <textarea id="suggestionText" rows="5" placeholder="Escribe tu sugerencia aquí..." style="background:var(--bg-alt); border:1px solid var(--line); border-radius:10px; color:var(--cream); padding:11px 13px; font-family:'Inter',sans-serif; font-size:15.5px; resize:none;"></textarea>
-    </div>
-    <button class="send-btn" style="margin-top:16px;" onclick="sendSuggestion()">Enviar sugerencia</button>
-    <div class="modal-hint modal-hint-center">Se abre tu correo con la sugerencia lista para enviar</div>
   </div>
 </div>
 
@@ -1663,17 +1666,6 @@ function closeGuide(){
 
 function openHours(){ document.getElementById('hoursOverlay').classList.add('open'); }
 function closeHours(){ document.getElementById('hoursOverlay').classList.remove('open'); }
-
-function openSuggestions(){ document.getElementById('suggestionOverlay').classList.add('open'); }
-function closeSuggestions(){ document.getElementById('suggestionOverlay').classList.remove('open'); }
-function sendSuggestion(){
-  const text = document.getElementById('suggestionText').value.trim();
-  if(!text) return;
-  const subject = encodeURIComponent('Sugerencia desde el menú Clowder');
-  const body = encodeURIComponent(text);
-  const url = `mailto:clowdercoffeehouse@pm.me?subject=${subject}&body=${body}`;
-  window.location.href = url;
-}
 
 function toggleTheme(){
   document.body.classList.toggle('light-theme');
