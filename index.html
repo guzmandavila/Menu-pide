@@ -465,6 +465,14 @@
     font-family:'Inter',sans-serif; font-size:11.5px; font-weight:600; font-style:italic;
     color:#B5542C; margin-top:6px; line-height:1.4;
   }
+  .process-tag{
+    display:inline-flex; align-items:center; width:fit-content;
+    margin-top:8px; padding:5px 10px;
+    border:2px solid #D77B22; border-radius:999px;
+    background:#FFF8E5; color:#2B201A;
+    font-family:'Inter',sans-serif; font-size:11.5px; font-weight:700;
+    line-height:1.25; box-shadow:0 2px 5px rgba(80,45,15,.16);
+  }
   .item-top{
     display:flex; justify-content:space-between; align-items:flex-start; gap:14px;
   }
@@ -574,6 +582,11 @@
       grid-column:1 / -1; grid-row:3; width:100%;
     }
     .item-top:has(.classic-tag) .item-desc{ grid-row:4; }
+    .item-top .process-tag{
+      grid-column:1 / -1; grid-row:4; justify-self:start;
+      max-width:100%; white-space:nowrap;
+    }
+    .item-top:has(.classic-tag) .process-tag{ grid-row:5; }
     .item-desc{
       grid-column:1 / -1; grid-row:3;
       margin-top:2px; font-size:15px; line-height:1.42;
@@ -811,6 +824,37 @@
   /* Cada opción con su color, tomado de la paleta de categorías */
   #btnMesa.active{ background:#3F854A; border-color:#3F854A; color:#fff; }
   #btnLlevar.active{ background:#CC835A; border-color:#CC835A; color:#1a1310; }
+  #btnDelivery.active{ background:#F2A65A; border-color:#D77B22; color:#1a1310; }
+  #btnDelivery:disabled{ opacity:.55; cursor:not-allowed; }
+  .delivery-hint{
+    display:none;
+    margin-top:8px; padding:9px 11px; border-radius:10px;
+    background:rgba(242,166,90,.16); border:1px solid rgba(215,123,34,.35);
+    color:var(--cream-dim); font-size:12px; line-height:1.4;
+  }
+  .delivery-hint.open{display:block;}
+  .delivery-fields{display:none; gap:8px; margin-top:9px; grid-template-columns:1fr 1fr;}
+  .delivery-fields.open{display:grid;}
+  .delivery-fields label{
+    display:block; color:var(--cream-dim); font-family:'Inter',sans-serif;
+    font-size:12px; font-weight:800; letter-spacing:.2px; text-transform:none;
+  }
+  .delivery-fields input{width:100%; margin-top:4px !important;}
+  .location-btn{
+    grid-column:1 / -1; border:1px solid #D77B22; border-radius:9px;
+    background:#FFF8E5; color:#2B201A; padding:9px 10px;
+    font-family:'Inter',sans-serif; font-size:12px; font-weight:800; cursor:pointer;
+  }
+  .location-status{
+    grid-column:1 / -1; color:var(--cream-dim); font-size:11.5px; line-height:1.35;
+  }
+  .delivery-validation{
+    display:none; grid-column:1 / -1; padding:8px 10px; border-radius:9px;
+    background:#FFE2DE; border:2px solid #C94C3C; color:#8B241B;
+    font-family:'Inter',sans-serif; font-size:12px; font-weight:800; line-height:1.35;
+  }
+  .delivery-validation.open{display:block;}
+  .field-missing{border-color:#C94C3C !important; box-shadow:0 0 0 2px rgba(201,76,60,.18);}
   #btnEfectivo.active{ background:#FAEF9A; border-color:#C9B84A; color:#1a1310; }
   #btnTransfer.active{ background:#B6DAEA; border-color:#6FA8C4; color:#1a1310; }
   .modal-hint{
@@ -1072,6 +1116,15 @@
         <div class="toggle-row" id="modeToggleRow">
           <button id="btnMesa" onclick="setMode('mesa')">Para servir</button>
           <button id="btnLlevar" onclick="setMode('llevar')">Para llevar</button>
+          <button id="btnDelivery" onclick="setMode('delivery')">Delivery</button>
+        </div>
+        <div class="delivery-hint" id="deliveryHint"><strong>DELIVERY EN BICI</strong><br>Solo dentro de Canaria.<br>Es gratis y está disponible solo por la mañana.<br>La entrega tarda 15 minutos adicionales después de preparar tu pedido.</div>
+        <div class="delivery-fields" id="deliveryFields">
+          <label>Manzana<input type="number" id="deliveryManzana" inputmode="numeric" pattern="[0-9]*" min="0" step="1" placeholder="Ej. 12" oninput="updateBars()"></label>
+          <label>Villa<input type="number" id="deliveryVilla" inputmode="numeric" pattern="[0-9]*" min="0" step="1" placeholder="Ej. 8" oninput="updateBars()"></label>
+          <button type="button" class="location-btn" onclick="shareLocation()">Compartir ubicación</button>
+          <div class="location-status" id="locationStatus"></div>
+          <div class="delivery-validation" id="deliveryValidation">Completa Manzana y Villa para continuar.</div>
         </div>
       </div>
       <div>
@@ -1167,6 +1220,34 @@ if (naraSunset) naraSunset.desc = '';
 // La empanada de queso vuelve a estar disponible.
 const empanadaQueso = MENU.find(item => item.id === 'empanada-queso');
 if (empanadaQueso) delete empanadaQueso.soldOut;
+// Especial semanal: reemplaza el Apple Crumble por minicake de banano.
+const miniCake = MENU.find(item => item.id === 'mini-cake-del-dia');
+if (miniCake) {
+  miniCake.name = 'Minicake de banano';
+  miniCake.desc = 'Banano maduro, horneado hasta quedar suave y aromático.';
+  miniCake.img = 'minipan.png';
+  miniCake.imgScoop = '';
+  miniCake.scoop = false;
+  miniCake.accent = '#C98A3D';
+  miniCake.featured = true;
+  miniCake.featuredTag = 'MINICAKE DE LA SEMANA';
+}
+// Información de preparación visible en cada tarjeta.
+['wachipapa','tocipapa'].forEach(id => {
+  const item = MENU.find(product => product.id === id);
+  if (item) item.processTag = '♨️ Freidora de aire · papas y proteína';
+});
+MENU.filter(item => item.group === 'empanada').forEach(item => {
+  item.processTag = '♨️ Horneada · sin sartén ni aceite';
+});
+// El brownie vuelve a mostrarse como producto en camino, sin permitir agregarlo todavía.
+const brownie = MENU.find(item => item.id === 'brownie');
+if (brownie) {
+  brownie.comingSoon = true;
+  brownie.comingSoonLabel = 'Más en camino';
+  brownie.comingSoonNote = 'Estamos preparando más brownies para ti.';
+  delete brownie.soldOut;
+}
 
 /* Banners promocionales por categoría — array = slider. Para quitar uno, borra su entrada */
 const CAT_BANNERS = {
@@ -1231,7 +1312,30 @@ let activeCat = MENU.some(i=>i.cat==='Bebidas Frías') ? 'Bebidas Frías'
 let cart = {}; // id -> {qty, note}
 let mode = '';
 let payMethod = '';
+let deliveryLocationUrl = '';
 let lastCartCount = 0;
+
+// Conserva el pedido si la persona actualiza o cierra accidentalmente la página.
+try {
+  const draft = JSON.parse(localStorage.getItem('clowder_order_draft') || 'null');
+  if(draft){
+    cart = draft.cart || {};
+    mode = draft.mode || '';
+    payMethod = draft.payMethod || '';
+    deliveryLocationUrl = draft.deliveryLocationUrl || '';
+  }
+} catch(e) {}
+
+function persistOrderDraft(){
+  try {
+    localStorage.setItem('clowder_order_draft', JSON.stringify({
+      cart, mode, payMethod, deliveryLocationUrl,
+      customerName: document.getElementById('customerName')?.value || '',
+      deliveryManzana: document.getElementById('deliveryManzana')?.value || '',
+      deliveryVilla: document.getElementById('deliveryVilla')?.value || ''
+    }));
+  } catch(e) {}
+}
 
 let catsCollapsed = true; // arranca enfocada en la categoría de entrada, sin la lista completa
 function renderCats(){
@@ -1399,9 +1503,9 @@ function renderMenu(){
     const closedNow = !i.comingSoon && !i.soldOut && !isItemOrderable(i);
     // Fuera de horario se conserva el precio y se bloquea solo el botón "+".
     // Así la tarjeta no se llena con el estado "Cerrado" repetido.
-    const badgeText = i.comingSoon ? 'Próximamente' : (i.soldOut ? 'Agotado' : null);
+    const badgeText = i.comingSoon ? (i.comingSoonLabel || 'Próximamente') : (i.soldOut ? 'Agotado' : null);
     const badgeClass = i.comingSoon ? 'coming-soon-price' : (i.soldOut ? 'sold-out-price' : '');
-    const unavailableNote = i.comingSoon ? 'Todavía no está disponible para pedir.' : (i.soldOut ? 'Se agotó por hoy — vuelve pronto.' : '');
+    const unavailableNote = i.comingSoon ? (i.comingSoonNote || 'Todavía no está disponible para pedir.') : (i.soldOut ? 'Se agotó por hoy — vuelve pronto.' : '');
     const variantSelect = i.__isGroup ? `
       <select class="variant-select" style="background-color:${flavorColor}; color:${flavorText}; background-image:${arrowSvg(flavorText)};" onchange="selectVariant('${i.__group}', this.value)">
         ${i.__variants.map(v=>`<option value="${v.id}" ${v.id===i.id?'selected':''}>${v.flavor}</option>`).join('')}
@@ -1416,6 +1520,7 @@ function renderMenu(){
           ${i.classic ? `<span class="classic-tag ${i.classicTheme==='fresh'?'classic-tag-fresh':''}">${i.classic}</span>` : ''}
           ${variantSelect}
           ${i.desc ? `<div class="item-desc">${i.desc}</div>` : ''}
+          ${i.processTag ? `<div class="process-tag">${i.processTag}</div>` : ''}
         </div>
         <div class="item-price-col">
           ${i.originalPrice ? `<div class="item-price-was">$${i.originalPrice.toFixed(2)}</div>` : ''}
@@ -1598,6 +1703,35 @@ function isMenuOpenNow(){
   if(day === 0) return mins >= (18*60+30) && mins <= (22*60+30);
   return mins >= (19*60) && mins <= (23*60);
 }
+function isDeliveryAvailableNow(){
+  // MODO PRUEBA TEMPORAL: cambia a false antes de publicar la versión definitiva.
+  const DELIVERY_TEST_MODE = true;
+  if(DELIVERY_TEST_MODE) return true;
+  // También permite probarlo puntualmente con ?testDelivery=1.
+  try { if(new URLSearchParams(location.search).has('testDelivery')) return true; } catch(e) {}
+  const hour = new Date().getHours();
+  return hour >= 7 && hour < 12;
+}
+function deliveryAddressOk(){
+  return (document.getElementById('deliveryManzana')?.value || '').trim() !== ''
+    && (document.getElementById('deliveryVilla')?.value || '').trim() !== '';
+}
+function shareLocation(){
+  const status = document.getElementById('locationStatus');
+  if(!navigator.geolocation){
+    if(status) status.textContent = 'Este navegador no permite compartir ubicación.';
+    return;
+  }
+  if(status) status.textContent = 'Buscando tu ubicación…';
+  navigator.geolocation.getCurrentPosition(pos => {
+    const { latitude, longitude } = pos.coords;
+    deliveryLocationUrl = `https://www.google.com/maps?q=${latitude},${longitude}`;
+    if(status) status.textContent = 'Ubicación lista. También puedes completar Manzana y Villa.';
+    persistOrderDraft();
+  }, () => {
+    if(status) status.textContent = 'No pudimos obtenerla. Revisa el permiso o usa Manzana y Villa.';
+  }, { enableHighAccuracy:true, timeout:10000, maximumAge:60000 });
+}
 function isItemOrderable(item){
   if(item.days && !item.days.includes(new Date().getDay())) return false;
   if(ALWAYS_OPEN_CATS.includes(item.cat)) return true;
@@ -1652,6 +1786,7 @@ function packagingFee(){ return packagingReasons().reduce((s,r)=>s+r.fee,0); }
 function grandTotal(){ return cartTotal() + packagingFee(); }
 
 function updateBars(){
+  persistOrderDraft();
   const count = cartCount();
   const total = grandTotal();
   document.getElementById('cartCount').textContent = count;
@@ -1675,18 +1810,44 @@ function updateBars(){
     const item = MENU.find(m=>m.id===id);
     return item && STORE_CATS.includes(item.cat);
   });
-  document.getElementById('modeToggleRow').style.display = storeOnly ? 'none' : 'flex';
+  document.getElementById('modeFieldWrap').style.display = storeOnly ? 'none' : 'block';
+  const deliveryBtn = document.getElementById('btnDelivery');
+  const deliveryHint = document.getElementById('deliveryHint');
+  const deliveryFields = document.getElementById('deliveryFields');
+  const deliveryActive = mode === 'delivery';
+  if(deliveryBtn){
+    deliveryBtn.disabled = !isDeliveryAvailableNow();
+    deliveryBtn.title = deliveryBtn.disabled ? 'Delivery disponible solo de 07h00 a 12h00' : '';
+  }
+  if(deliveryHint) deliveryHint.classList.toggle('open', deliveryActive);
+  if(deliveryFields) deliveryFields.classList.toggle('open', deliveryActive);
+  const manzanaEl = document.getElementById('deliveryManzana');
+  const villaEl = document.getElementById('deliveryVilla');
+  const deliveryValidation = document.getElementById('deliveryValidation');
+  const manzanaOk = (manzanaEl?.value || '').trim() !== '';
+  const villaOk = (villaEl?.value || '').trim() !== '';
+  if(manzanaEl) manzanaEl.classList.toggle('field-missing', deliveryActive && !manzanaOk);
+  if(villaEl) villaEl.classList.toggle('field-missing', deliveryActive && !villaOk);
+  if(manzanaEl) manzanaEl.setAttribute('aria-invalid', deliveryActive && !manzanaOk ? 'true' : 'false');
+  if(villaEl) villaEl.setAttribute('aria-invalid', deliveryActive && !villaOk ? 'true' : 'false');
+  if(deliveryValidation) deliveryValidation.classList.toggle('open', deliveryActive && (!manzanaOk || !villaOk));
 
   const nameOk = (document.getElementById('customerName')?.value || '').trim().length > 0;
+  const nameField = document.getElementById('customerName');
+  if(nameField) nameField.classList.toggle('field-missing', !nameOk && count > 0);
   const modeOk = storeOnly || mode !== '';
-  const listo = count > 0 && nameOk && modeOk && payMethod !== '';
+  const addressOk = mode !== 'delivery' || deliveryAddressOk();
+  const deliveryOk = mode !== 'delivery' || isDeliveryAvailableNow();
+  const listo = count > 0 && nameOk && modeOk && addressOk && deliveryOk && payMethod !== '';
   document.getElementById('sendBtn').disabled = !listo;
   const hint = document.getElementById('sendHint');
   if(hint){
     const faltan = [];
     if(count === 0) faltan.push('tu pedido');
     if(!nameOk) faltan.push('tu nombre');
-    if(!modeOk) faltan.push('servir o llevar');
+    if(!modeOk) faltan.push('cómo recibes tu pedido');
+    if(mode === 'delivery' && !deliveryOk) faltan.push('delivery disponible solo por la mañana');
+    if(mode === 'delivery' && deliveryOk && !addressOk) faltan.push('manzana y villa');
     if(payMethod === '') faltan.push('cómo pagas');
     if(faltan.length){
       const lista = faltan.length === 1
@@ -1715,7 +1876,8 @@ function updateBars(){
     prepLine.style.display = 'none';
   } else {
     prepLine.style.display = 'flex';
-    prepLine.innerHTML = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><polyline points="12 7 12 12 16 14"/></svg><span>Listo en <strong>${prepTime[0]}–${prepTime[1]} min</strong> aprox. (puede variar si hay varios pedidos a la vez)</span>`;
+    const deliveryExtra = mode === 'delivery' ? ' · entrega en bici adicional +15 min' : '';
+    prepLine.innerHTML = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><polyline points="12 7 12 12 16 14"/></svg><span>Preparación: <strong>${prepTime[0]}–${prepTime[1]} min</strong> aprox.${deliveryExtra}</span>`;
   }
 
   renderCartList();
@@ -1838,9 +2000,14 @@ function setPay(p){
 }
 
 function setMode(m){
+  if(m === 'delivery' && !isDeliveryAvailableNow()){
+    alert('El delivery está disponible únicamente por la mañana, de 07h00 a 12h00.');
+    return;
+  }
   mode = m;
   document.getElementById('btnMesa').classList.toggle('active', m==='mesa');
   document.getElementById('btnLlevar').classList.toggle('active', m==='llevar');
+  document.getElementById('btnDelivery').classList.toggle('active', m==='delivery');
   updateBars();
 }
 
@@ -1869,6 +2036,16 @@ function sendOrder(){
   const name = document.getElementById('customerName').value.trim() || 'Sin nombre';
   const entries = Object.entries(cart);
   if(entries.length===0) return;
+  if(mode === 'delivery'){
+    if(!isDeliveryAvailableNow()){
+      alert('El delivery está disponible únicamente por la mañana, de 07h00 a 12h00.');
+      return;
+    }
+    if(!deliveryAddressOk()){
+      alert('Para delivery necesitamos tu Manzana y Villa dentro de Canaria.');
+      return;
+    }
+  }
 
   if(orderSentCount > 0){
     const confirmado = confirm('Ya enviaste un pedido antes. Esto va a mandar un pedido ACTUALIZADO a Clowder con todo lo que tienes ahora en el carrito (lo anterior + lo nuevo que agregaste), con el total sumado. ¿Confirmas el envío?');
@@ -1897,6 +2074,13 @@ function sendOrder(){
   });
   if(storeOnlyOrder){
     msg += `\u{1F4E6} Retiro o envío a coordinar · ${hh}:${mm}\n`;
+  } else if(mode === 'delivery') {
+    const manzana = document.getElementById('deliveryManzana').value.trim();
+    const villa = document.getElementById('deliveryVilla').value.trim();
+    msg += `DELIVERY EN BICI · Gratis · Canaria\n`;
+    msg += `   Manzana: ${manzana} · Villa: ${villa}\n`;
+    if(deliveryLocationUrl) msg += `   Ubicación: ${deliveryLocationUrl}\n`;
+    msg += `   Entrega en bicicleta: +15 min después del tiempo de preparación\n`;
   } else {
     msg += mode==='mesa' ? `\u{1F37D} Para servir` : `\u{1F961} Para llevar`;
     msg += ` · ${hh}:${mm}\n`;
@@ -1964,6 +2148,15 @@ function sendOrder(){
   }catch(e){}
 })();
 
+try {
+  const draft = JSON.parse(localStorage.getItem('clowder_order_draft') || 'null');
+  if(draft){
+    if(document.getElementById('customerName')) document.getElementById('customerName').value = draft.customerName || '';
+    if(document.getElementById('deliveryManzana')) document.getElementById('deliveryManzana').value = draft.deliveryManzana || '';
+    if(document.getElementById('deliveryVilla')) document.getElementById('deliveryVilla').value = draft.deliveryVilla || '';
+    if(draft.deliveryLocationUrl && document.getElementById('locationStatus')) document.getElementById('locationStatus').textContent = 'Ubicación guardada.';
+  }
+} catch(e) {}
 renderCats();
 renderMenu();
 updateBars();
