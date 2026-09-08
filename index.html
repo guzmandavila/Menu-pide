@@ -1090,10 +1090,10 @@
 <div class="overlay" id="hoursOverlay">
   <div class="drawer">
     <div class="drawer-head">
-      <h2>Horarios de atención</h2>
+      <h2 id="hoursTitle">Horarios de atención</h2>
       <button onclick="closeHours()">✕</button>
     </div>
-    <div class="closed-notice">Ahora estamos fuera del horario del menú completo. Puedes revisar los horarios y volver a pedir cuando esté disponible.</div>
+    <div class="closed-notice" id="hoursNotice">Ahora estamos fuera del horario del menú completo. Puedes revisar los horarios y volver a pedir cuando esté disponible.</div>
     <div class="hours-list">
       <div class="hours-row">
         <div class="hours-days">Lunes a domingo</div>
@@ -1593,7 +1593,7 @@ function renderMenu(){
         <div class="stepper">
           <button onclick="changeQty('${i.id}', -1)">–</button>
           <div class="qty" id="qty-${i.id}">${qty}</div>
-          <button class="${closedNow?'blocked-add':''}" onclick="${closedNow?'showClosedNotice()':`changeQty('${i.id}', 1)`}" aria-label="${closedNow?'Ver horarios de atención':'Agregar al pedido'}">+</button>
+          <button class="${closedNow?'blocked-add':''}" onclick="${closedNow?`showUnavailableNotice('${i.id}')`:`changeQty('${i.id}', 1)`}" aria-label="${closedNow && i.days?'Disponible solo los lunes':(closedNow?'Ver horarios de atención':'Agregar al pedido')}">+</button>
         </div>
         <button class="note-toggle ${note?'has-note':''}" id="notebtn-${i.id}" onclick="toggleNote('${i.id}')">${note ? '✎ '+escapeHtml(truncate(note)) : '+ nota'}</button>
       </div>
@@ -1657,7 +1657,7 @@ function unitPrice(id){
 function canAddItem(id){
   const item = MENU.find(product => product.id === id);
   if(!item || item.soldOut || item.comingSoon || HIDDEN_CATS.includes(item.cat)) return false;
-  if(!isItemOrderable(item)){ showClosedNotice(); return false; }
+  if(!isItemOrderable(item)){ showUnavailableNotice(id); return false; }
   return true;
 }
 function changeQty(id, delta){
@@ -2106,8 +2106,22 @@ function closeGuide(){
   } catch(e) {}
 })();
 
-function openHours(){ document.getElementById('hoursOverlay').classList.add('open'); }
+const DEFAULT_HOURS_TITLE = 'Horarios de atención';
+const DEFAULT_HOURS_NOTICE = 'Ahora estamos fuera del horario del menú completo. Puedes revisar los horarios y volver a pedir cuando esté disponible.';
+function openHours(title = DEFAULT_HOURS_TITLE, notice = DEFAULT_HOURS_NOTICE){
+  document.getElementById('hoursTitle').textContent = title;
+  document.getElementById('hoursNotice').textContent = notice;
+  document.getElementById('hoursOverlay').classList.add('open');
+}
 function showClosedNotice(){ openHours(); }
+function showUnavailableNotice(id){
+  const item = MENU.find(product => product.id === id);
+  if(item?.days && !item.days.includes(businessTime().day)){
+    openHours('Combo del lunes', 'Este combo está disponible únicamente los lunes. Vuelve el lunes para agregarlo a tu pedido.');
+    return;
+  }
+  showClosedNotice();
+}
 function closeHours(){ document.getElementById('hoursOverlay').classList.remove('open'); }
 
 function toggleTheme(){
