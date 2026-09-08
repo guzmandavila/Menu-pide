@@ -964,6 +964,18 @@
 <div class="cats-wrap"><nav class="cats" id="cats"></nav></div>
 </div>
 
+<section id="birthdayNotice" hidden style="max-width:720px;margin:16px auto;padding:20px;border-radius:20px;background:#faef9a;color:#332519;box-sizing:border-box" aria-labelledby="birthdayTitle">
+  <img src="banners/cumple-gato-mesero.png" alt="El gato mesero celebra su cumpleaños con un pastel, café y un michi, en una ilustración cálida de Clowder." width="1049" height="1499" decoding="async" style="display:block;width:100%;max-width:300px;height:auto;margin:0 auto 18px;border-radius:14px">
+  <h2 id="birthdayTitle" style="margin:0 0 8px">🎂 ¡El gato mesero está de cumpleaños!</h2>
+  <p id="birthdayHours" role="status"></p>
+  <p>Su mejor regalo: ayudar a los michis de la calle. Tu aporte de cumpleaños, desde $1, se destina a nuestra ayuda social animal. 🐾</p>
+  <form onsubmit="openBirthdayGift(event)" style="display:flex;gap:10px;flex-wrap:wrap;align-items:center">
+    <label for="birthdayAmount">Tu regalo ($)</label>
+    <input id="birthdayAmount" type="number" min="1" step="0.01" value="1" required style="width:90px;padding:10px;font:inherit">
+    <button type="submit" style="padding:12px;border-radius:12px;cursor:pointer;font:inherit">🎁 Regalar desde $1</button>
+  </form>
+  <p id="birthdayGiftInstructions" hidden>Transfiere el valor elegido a una de nuestras cuentas y adjunta tu comprobante en WhatsApp. <a id="birthdayReceipt" target="_blank" rel="noopener">Enviar comprobante</a>. Abrir WhatsApp no confirma el aporte.</p>
+</section>
 <main id="menu"></main>
 
 <div class="footer-mascot">
@@ -1365,6 +1377,30 @@ function businessTime(now = new Date()){
     timeZone:'America/Guayaquil', weekday:'short', hour:'2-digit', minute:'2-digit', hourCycle:'h23'
   }).formatToParts(now).map(part => [part.type, part.value]));
   return { day:['Sun','Mon','Tue','Wed','Thu','Fri','Sat'].indexOf(parts.weekday), hour:Number(parts.hour), minute:Number(parts.minute) };
+}
+// Evento único: 8 de septiembre de 2026, hora de Ecuador.
+function birthdayState(now = new Date()){
+  const date = new Intl.DateTimeFormat('en-CA', {timeZone:'America/Guayaquil',year:'numeric',month:'2-digit',day:'2-digit'}).format(now);
+  const active = date === '2026-09-08';
+  return {active, closed:active && businessTime(now).hour >= 19};
+}
+function refreshBirthday(){
+  const state = birthdayState();
+  document.getElementById('birthdayNotice').hidden = !state.active;
+  document.getElementById('birthdayHours').textContent = state.closed
+    ? 'Hoy cerramos a las 19h00 para salir a celebrar. Los pedidos ya están cerrados, pero puedes dejar un regalo solidario.'
+    : 'Hoy atendemos hasta las 19h00: después saldremos a celebrar y cerraremos los pedidos.';
+}
+function openBirthdayGift(event){
+  event.preventDefault();
+  const input = document.getElementById('birthdayAmount');
+  if(!birthdayState().active || !input.reportValidity()) return;
+  const amount = Number(input.value);
+  if(!Number.isFinite(amount) || amount < 1) return;
+  const message = `🎂 ¡Feliz cumpleaños, gato mesero! Quiero aportar $${amount.toFixed(2)} como regalo solidario para los michis de la calle. Adjunto mi comprobante de transferencia para que puedan verificarlo.`;
+  document.getElementById('birthdayReceipt').href = 'https://wa.me/593979982241?text=' + encodeURIComponent(message);
+  document.getElementById('birthdayGiftInstructions').hidden = false;
+  openPayments();
 }
 function sanitizeCart(value){
   const clean = {};
@@ -1812,6 +1848,7 @@ function shareLocation(){
   }, { enableHighAccuracy:true, timeout:10000, maximumAge:60000 });
 }
 function isItemOrderable(item){
+  if(birthdayState().closed) return false;
   if(item.soldOut || item.comingSoon || HIDDEN_CATS.includes(item.cat)) return false;
   if(item.days && !item.days.includes(businessTime().day)) return false;
   if(KITCHEN_HOURS_ITEM_IDS.includes(item.id)) return isMenuOpenNow();
@@ -1958,7 +1995,7 @@ function updateBars(){
     const el = document.getElementById(id);
     if(el) el.classList.toggle('option-missing', count > 0 && payMethod === '');
   });
-  document.getElementById('sendBtn').disabled = !listo;
+  document.getElementById('sendBtn').disabled = !listo || birthdayState().closed;
   const hint = document.getElementById('sendHint');
   if(hint){
     const faltan = [];
@@ -2125,6 +2162,7 @@ function itemDayNotice(item){
   return 'Disponible solo los ' + item.days.map(day => dayNames[day]).join(' y ') + '.';
 }
 function showUnavailableNotice(id){
+  if(birthdayState().closed){ openHours('🎂 Cerrado por cumpleaños', 'Hoy cerramos a las 19h00 para celebrar al gato mesero. Puedes dejar un regalo desde $1 para los michis de la calle en el aviso de cumpleaños.'); return; }
   const item = MENU.find(product => product.id === id);
   if(item?.days && !item.days.includes(businessTime().day)){
     openHours('Combo del día', itemDayNotice(item));
@@ -2190,6 +2228,7 @@ function createOrderCode(now){
 }
 
 function sendOrder(){
+  if(birthdayState().closed){ showUnavailableNotice(); return; }
   const unavailable = Object.keys(cart).some(id => {
     const item = MENU.find(product => product.id === id);
     return !item || !isItemOrderable(item);
@@ -2363,6 +2402,17 @@ try {
     if(deliveryLocationUrl && document.getElementById('locationStatus')) document.getElementById('locationStatus').textContent = 'Ubicación guardada.';
   }
 } catch(e) {}
+refreshBirthday();
+let lastBirthdayState = JSON.stringify(birthdayState());
+setInterval(() => {
+  const next = JSON.stringify(birthdayState());
+  if(next !== lastBirthdayState){
+    lastBirthdayState = next;
+    refreshBirthday();
+    renderMenu();
+    updateBars();
+  }
+}, 1000);
 renderCats();
 renderMenu();
 updateBars();
