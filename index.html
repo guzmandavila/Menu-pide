@@ -865,7 +865,10 @@
     font-family:'Inter',sans-serif; font-size:12px; font-weight:800; line-height:1.35;
   }
   .delivery-validation.open{display:block;}
-  .field-missing{border-color:#C94C3C !important; box-shadow:0 0 0 2px rgba(201,76,60,.18);}
+  @keyframes attentionPulse{0%,100%{box-shadow:0 0 0 2px rgba(201,76,60,.16);}50%{box-shadow:0 0 0 6px rgba(201,76,60,.30);}}
+  .field-missing{border-color:#C94C3C !important; box-shadow:0 0 0 2px rgba(201,76,60,.18); animation:attentionPulse 1.25s ease-in-out infinite;}
+  .option-missing{border-color:#C94C3C !important; animation:attentionPulse 1.25s ease-in-out infinite;}
+  @media(prefers-reduced-motion:reduce){.field-missing,.option-missing{animation:none;}}
   #btnEfectivo.active{ background:#FAEF9A; border-color:#C9B84A; color:#1a1310; }
   #btnTransfer.active{ background:#B6DAEA; border-color:#6FA8C4; color:#1a1310; }
   .modal-hint{
@@ -1163,7 +1166,6 @@
       <span class="val" id="drawerTotal">$0.00</span>
     </div>
 
-    <div class="send-hint" id="sendHint"></div>
     <button class="send-btn" id="sendBtn" onclick="sendOrder()">Enviar pedido por WhatsApp</button>
   </div>
 </div>
@@ -1877,6 +1879,14 @@ function updateBars(){
   const addressOk = mode !== 'delivery' || deliveryAddressOk();
   const deliveryOk = mode !== 'delivery' || isDeliveryAvailableNow();
   const listo = count > 0 && nameOk && modeOk && addressOk && deliveryOk && payMethod !== '' && cashOk;
+  ['btnMesa','btnLlevar'].forEach(id => {
+    const el = document.getElementById(id);
+    if(el) el.classList.toggle('option-missing', count > 0 && !storeOnly && !modeOk);
+  });
+  ['btnEfectivo','btnTransfer'].forEach(id => {
+    const el = document.getElementById(id);
+    if(el) el.classList.toggle('option-missing', count > 0 && payMethod === '');
+  });
   document.getElementById('sendBtn').disabled = !listo;
   const hint = document.getElementById('sendHint');
   if(hint){
