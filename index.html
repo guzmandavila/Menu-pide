@@ -510,9 +510,13 @@
     color:#1a1310; background:#faf6ec; white-space:nowrap;
     border:2px solid #1a1310; border-radius:999px; padding:4px 12px;
   }
-  .item-price.coming-soon-price{
-    font-family:'Inter',sans-serif; font-size:11.5px; font-weight:700;
-    color:#faf6ec; background:#1a1310; border-color:#1a1310;
+  .coming-soon-status{
+    display:table; max-width:100%; box-sizing:border-box;
+    margin:0 0 12px; padding:8px 14px;
+    font-family:'Inter',sans-serif; font-size:13px; font-weight:800; line-height:1.35;
+    color:#722344; background:#FFE1ED; border:2px solid #D5528C;
+    border-radius:12px; overflow-wrap:anywhere;
+    box-shadow:0 3px 8px rgba(213,82,140,.16);
   }
   .item-price.sold-out-price{
     font-family:'Inter',sans-serif; font-size:13.5px; font-weight:800;
@@ -570,6 +574,7 @@
       max-width:calc(100% - 88px);
       font-size:19px;
     }
+    .item:has(.coming-soon-status) .item-name-badge{ max-width:100%; }
     .item-info > .classic-tag,
     .item-info > .variant-select{
       grid-column:2; grid-row:2;
@@ -1309,8 +1314,8 @@ const CAT_BANNERS = {
     { img:'banners/bm-banner-01.jpg', alt:'Banana Bread Latte — bebida del mes' },
   ],
   'Combos': [
-    { img:'banners/cmb-banner-01.jpg', alt:'Combo del lunes — café más empanada de queso' },
-    { img:'banners/cmb-banner-02.jpg', alt:'Combo del martes — Bananacake más Catpuccino por $4,60' },
+    { day:1, img:'banners/cmb-banner-01.jpg', alt:'Combo del lunes — café más empanada de queso' },
+    { day:2, img:'banners/cmb-banner-02.jpg', alt:'Combo del martes — Bananacake más Catpuccino por $4,60' },
   ],
 };
 // Categorías ocultas temporalmente: sus productos siguen en MENU (por si se reactivan),
@@ -1342,8 +1347,8 @@ function lighten(hex, amt){
 }
 function pastelBg(c){ const hex = catColor(c); return hex==='transparent' ? 'transparent' : lighten(hex, 0.45); }
 
-// Arranca en Bebidas Frías (por el clima); si no existe, cae en Calientes, y si tampoco, en la primera visible
-let activeCat = MENU.some(i=>i.cat==='Bebidas Frías') ? 'Bebidas Frías'
+// Abre en el combo del día; los días sin combo conservan la categoría habitual.
+let activeCat = CAT_BANNERS.Combos.some(b=>b.day===businessTime().day) ? 'Combos' : MENU.some(i=>i.cat==='Bebidas Frías') ? 'Bebidas Frías'
               : (MENU.some(i=>i.cat==='Bebidas Calientes') ? 'Bebidas Calientes' : CATS[0]);
 let cart = {}; // id -> {qty, note}
 let mode = '';
@@ -1553,7 +1558,9 @@ function renderMenu(){
   });
 
   const el = document.getElementById('menu');
-  const banners = CAT_BANNERS[activeCat];
+  const categoryBanners = CAT_BANNERS[activeCat];
+  const dailyBanner = activeCat === 'Combos' && categoryBanners.find(b=>b.day===today);
+  const banners = dailyBanner ? [dailyBanner] : categoryBanners;
   let bannerHtml = '';
   if(banners && banners.length){
     const slides = banners.map(b => `<div class="cat-banner-slide"><img src="${b.img}" alt="${b.alt}" loading="lazy" decoding="async"></div>`).join('');
@@ -1585,6 +1592,7 @@ function renderMenu(){
     return `
     <div class="item ${i.featured?'item-featured':''} ${i.cat==='Combos'?'item-combo':''}" style="background:${i.accent ? lighten(i.accent, 0.82) : (isStoreCat(i.cat) ? '#F2EEE6' : pastelBg(i.cat))}; border-left-color:${i.accent || (catColor(i.cat)==='transparent' ? 'var(--line)' : catColor(i.cat))};">
       ${i.featured ? `<div class="featured-ribbon">\u{1F43E} ${i.featuredTag||'Destacado'}</div>` : ''}
+      ${i.comingSoon ? `<div class="coming-soon-status">✦ ${badgeText}</div>` : ''}
       <div class="item-top">
         ${(() => { const currentImg = (i.imgScoop && scoop === 'si') ? i.imgScoop : i.img; return currentImg ? `<img class="item-thumb" id="thumb-${i.id}" src="${currentImg}" alt="${i.name}">` : ''; })()}
         <div class="item-info">
@@ -1594,10 +1602,10 @@ function renderMenu(){
           ${i.desc ? `<div class="item-desc">${i.desc}</div>` : ''}
           ${i.processTag ? `<div class="process-tag">${i.processTag}</div>` : ''}
         </div>
-        <div class="item-price-col">
+        ${!i.comingSoon ? `<div class="item-price-col">
           ${i.originalPrice ? `<div class="item-price-was">$${i.originalPrice.toFixed(2)}</div>` : ''}
           <div class="item-price ${badgeClass}">${badgeText ? badgeText : '$'+i.price.toFixed(2)}</div>
-        </div>
+        </div>` : ''}
       </div>
       ${i.promoNote ? `<div class="promo-note">${i.promoNote}</div>` : ''}
       ${badgeText ? `
@@ -1630,32 +1638,16 @@ function renderMenu(){
   }).join('');
   initBannerSlider();
 }
-let bannerTimer = null;
-const BANNER_INTERVAL = 5000; // 5 segundos por imagen
+// Los banners múltiples se recorren únicamente al deslizar.
 function initBannerSlider(){
-  if(bannerTimer){ clearInterval(bannerTimer); bannerTimer = null; }
   const track = document.getElementById('catBannerTrack');
   if(!track) return;
   const dots = track.parentElement.querySelectorAll('.cat-banner-dot');
   if(!dots.length) return;
-
   track.addEventListener('scroll', () => {
     const idx = Math.round(track.scrollLeft / track.clientWidth);
     dots.forEach((d,i) => d.classList.toggle('active', i === idx));
   }, {passive:true});
-
-  const total = track.children.length;
-  // Avance automático; se detiene apenas la persona toca o desliza
-  bannerTimer = setInterval(() => {
-    if(!document.body.contains(track)){ clearInterval(bannerTimer); bannerTimer = null; return; }
-    const idx = Math.round(track.scrollLeft / track.clientWidth);
-    const next = (idx + 1) % total;
-    track.scrollTo({ left: next * track.clientWidth, behavior:'smooth' });
-  }, BANNER_INTERVAL);
-
-  const stop = () => { if(bannerTimer){ clearInterval(bannerTimer); bannerTimer = null; } };
-  track.addEventListener('touchstart', stop, {passive:true});
-  track.addEventListener('mousedown', stop, {passive:true});
 }
 function truncate(s){ return s.length>18 ? s.slice(0,18)+'…' : s; }
 
