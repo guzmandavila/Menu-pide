@@ -1769,11 +1769,8 @@ const SNACK_CATS = ['Snack Sal','Snack Dulce'];
 const STORE_CATS = ['Congelados y Más','Merch Clowder'];
 function isStoreCat(c){ return STORE_CATS.includes(c); }
 
-// Bebidas Calientes se puede pedir a cualquier hora; el resto solo dentro
-// del horario del menú (lunes a sábado 19h00-23h00, domingos 18h30-22h30).
-// Bebidas Calientes y Congelados y Más se pueden pedir a cualquier hora:
-// Congelados son productos bajo pedido/stock con entrega o retiro coordinados
-// aparte, así que no dependen del horario de preparación del menú del día.
+// Wachi y Toci requieren el horario de cocina; el resto conserva su disponibilidad.
+const KITCHEN_HOURS_ITEM_IDS = ['wachipapa', 'tocipapa'];
 const FULL_MENU_ORDERING_ENABLED = true; // Permite pedidos fuera del horario habitual.
 const ALWAYS_OPEN_CATS = ['Bebidas Calientes', 'Congelados y Más', 'Combos'];
 const ALWAYS_OPEN_GROUPS = ['empanada']; // se puede pedir a cualquier hora, sin importar su categoría
@@ -1817,6 +1814,7 @@ function shareLocation(){
 function isItemOrderable(item){
   if(item.soldOut || item.comingSoon || HIDDEN_CATS.includes(item.cat)) return false;
   if(item.days && !item.days.includes(businessTime().day)) return false;
+  if(KITCHEN_HOURS_ITEM_IDS.includes(item.id)) return isMenuOpenNow();
   if(FULL_MENU_ORDERING_ENABLED) return true;
   if(ALWAYS_OPEN_CATS.includes(item.cat)) return true;
   if(ALWAYS_OPEN_GROUPS.includes(item.group || item.__group)) return true;
@@ -2130,6 +2128,10 @@ function showUnavailableNotice(id){
   const item = MENU.find(product => product.id === id);
   if(item?.days && !item.days.includes(businessTime().day)){
     openHours('Combo del día', itemDayNotice(item));
+    return;
+  }
+  if(item && KITCHEN_HOURS_ITEM_IDS.includes(item.id)){
+    openHours('Horario de papas', 'Wachipapas y Tocipapas: lunes a sábado de 19:00 a 23:00; domingos de 18:30 a 22:30.');
     return;
   }
   showClosedNotice();
