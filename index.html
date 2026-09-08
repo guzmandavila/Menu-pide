@@ -732,6 +732,9 @@
     font-size:13px; padding:4px 9px; border-radius:999px;
   }
   .cartbar .right{font-family:'IBM Plex Mono',monospace; font-weight:600; font-size:16.5px;}
+  .order-complete{position:fixed; left:50%; bottom:24px; transform:translate(-50%,18px); z-index:80; display:none; width:min(90vw,420px); padding:16px 18px; border-radius:16px; background:#3F854A; color:#fff; text-align:center; box-shadow:0 10px 28px rgba(0,0,0,.3); font-family:'Inter',sans-serif; font-weight:800; line-height:1.35;}
+  .order-complete.open{display:block; animation:orderCompleteIn .25s ease-out forwards;}
+  @keyframes orderCompleteIn{to{transform:translate(-50%,0);}}
 
   /* Cart drawer */
   .overlay{
@@ -821,11 +824,19 @@
     padding:12px; border-radius:10px; font-family:'Doughie','Inter',sans-serif; font-size:20px; font-weight:400; cursor:pointer;
   }
   .toggle-row button.active{background:var(--sage); color:var(--bg); border-color:var(--sage);}
+  .cash-change{display:none; margin-top:8px;}
+  .cash-change.open{display:block;}
+  .cash-change label{display:block; color:var(--cream-dim); font-family:'Inter',sans-serif; font-size:12px; font-weight:800;}
+  .cash-change input{width:100%; margin-top:4px !important;}
+  .cash-actions{display:flex; align-items:center; gap:8px; margin-top:6px;}
+  .cash-exact{border:1px solid var(--line); border-radius:8px; background:var(--bg-alt); color:var(--cream-dim); padding:6px 9px; font:600 12px 'Inter',sans-serif; cursor:pointer;}
+  .cash-change-text{font:700 12px 'Inter',sans-serif; color:var(--gold);}
   /* Cada opción con su color, tomado de la paleta de categorías */
   #btnMesa.active{ background:#3F854A; border-color:#3F854A; color:#fff; }
   #btnLlevar.active{ background:#CC835A; border-color:#CC835A; color:#1a1310; }
   #btnDelivery.active{ background:#F2A65A; border-color:#D77B22; color:#1a1310; }
   #btnDelivery:disabled{ opacity:.55; cursor:not-allowed; }
+  #btnDelivery.unavailable{ opacity:.55; cursor:not-allowed; }
   .delivery-hint{
     display:none;
     margin-top:8px; padding:9px 11px; border-radius:10px;
@@ -970,6 +981,7 @@
     <svg class="cartbar-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
   </div>
 </div>
+<div class="order-complete" id="orderComplete">✅ Pedido enviado<br><small>¡Gracias! Tu próximo pedido empezará desde cero.</small></div>
 
 <div class="overlay" id="paymentsOverlay">
   <div class="drawer">
@@ -1132,6 +1144,15 @@
         <div class="toggle-row">
           <button id="btnEfectivo" onclick="setPay('efectivo')">Efectivo</button>
           <button id="btnTransfer" onclick="setPay('transferencia')">Transferencia</button>
+        </div>
+        <div class="cash-change" id="cashChange">
+          <label>¿Con cuánto pagas?
+            <input type="number" id="cashAmount" inputmode="decimal" min="0.01" step="0.01" placeholder="Ej. 10.00" oninput="updateBars()">
+            <div class="cash-actions">
+              <button type="button" class="cash-exact" onclick="setExactCash()">Pago exacto</button>
+              <span class="cash-change-text" id="cashChangeText"></span>
+            </div>
+          </label>
         </div>
       </div>
     </div>
@@ -1321,8 +1342,8 @@ try {
   if(draft){
     cart = draft.cart || {};
     mode = draft.mode || '';
-    payMethod = draft.payMethod || '';
-    deliveryLocationUrl = draft.deliveryLocationUrl || '';
+        payMethod = draft.payMethod || '';
+        deliveryLocationUrl = draft.deliveryLocationUrl || '';
   }
 } catch(e) {}
 
@@ -1330,8 +1351,9 @@ function persistOrderDraft(){
   try {
     localStorage.setItem('clowder_order_draft', JSON.stringify({
       cart, mode, payMethod, deliveryLocationUrl,
-      customerName: document.getElementById('customerName')?.value || '',
-      deliveryManzana: document.getElementById('deliveryManzana')?.value || '',
+          customerName: document.getElementById('customerName')?.value || '',
+          cashAmount: document.getElementById('cashAmount')?.value || '',
+          deliveryManzana: document.getElementById('deliveryManzana')?.value || '',
       deliveryVilla: document.getElementById('deliveryVilla')?.value || ''
     }));
   } catch(e) {}
@@ -1704,11 +1726,7 @@ function isMenuOpenNow(){
   return mins >= (19*60) && mins <= (23*60);
 }
 function isDeliveryAvailableNow(){
-  // MODO PRUEBA TEMPORAL: cambia a false antes de publicar la versión definitiva.
-  const DELIVERY_TEST_MODE = true;
-  if(DELIVERY_TEST_MODE) return true;
-  // También permite probarlo puntualmente con ?testDelivery=1.
-  try { if(new URLSearchParams(location.search).has('testDelivery')) return true; } catch(e) {}
+  // Delivery: todos los días, únicamente durante la mañana, hasta las 11:59.
   const hour = new Date().getHours();
   return hour >= 7 && hour < 12;
 }
@@ -1814,10 +1832,16 @@ function updateBars(){
   const deliveryBtn = document.getElementById('btnDelivery');
   const deliveryHint = document.getElementById('deliveryHint');
   const deliveryFields = document.getElementById('deliveryFields');
+  // Si quedó guardado un delivery de una sesión anterior y ya pasó el horario,
+  // vuelve al estado neutro sin borrar el resto del pedido.
+  if(mode === 'delivery' && !isDeliveryAvailableNow()) mode = '';
   const deliveryActive = mode === 'delivery';
   if(deliveryBtn){
-    deliveryBtn.disabled = !isDeliveryAvailableNow();
-    deliveryBtn.title = deliveryBtn.disabled ? 'Delivery disponible solo de 07h00 a 12h00' : '';
+    const unavailable = !isDeliveryAvailableNow();
+    deliveryBtn.disabled = false;
+    deliveryBtn.classList.toggle('unavailable', unavailable);
+    deliveryBtn.setAttribute('aria-disabled', unavailable ? 'true' : 'false');
+    deliveryBtn.title = unavailable ? 'Delivery disponible solo hasta las 11:59. Toca para ver el horario.' : '';
   }
   if(deliveryHint) deliveryHint.classList.toggle('open', deliveryActive);
   if(deliveryFields) deliveryFields.classList.toggle('open', deliveryActive);
@@ -1832,13 +1856,27 @@ function updateBars(){
   if(villaEl) villaEl.setAttribute('aria-invalid', deliveryActive && !villaOk ? 'true' : 'false');
   if(deliveryValidation) deliveryValidation.classList.toggle('open', deliveryActive && (!manzanaOk || !villaOk));
 
+  const cashAmountEl = document.getElementById('cashAmount');
+  const cashActive = payMethod === 'efectivo';
+  const cashOk = !cashActive || Number(cashAmountEl?.value) >= total;
+  const cashChange = document.getElementById('cashChange');
+  if(cashChange) cashChange.classList.toggle('open', cashActive);
+  if(cashAmountEl) cashAmountEl.classList.toggle('field-missing', cashActive && !cashOk);
+  const cashChangeText = document.getElementById('cashChangeText');
+  if(cashChangeText){
+    const amount = Number(cashAmountEl?.value || 0);
+    cashChangeText.textContent = cashActive && amount >= total
+      ? `Cambio: $${(amount - total).toFixed(2)}`
+      : (cashActive && amount > 0 ? `Debe cubrir $${total.toFixed(2)}` : '');
+  }
+
   const nameOk = (document.getElementById('customerName')?.value || '').trim().length > 0;
   const nameField = document.getElementById('customerName');
   if(nameField) nameField.classList.toggle('field-missing', !nameOk && count > 0);
   const modeOk = storeOnly || mode !== '';
   const addressOk = mode !== 'delivery' || deliveryAddressOk();
   const deliveryOk = mode !== 'delivery' || isDeliveryAvailableNow();
-  const listo = count > 0 && nameOk && modeOk && addressOk && deliveryOk && payMethod !== '';
+  const listo = count > 0 && nameOk && modeOk && addressOk && deliveryOk && payMethod !== '' && cashOk;
   document.getElementById('sendBtn').disabled = !listo;
   const hint = document.getElementById('sendHint');
   if(hint){
@@ -1849,6 +1887,7 @@ function updateBars(){
     if(mode === 'delivery' && !deliveryOk) faltan.push('delivery disponible solo por la mañana');
     if(mode === 'delivery' && deliveryOk && !addressOk) faltan.push('manzana y villa');
     if(payMethod === '') faltan.push('cómo pagas');
+    if(cashActive && !cashOk) faltan.push('con cuánto pagas');
     if(faltan.length){
       const lista = faltan.length === 1
         ? faltan[0]
@@ -1999,9 +2038,16 @@ function setPay(p){
   updateBars();
 }
 
+function setExactCash(){
+  const input = document.getElementById('cashAmount');
+  if(!input) return;
+  input.value = grandTotal().toFixed(2);
+  updateBars();
+}
+
 function setMode(m){
   if(m === 'delivery' && !isDeliveryAvailableNow()){
-    alert('El delivery está disponible únicamente por la mañana, de 07h00 a 12h00.');
+    alert('El delivery está disponible únicamente por la mañana, hasta las 11:59. Puedes pedir para llevar o para servir.');
     return;
   }
   mode = m;
@@ -2038,13 +2084,19 @@ function sendOrder(){
   if(entries.length===0) return;
   if(mode === 'delivery'){
     if(!isDeliveryAvailableNow()){
-      alert('El delivery está disponible únicamente por la mañana, de 07h00 a 12h00.');
+      alert('El delivery está disponible únicamente por la mañana, hasta las 11:59.');
       return;
     }
     if(!deliveryAddressOk()){
       alert('Para delivery necesitamos tu Manzana y Villa dentro de Canaria.');
       return;
     }
+  }
+  const cashAmount = Number(document.getElementById('cashAmount')?.value || 0);
+  if(payMethod === 'efectivo' && !(cashAmount >= grandTotal())){
+    alert(`Escribe un monto igual o mayor al total ($${grandTotal().toFixed(2)}).`);
+    document.getElementById('cashAmount')?.focus();
+    return;
   }
 
   if(orderSentCount > 0){
@@ -2053,8 +2105,6 @@ function sendOrder(){
   }
 
   const now = new Date();
-  const hh = String(now.getHours()).padStart(2,'0');
-  const mm = String(now.getMinutes()).padStart(2,'0');
   if(!currentOrderCode){
     currentOrderCode = createOrderCode(now);
     try { sessionStorage.setItem('clowder_active_order_code', currentOrderCode); } catch(e) {}
@@ -2063,9 +2113,9 @@ function sendOrder(){
   const totalItems = entries.reduce((s,[,c])=>s+c.qty,0);
 
   let msg = orderSentCount > 0
-    ? `\u{1F9FE} *Pedido ACTUALIZADO Clowder* #${orderCode}\n`
+    ? `\u{1F9FE} *Pedido actualizado* #${orderCode}\n`
     : `\u{1F9FE} *Pedido Clowder* #${orderCode}\n`;
-  msg += `\u{1F464} Cliente: ${name}\n`;
+  msg += `👤 ${name}\n`;
   // Si el pedido es solo de Congelados/Merch, "para servir/llevar" no aplica: se reemplaza
   // por la línea de retiro/envío coordinado (misma lógica que en updateBars()).
   const storeOnlyOrder = entries.every(([id]) => {
@@ -2073,44 +2123,47 @@ function sendOrder(){
     return item && STORE_CATS.includes(item.cat);
   });
   if(storeOnlyOrder){
-    msg += `\u{1F4E6} Retiro o envío a coordinar · ${hh}:${mm}\n`;
+    msg += `📦 *Retiro o envío a coordinar*\n`;
   } else if(mode === 'delivery') {
     const manzana = document.getElementById('deliveryManzana').value.trim();
     const villa = document.getElementById('deliveryVilla').value.trim();
-    msg += `DELIVERY EN BICI · Gratis · Canaria\n`;
-    msg += `   Manzana: ${manzana} · Villa: ${villa}\n`;
-    if(deliveryLocationUrl) msg += `   Ubicación: ${deliveryLocationUrl}\n`;
-    msg += `   Entrega en bicicleta: +15 min después del tiempo de preparación\n`;
+    msg += `🚲 *Delivery gratis* · Canaria\n`;
+    msg += `📍 Manzana ${manzana} · Villa ${villa}\n`;
+    if(deliveryLocationUrl) msg += `🗺️ Ubicación: ${deliveryLocationUrl}\n`;
   } else {
-    msg += mode==='mesa' ? `\u{1F37D} Para servir` : `\u{1F961} Para llevar`;
-    msg += ` · ${hh}:${mm}\n`;
+    msg += mode==='mesa' ? `🍽️ *Para servir*` : `🥡 *Para llevar*`;
+    msg += `\n`;
   }
-  if(payMethod) msg += (payMethod === 'efectivo' ? `\u{1F4B5} Paga en efectivo\n` : `\u{1F3E6} Paga por transferencia\nCuentas: https://guzmandavila.github.io/pagosclowder/\n`);
-  if(orderSentCount > 0) msg += `(Incluye lo que ya envié antes + lo nuevo)\n`;
-  msg += `-----------------------------\n`;
+  if(payMethod) msg += (payMethod === 'efectivo'
+    ? `💵 *Efectivo: paga con $${cashAmount.toFixed(2)}*\n`
+    : `🏦 *Pago: transferencia*\nCuentas: https://guzmandavila.github.io/pagosclowder/\n`);
+  if(orderSentCount > 0) msg += `🔄 Incluye lo enviado antes + lo nuevo\n`;
+  msg += `\n*PRODUCTOS*\n`;
   entries.forEach(([id,c])=>{
     const item = MENU.find(m=>m.id===id);
-    msg += `${c.qty}x *${item.name}* — $${(unitPrice(id)*c.qty).toFixed(2)}\n`;
-    if(c.milk) msg += `   + leche vegetal (${c.milk})\n`;
-    if(c.scoop) msg += `   + bola de helado de vainilla Madagascar\n`;
-    if(c.syrup) msg += `   + sirope de ${SYRUP_LABELS[c.syrup]}\n`;
-    if(c.note) msg += `   nota: ${c.note}\n`;
+    msg += `• ${c.qty}x *${item.name}* — $${(unitPrice(id)*c.qty).toFixed(2)}\n`;
+    if(c.milk) msg += `  + Leche ${c.milk}\n`;
+    if(c.scoop) msg += `  + Helado de vainilla\n`;
+    if(c.syrup) msg += `  + Sirope de ${SYRUP_LABELS[c.syrup]}\n`;
+    if(c.note) msg += `  + Nota: ${c.note}\n`;
   });
-  msg += `-----------------------------\n`;
-  packagingReasons().forEach(r => { msg += `${r.label}: $${r.fee.toFixed(2)}\n`; });
-  msg += `\u{1F6D2} ${totalItems} producto${totalItems===1?'':'s'} · *Total: $${grandTotal().toFixed(2)}*\n`;
+  const fees = packagingReasons();
+  fees.forEach(r => { msg += `+ ${r.label}: $${r.fee.toFixed(2)}\n`; });
+  msg += `\n🛒 *${totalItems} producto${totalItems===1?'':'s'} · TOTAL: $${grandTotal().toFixed(2)}*\n`;
   const prepTimeMsg = estimatedPrepTime();
-  if(prepTimeMsg) msg += `\u{23F1} Tiempo estimado: ${prepTimeMsg[0]}–${prepTimeMsg[1]} min\n`;
+  if(prepTimeMsg) msg += mode === 'delivery'
+    ? `⏱ Preparación ${prepTimeMsg[0]}–${prepTimeMsg[1]} min + entrega 15 min\n`
+    : `⏱ Listo en ${prepTimeMsg[0]}–${prepTimeMsg[1]} min\n`;
   // Los productos de Congelados y Más no se preparan al momento: son bajo stock/pedido,
   // así que en vez de un tiempo estimado avisamos que coordinamos la entrega aparte.
   const hasFrozenOrder = Object.keys(cart).some(id => {
     const item = MENU.find(m=>m.id===id);
     return item && item.cat === 'Congelados y Más';
   });
-  if(hasFrozenOrder) msg += `\u{1F4E6} Este pedido incluye productos bajo stock — coordinamos por aquí el día y la hora de entrega o retiro.\n`;
-  msg += `\n\u{2615} *¡Gracias por tu pedido!*\n\n`;
-  msg += `\u{1F4F8} Síguenos en Instagram:\nhttps://www.instagram.com/clowdercoffeehouse/\n\n`;
-  msg += `\u{1F4AC} Únete a nuestra comunidad y entérate primero de lo nuevo:\nhttps://chat.whatsapp.com/FmkJsNMPguv5i49yfS8rQF?mode=gi_t`;
+  if(hasFrozenOrder) msg += `📦 Producto bajo stock: coordinamos contigo la entrega o retiro.\n`;
+  msg += `\n☕ *¡Gracias! Te esperamos en Clowder.*\n`;
+  msg += `📸 Instagram: https://instagram.com/clowdercoffeehouse\n`;
+  msg += `💬 Comunidad: https://chat.whatsapp.com/FmkJsNMPguv5i49yfS8rQF`;
 
   /* EDITA ESTE NÚMERO: código de país + número, sin + ni espacios */
   const WHATSAPP_NUMBER = '593979982241';
@@ -2126,6 +2179,33 @@ function sendOrder(){
     window.location.href = url;
   }
   orderSentCount++;
+  completeOrder();
+}
+
+function completeOrder(){
+  // El pedido ya fue enviado: se borra el borrador para que el siguiente empiece limpio.
+  try { localStorage.removeItem('clowder_order_draft'); } catch(e) {}
+  try { sessionStorage.removeItem('clowder_active_order_code'); } catch(e) {}
+  cart = {};
+  mode = '';
+  payMethod = '';
+  deliveryLocationUrl = '';
+  orderSentCount = 0;
+  currentOrderCode = '';
+  ['customerName','cashAmount','deliveryManzana','deliveryVilla'].forEach(id => {
+    const el = document.getElementById(id);
+    if(el) el.value = '';
+  });
+  document.getElementById('btnEfectivo')?.classList.remove('active');
+  document.getElementById('btnTransfer')?.classList.remove('active');
+  closeCart();
+  updateBars();
+  try { localStorage.removeItem('clowder_order_draft'); } catch(e) {}
+  const confirmation = document.getElementById('orderComplete');
+  if(confirmation){
+    confirmation.classList.add('open');
+    setTimeout(() => confirmation.classList.remove('open'), 5000);
+  }
 }
 
 // Prueba visible de emojis: si aqui se ven rombos, el navegador o la fuente es el problema.
@@ -2152,6 +2232,7 @@ try {
   const draft = JSON.parse(localStorage.getItem('clowder_order_draft') || 'null');
   if(draft){
     if(document.getElementById('customerName')) document.getElementById('customerName').value = draft.customerName || '';
+    if(document.getElementById('cashAmount')) document.getElementById('cashAmount').value = draft.cashAmount || '';
     if(document.getElementById('deliveryManzana')) document.getElementById('deliveryManzana').value = draft.deliveryManzana || '';
     if(document.getElementById('deliveryVilla')) document.getElementById('deliveryVilla').value = draft.deliveryVilla || '';
     if(draft.deliveryLocationUrl && document.getElementById('locationStatus')) document.getElementById('locationStatus').textContent = 'Ubicación guardada.';
