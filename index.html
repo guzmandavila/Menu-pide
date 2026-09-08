@@ -1118,13 +1118,13 @@
           <button id="btnLlevar" onclick="setMode('llevar')">Para llevar</button>
           <button id="btnDelivery" onclick="setMode('delivery')">Delivery</button>
         </div>
-        <div class="delivery-hint" id="deliveryHint"><strong>DELIVERY EN BICI</strong><br>Solo dentro de Canaria.<br>Es gratis y está disponible solo por la mañana.<br>La entrega tarda 15 minutos adicionales después de preparar tu pedido.</div>
+        <div class="delivery-hint" id="deliveryHint"><strong>DELIVERY EN BICI</strong> · Canaria · Gratis · Mañanas<br><span>Preparación + 15 min de entrega</span></div>
         <div class="delivery-fields" id="deliveryFields">
           <label>Manzana<input type="number" id="deliveryManzana" inputmode="numeric" pattern="[0-9]*" min="0" step="1" placeholder="Ej. 12" oninput="updateBars()"></label>
           <label>Villa<input type="number" id="deliveryVilla" inputmode="numeric" pattern="[0-9]*" min="0" step="1" placeholder="Ej. 8" oninput="updateBars()"></label>
           <button type="button" class="location-btn" onclick="shareLocation()">Compartir ubicación</button>
           <div class="location-status" id="locationStatus"></div>
-          <div class="delivery-validation" id="deliveryValidation">Completa Manzana y Villa para continuar.</div>
+          <div class="delivery-validation" id="deliveryValidation">Faltan Manzana y Villa</div>
         </div>
       </div>
       <div>
@@ -1853,7 +1853,7 @@ function updateBars(){
       const lista = faltan.length === 1
         ? faltan[0]
         : faltan.slice(0,-1).join(', ') + ' y ' + faltan[faltan.length-1];
-      hint.innerHTML = 'Casi listo \u{1F43E}<em>Nos falta: ' + lista + '</em>';
+      hint.innerHTML = 'Casi listo<em>Completa los campos marcados</em>';
       hint.style.display = 'block';
     } else {
       hint.innerHTML = '';
@@ -1876,8 +1876,8 @@ function updateBars(){
     prepLine.style.display = 'none';
   } else {
     prepLine.style.display = 'flex';
-    const deliveryExtra = mode === 'delivery' ? ' · entrega en bici adicional +15 min' : '';
-    prepLine.innerHTML = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><polyline points="12 7 12 12 16 14"/></svg><span>Preparación: <strong>${prepTime[0]}–${prepTime[1]} min</strong> aprox.${deliveryExtra}</span>`;
+    const deliveryExtra = mode === 'delivery' ? ` + <strong>15 min entrega</strong>` : '';
+    prepLine.innerHTML = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><polyline points="12 7 12 12 16 14"/></svg><span><strong>${prepTime[0]}–${prepTime[1]} min</strong> preparación${deliveryExtra}</span>`;
   }
 
   renderCartList();
