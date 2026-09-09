@@ -1254,7 +1254,7 @@ const MENU = [
 // Producto retirado: se excluye del menú activo sin tocar el resto del catálogo.
 // Mantener este filtro separado hace sencillo revertirlo si vuelve a venderse.
 for (let i = MENU.length - 1; i >= 0; i--) {
-  if (MENU[i].name === 'Virginia Melt') MENU.splice(i, 1);
+  if (MENU[i].name === 'Virginia Melt' || MENU[i].id === 'empanada-pizza') MENU.splice(i, 1);
 }
 // Nara Sunset se presenta sin una descripción redundante en la tarjeta.
 const naraSunset = MENU.find(item => item.id === 'nara-sunset');
@@ -1280,6 +1280,7 @@ if (miniCake) {
   if (item) item.processTag = '♨️ Freidora de aire · papas y proteína';
 });
 MENU.filter(item => item.group === 'empanada').forEach(item => {
+  item.name = `Empanada de Hojaldre de ${item.flavor.toLowerCase()}`;
   item.processTag = '♨️ Horneada · sin sartén ni aceite';
 });
 // Disponibilidad actual: sin helado; el resto del menú activo se puede pedir.
@@ -1294,7 +1295,7 @@ MENU.forEach(item => {
   }
   if (!ICE_CREAM_AVAILABLE && item.scoop) item.scoop = false;
 });
-['brownie', 'empanada-pizza'].forEach(id => {
+['brownie'].forEach(id => {
   const item = MENU.find(product => product.id === id);
   if (item) {
     delete item.comingSoon;
