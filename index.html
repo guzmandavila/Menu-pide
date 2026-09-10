@@ -1151,7 +1151,7 @@
           <button id="btnLlevar" onclick="setMode('llevar')">Para llevar</button>
           <button id="btnDelivery" onclick="setMode('delivery')">Delivery</button>
         </div>
-        <div class="delivery-hint" id="deliveryHint"><strong>DELIVERY EN BICI</strong> · Canaria · Gratis · Mañanas<br><span>Preparación + 15 min de entrega</span></div>
+        <div class="delivery-hint" id="deliveryHint"><strong>DELIVERY EN BICI</strong> · Canaria · Gratis · Según disponibilidad<br><span>Preparación + 15 min de entrega</span></div>
         <div class="delivery-fields" id="deliveryFields">
           <label>Manzana<input type="number" id="deliveryManzana" inputmode="numeric" pattern="[0-9]*" min="0" step="1" placeholder="Ej. 12" oninput="updateBars()"></label>
           <label>Villa<input type="number" id="deliveryVilla" inputmode="numeric" pattern="[0-9]*" min="0" step="1" placeholder="Ej. 8" oninput="updateBars()"></label>
@@ -1809,6 +1809,10 @@ function isStoreCat(c){ return STORE_CATS.includes(c); }
 // Wachi y Toci requieren el horario de cocina; el resto conserva su disponibilidad.
 const KITCHEN_HOURS_ITEM_IDS = ['wachipapa', 'tocipapa'];
 const FULL_MENU_ORDERING_ENABLED = true; // Permite pedidos fuera del horario habitual.
+// Excepción manual: se puede abrir o cerrar el delivery sin depender de la hora.
+// Para otro día, cambia la fecha; para cerrarlo antes, cambia DELIVERY_MANUAL_OPEN a false.
+const DELIVERY_MANUAL_DATE = '2026-09-09';
+const DELIVERY_MANUAL_OPEN = true;
 const ALWAYS_OPEN_CATS = ['Bebidas Calientes', 'Congelados y Más', 'Combos'];
 const ALWAYS_OPEN_GROUPS = ['empanada']; // se puede pedir a cualquier hora, sin importar su categoría
 function isMenuOpenNow(){
@@ -1819,7 +1823,11 @@ function isMenuOpenNow(){
   return mins >= (19*60) && mins <= (23*60);
 }
 function isDeliveryAvailableNow(){
-  // Delivery: todos los días, únicamente durante la mañana, hasta las 11:59.
+  const date = new Intl.DateTimeFormat('en-CA', {
+    timeZone:'America/Guayaquil', year:'numeric', month:'2-digit', day:'2-digit'
+  }).format(new Date());
+  if(date === DELIVERY_MANUAL_DATE) return DELIVERY_MANUAL_OPEN;
+  // Horario normal: todos los días, únicamente durante la mañana, hasta las 11:59.
   const hour = businessTime().hour;
   return hour >= 7 && hour < 12;
 }
