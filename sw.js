@@ -1,10 +1,10 @@
-const CACHE_NAME = 'clowder-pwa-v8';
+const CACHE_NAME = 'clowder-pwa-v9';
 const APP_SHELL = [
   './',
   './index.html',
   './manifest.webmanifest',
-  './icons/clowder-icon-192-v8.png',
-  './icons/clowder-icon-512-v8.png',
+  './icons/clowder-icon-192-v9.png',
+  './icons/clowder-icon-512-v9.png',
   './fuentes/Doughie.ttf'
 ];
 
