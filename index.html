@@ -2472,7 +2472,7 @@ window.addEventListener('beforeinstallprompt', event => {
   deferredInstallPrompt = event;
   showInstallButton();
 });
-if(isIOS && !isStandalone) showInstallButton();
+if(!isStandalone) showInstallButton();
 async function installApp(){
   if(deferredInstallPrompt){
     deferredInstallPrompt.prompt();
