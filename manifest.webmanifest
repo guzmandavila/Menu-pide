@@ -7,11 +7,11 @@
   "scope": "./",
   "display": "standalone",
   "orientation": "portrait-primary",
-  "background_color": "#181310",
-  "theme_color": "#181310",
+  "background_color": "#ffffff",
+  "theme_color": "#ffffff",
   "categories": ["food", "shopping"],
   "icons": [
-    { "src": "icons/clowder-icon-192-v6.png", "sizes": "192x192", "type": "image/png", "purpose": "any maskable" },
-    { "src": "icons/clowder-icon-512-v6.png", "sizes": "512x512", "type": "image/png", "purpose": "any maskable" }
+    { "src": "icons/clowder-icon-192-v7.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "icons/clowder-icon-512-v7.png", "sizes": "512x512", "type": "image/png", "purpose": "any" }
   ]
 }
