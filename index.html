@@ -162,6 +162,8 @@
     display:flex; width:32px; height:32px; padding:0;
     border-radius:50%; justify-content:center; gap:0;
   }
+  .sticky-top.compact .install-toggle{width:32px; height:32px; padding:0; border-radius:50%; font-size:0; gap:0;}
+  .sticky-top.compact .install-toggle svg{width:17px; height:17px;}
   .sticky-top.compact .guide-toggle,
   .sticky-top.compact .pay-toggle{ font-size:0; }
   .sticky-top.compact .guide-toggle svg,
@@ -190,6 +192,8 @@
   .theme-toggle .icon-moon{display:none;}
   body.light-theme .theme-toggle .icon-sun{display:none;}
   body.light-theme .theme-toggle .icon-moon{display:block;}
+  .install-toggle{display:none; width:auto; min-height:34px; flex:0 0 auto; border-radius:999px; background:#3F854A; border:1px solid rgba(255,255,255,.25); color:#fff; align-items:center; justify-content:center; gap:6px; cursor:pointer; padding:0 12px; font-family:'Inter',sans-serif; font-size:12px; font-weight:800; white-space:nowrap;}
+  .install-toggle svg{width:16px; height:16px;}
   .suggestion-toggle{
     position:absolute; top:18px; left:14px;
     width:34px; height:34px; border-radius:50%;
@@ -960,6 +964,10 @@
   <button class="theme-toggle" id="themeToggle" onclick="toggleTheme()" aria-label="Cambiar tema">
     <svg class="icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2.5M12 19.5V22M4.2 4.2l1.8 1.8M18 18l1.8 1.8M2 12h2.5M19.5 12H22M4.2 19.8L6 18M18 6l1.8-1.8"/></svg>
     <svg class="icon-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.8A9 9 0 1 1 11.2 3 7 7 0 0 0 21 12.8z"/></svg>
+  </button>
+  <button class="install-toggle" id="installToggle" onclick="installApp()" aria-label="Instalar Clowder">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12"/><path d="m7 10 5 5 5-5"/><path d="M5 21h14"/></svg>
+    Instalar Clowder
   </button>
   </div>
   </div>
@@ -2450,6 +2458,36 @@ renderCats();
 renderMenu();
 updateBars();
 syncHeaderCompact();
+
+// Instalación guiada: Android ofrece el aviso nativo; iPhone muestra los pasos de Safari.
+let deferredInstallPrompt = null;
+const installToggle = document.getElementById('installToggle');
+const isStandalone = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true;
+const isIOS = /iphone|ipad|ipod/i.test(navigator.userAgent);
+function showInstallButton(){
+  if(installToggle && !isStandalone) installToggle.style.display = 'flex';
+}
+window.addEventListener('beforeinstallprompt', event => {
+  event.preventDefault();
+  deferredInstallPrompt = event;
+  showInstallButton();
+});
+if(isIOS && !isStandalone) showInstallButton();
+async function installApp(){
+  if(deferredInstallPrompt){
+    deferredInstallPrompt.prompt();
+    await deferredInstallPrompt.userChoice;
+    deferredInstallPrompt = null;
+    if(installToggle) installToggle.style.display = 'none';
+    return;
+  }
+  if(isIOS){
+    alert('Para instalar Clowder: toca Compartir y luego “Agregar a pantalla de inicio”.');
+  }
+}
+window.addEventListener('appinstalled', () => {
+  if(installToggle) installToggle.style.display = 'none';
+});
 
 // Habilita la experiencia instalable y el funcionamiento básico sin conexión.
 if ('serviceWorker' in navigator) {
