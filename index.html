@@ -87,6 +87,7 @@
     background:var(--bg);
     border-radius:0;
     overflow:hidden;
+    clip-path:inset(0);
   }
   .header-actions{
     display:flex; align-items:center; justify-content:center;
@@ -102,6 +103,7 @@
   }
   header{
     background:var(--bg);
+    border-radius:0;
     padding:16px 16px 14px;
     text-align:center;
     transition:var(--theme-transition);
@@ -112,11 +114,13 @@
     display:flex; align-items:center; gap:12px;
     padding:10px 20px;
     border-bottom:1px solid var(--line-solid);
+    background:var(--bg);
+    border-radius:0;
   }
   /* El logo se sacrifica en modo compacto: la píldora de categoría ocupa su lugar */
   .sticky-top.compact header{
     display:flex; align-items:center; flex:0 0 auto;
-    padding:0; background:transparent; text-align:left;
+    padding:0; background:var(--bg); border-radius:0; text-align:left;
   }
   .sticky-top.compact .cats-wrap{ display:none; }
   .sticky-top.compact .cats-wrap::after{ display:none; }
