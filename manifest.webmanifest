@@ -1,6 +1,6 @@
 {
-  "name": "Clowder Coffee House · Arma tu pedido",
-  "short_name": "Clowder",
+  "name": "Clowder Coffee House - Pedidos",
+  "short_name": "Clowder Coffee House - Pedidos",
   "description": "Pide café, snacks y bebidas de Clowder Coffee House.",
   "lang": "es-EC",
   "start_url": "./",
