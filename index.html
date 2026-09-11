@@ -5,6 +5,13 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Clowder · Arma tu pedido</title>
 <meta name="description" content="Pide desde aquí y te llega directo a nuestro WhatsApp. Café, snacks y la bebida del mes.">
+<meta name="theme-color" content="#181310">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Clowder">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="icons/icon-192.svg">
 <meta property="og:type" content="website">
 <meta property="og:title" content="Clowder Coffee House · Arma tu pedido">
 <meta property="og:description" content="Pide desde aquí y te llega directo a nuestro WhatsApp. Café, snacks y la bebida del mes.">
@@ -2439,6 +2446,13 @@ renderCats();
 renderMenu();
 updateBars();
 syncHeaderCompact();
+
+// Habilita la experiencia instalable y el funcionamiento básico sin conexión.
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('./sw.js', { scope: './' }).catch(() => {});
+  });
+}
 </script>
 </body>
 </html>
