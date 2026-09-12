@@ -1304,7 +1304,7 @@ MENU.filter(item => item.group === 'empanada').forEach(item => {
 });
 // MilkiShaki está de vuelta y disponible para pedir.
 const ICE_CREAM_AVAILABLE = true;
-const ICE_CREAM_DRINK_IDS = ['affocato', 'milkishaki-nutella', 'milkishaki-fresa', 'milkishaki-salted-caramel'];
+const ICE_CREAM_DRINK_IDS = ['milkishaki-nutella', 'milkishaki-fresa', 'milkishaki-salted-caramel'];
 MENU.forEach(item => {
   if (ICE_CREAM_DRINK_IDS.includes(item.id)) {
     delete item.soldOut;
