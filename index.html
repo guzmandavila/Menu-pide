@@ -1828,10 +1828,9 @@ function isStoreCat(c){ return STORE_CATS.includes(c); }
 // Wachi y Toci requieren el horario de cocina; el resto conserva su disponibilidad.
 const KITCHEN_HOURS_ITEM_IDS = ['wachipapa', 'tocipapa'];
 const FULL_MENU_ORDERING_ENABLED = true; // Permite pedidos fuera del horario habitual.
-// Excepción manual: se puede abrir o cerrar el delivery sin depender de la hora.
-// Para otro día, cambia la fecha; para cerrarlo antes, cambia DELIVERY_MANUAL_OPEN a false.
-const DELIVERY_MANUAL_DATE = '2026-09-09';
-const DELIVERY_MANUAL_OPEN = true;
+// Excepción manual: delivery habilitado solo por esta noche hasta las 23:00.
+const DELIVERY_MANUAL_DATE = '2026-09-11';
+const DELIVERY_MANUAL_CUTOFF_MINUTES = 23 * 60;
 const ALWAYS_OPEN_CATS = ['Bebidas Calientes', 'Congelados y Más', 'Combos'];
 const ALWAYS_OPEN_GROUPS = ['empanada']; // se puede pedir a cualquier hora, sin importar su categoría
 function isMenuOpenNow(){
@@ -1845,7 +1844,10 @@ function isDeliveryAvailableNow(){
   const date = new Intl.DateTimeFormat('en-CA', {
     timeZone:'America/Guayaquil', year:'numeric', month:'2-digit', day:'2-digit'
   }).format(new Date());
-  if(date === DELIVERY_MANUAL_DATE) return DELIVERY_MANUAL_OPEN;
+  if(date === DELIVERY_MANUAL_DATE) {
+    const now = businessTime();
+    return (now.hour * 60 + now.minute) <= DELIVERY_MANUAL_CUTOFF_MINUTES;
+  }
   // Horario normal: todos los días, únicamente durante la mañana, hasta las 11:59.
   const hour = businessTime().hour;
   return hour >= 7 && hour < 12;
@@ -1992,7 +1994,7 @@ function updateBars(){
     deliveryBtn.disabled = false;
     deliveryBtn.classList.toggle('unavailable', unavailable);
     deliveryBtn.setAttribute('aria-disabled', unavailable ? 'true' : 'false');
-    deliveryBtn.title = unavailable ? 'Delivery disponible solo hasta las 11:59. Toca para ver el horario.' : '';
+    deliveryBtn.title = unavailable ? 'El delivery de esta noche estuvo disponible hasta las 23:00.' : 'Delivery disponible hasta las 23:00 esta noche.';
   }
   if(deliveryHint) deliveryHint.classList.toggle('open', deliveryActive);
   if(deliveryFields) deliveryFields.classList.toggle('open', deliveryActive);
@@ -2043,7 +2045,7 @@ function updateBars(){
     if(count === 0) faltan.push('tu pedido');
     if(!nameOk) faltan.push('tu nombre');
     if(!modeOk) faltan.push('cómo recibes tu pedido');
-    if(mode === 'delivery' && !deliveryOk) faltan.push('delivery disponible solo por la mañana');
+    if(mode === 'delivery' && !deliveryOk) faltan.push('delivery disponible hasta las 23:00 esta noche');
     if(mode === 'delivery' && deliveryOk && !addressOk) faltan.push('manzana y villa');
     if(payMethod === '') faltan.push('cómo pagas');
     if(cashActive && !cashOk) faltan.push('con cuánto pagas');
@@ -2237,7 +2239,7 @@ function setExactCash(){
 
 function setMode(m){
   if(m === 'delivery' && !isDeliveryAvailableNow()){
-    alert('El delivery está disponible únicamente por la mañana, hasta las 11:59. Puedes pedir para llevar o para servir.');
+    alert('El delivery de esta noche está disponible hasta las 23:00. Puedes pedir para llevar o para servir después de esa hora.');
     return;
   }
   mode = m;
@@ -2286,7 +2288,7 @@ function sendOrder(){
   if(entries.length===0) return;
   if(mode === 'delivery'){
     if(!isDeliveryAvailableNow()){
-      alert('El delivery está disponible únicamente por la mañana, hasta las 11:59.');
+      alert('El delivery de esta noche está disponible hasta las 23:00.');
       return;
     }
     if(!deliveryAddressOk()){
