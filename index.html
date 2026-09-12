@@ -1302,15 +1302,16 @@ MENU.filter(item => item.group === 'empanada').forEach(item => {
   item.name = `Empanada de Hojaldre de ${item.flavor.toLowerCase()}`;
   item.processTag = '♨️ Horneada · sin sartén ni aceite';
 });
-// Disponibilidad actual: sin helado; el resto del menú activo se puede pedir.
-const ICE_CREAM_AVAILABLE = false;
+// MilkiShaki está de vuelta y disponible para pedir.
+const ICE_CREAM_AVAILABLE = true;
 const ICE_CREAM_DRINK_IDS = ['affocato', 'milkishaki-nutella', 'milkishaki-fresa', 'milkishaki-salted-caramel'];
 MENU.forEach(item => {
   if (ICE_CREAM_DRINK_IDS.includes(item.id)) {
     delete item.soldOut;
-    item.comingSoon = !ICE_CREAM_AVAILABLE;
-    item.comingSoonLabel = 'Más en camino';
-    item.comingSoonNote = 'Estamos reponiendo el helado para esta bebida.';
+    delete item.comingSoon;
+    item.featured = true;
+    item.featuredTag = '¡MILKISHAKI DE VUELTA!';
+    item.promoNote = '✨ ¡De vuelta! Pide tu MilkiShaki favorito hoy.';
   }
   if (!ICE_CREAM_AVAILABLE && item.scoop) item.scoop = false;
 });
@@ -1339,7 +1340,7 @@ const CAT_BANNERS = {
     { img:'banners/ss-banner-02.jpg', alt:'Wachipapas — el cierre perfecto de tu fin de semana' },
   ],
   'Bebidas Frías': [
-    { img:'banners/bf-banner-01.jpg', alt:'MilkiShaki Nutella — brownie bites, salsa de chocolate casera y helado de vainilla' },
+    { img:'banners/bf-banner-01.jpg', alt:'¡MilkiShaki de vuelta! Nutella, brownie bites, salsa de chocolate casera y helado de vainilla' },
     { img:'banners/bf-banner-02.jpg', alt:'Berry Bloom — limonada con salsa de fresa, refrescante y sin café' },
   ],
   'Bebida del Mes': [
