@@ -1,4 +1,4 @@
-const CACHE_NAME = 'clowder-pwa-v10-milkishaki-delivery';
+const CACHE_NAME = 'clowder-pwa-v11-milkishaki-delivery';
 const APP_SHELL = [
   './',
   './index.html',
