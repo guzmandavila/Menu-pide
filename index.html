@@ -1996,7 +1996,7 @@ function updateBars(){
     deliveryBtn.disabled = false;
     deliveryBtn.classList.toggle('unavailable', unavailable);
     deliveryBtn.setAttribute('aria-disabled', unavailable ? 'true' : 'false');
-    deliveryBtn.title = unavailable ? 'El delivery de esta noche estuvo disponible hasta las 23:00.' : 'Delivery disponible hasta las 23:00 esta noche.';
+    deliveryBtn.title = unavailable ? 'El delivery de hoy estuvo disponible hasta las 23:59.' : 'Delivery disponible todo el día de hoy, hasta las 23:59.';
   }
   if(deliveryHint) deliveryHint.classList.toggle('open', deliveryActive);
   if(deliveryFields) deliveryFields.classList.toggle('open', deliveryActive);
@@ -2241,7 +2241,7 @@ function setExactCash(){
 
 function setMode(m){
   if(m === 'delivery' && !isDeliveryAvailableNow()){
-    alert('El delivery de esta noche está disponible hasta las 23:00. Puedes pedir para llevar o para servir después de esa hora.');
+    alert('El delivery de hoy está disponible hasta las 23:59. Puedes pedir para llevar o para servir después de esa hora.');
     return;
   }
   mode = m;
@@ -2290,7 +2290,7 @@ function sendOrder(){
   if(entries.length===0) return;
   if(mode === 'delivery'){
     if(!isDeliveryAvailableNow()){
-      alert('El delivery de esta noche está disponible hasta las 23:00.');
+      alert('El delivery de hoy está disponible hasta las 23:59.');
       return;
     }
     if(!deliveryAddressOk()){
