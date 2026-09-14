@@ -1293,6 +1293,8 @@ if (miniCake) {
   miniCake.featured = true;
   miniCake.featuredTag = 'MINICAKE DE LA SEMANA';
 }
+// El minicake de banano está agotado y no debe aparecer en el menú.
+const HIDDEN_ITEM_IDS = ['mini-cake-del-dia'];
 // Información de preparación visible en cada tarjeta.
 ['wachipapa','tocipapa'].forEach(id => {
   const item = MENU.find(product => product.id === id);
@@ -1584,7 +1586,7 @@ document.addEventListener('error', event => {
 
 function renderMenu(){
   const today = businessTime().day;
-  const items = MENU.filter(i=>i.cat===activeCat);
+  const items = MENU.filter(i=>i.cat===activeCat && !HIDDEN_ITEM_IDS.includes(i.id));
   const seenGroups = new Set();
   const display = [];
   items.forEach(i=>{
@@ -1829,8 +1831,8 @@ function isStoreCat(c){ return STORE_CATS.includes(c); }
 const KITCHEN_HOURS_ITEM_IDS = ['wachipapa', 'tocipapa'];
 const FULL_MENU_ORDERING_ENABLED = true; // Permite pedidos fuera del horario habitual.
 // Excepción manual: delivery habilitado solo por esta noche hasta las 23:00.
-const DELIVERY_MANUAL_DATE = '2026-09-11';
-const DELIVERY_MANUAL_CUTOFF_MINUTES = 23 * 60;
+const DELIVERY_MANUAL_DATE = '2026-09-14';
+const DELIVERY_MANUAL_CUTOFF_MINUTES = 23 * 60 + 59;
 const ALWAYS_OPEN_CATS = ['Bebidas Calientes', 'Congelados y Más', 'Combos'];
 const ALWAYS_OPEN_GROUPS = ['empanada']; // se puede pedir a cualquier hora, sin importar su categoría
 function isMenuOpenNow(){
@@ -1879,7 +1881,7 @@ function shareLocation(){
 }
 function isItemOrderable(item){
   if(birthdayState().closed) return false;
-  if(item.soldOut || item.comingSoon || HIDDEN_CATS.includes(item.cat)) return false;
+  if(item.soldOut || item.comingSoon || HIDDEN_CATS.includes(item.cat) || HIDDEN_ITEM_IDS.includes(item.id)) return false;
   if(item.days && !item.days.includes(businessTime().day)) return false;
   if(KITCHEN_HOURS_ITEM_IDS.includes(item.id)) return isMenuOpenNow();
   if(FULL_MENU_ORDERING_ENABLED) return true;
