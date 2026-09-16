@@ -434,6 +434,26 @@
     background:var(--cream-dim); opacity:.35;
   }
   .cat-banner-dot.active{ opacity:1; background:var(--gold); }
+  button.cat-banner-dot{
+    width:28px; height:28px; padding:0; border:0; cursor:pointer;
+    background:transparent; display:grid; place-items:center;
+  }
+  button.cat-banner-dot::before{content:''; width:8px; height:8px; border-radius:50%; background:var(--cream-dim);}
+  button.cat-banner-dot.active{background:transparent;}
+  button.cat-banner-dot.active::before{background:var(--gold);}
+  .cat-banner-controls{display:flex; align-items:center; justify-content:center; gap:12px; margin-top:8px;}
+  .cat-banner-controls .cat-banner-dots{margin:0; gap:2px;}
+  .cat-banner-arrow{width:40px; height:40px; border:1px solid var(--line-solid); border-radius:50%; background:var(--bg-alt); color:var(--cream); font-size:24px; cursor:pointer;}
+  .cat-banner-arrow:disabled{opacity:.3; cursor:default;}
+  .cat-banner button:focus-visible, .cat-banner-track:focus-visible{outline:3px solid var(--gold); outline-offset:3px;}
+  .mouse-dragging, .mouse-dragging *{cursor:grabbing !important; user-select:none !important;}
+  .mouse-dragging{scroll-snap-type:none; scroll-behavior:auto;}
+  @media (hover:hover) and (pointer:fine){
+    .cats, .cat-banner-track{cursor:grab;}
+    .cats{scrollbar-width:thin; scrollbar-color:var(--cream-dim) var(--bg);}
+    .cats::-webkit-scrollbar{display:block; height:8px;}
+    .cats::-webkit-scrollbar-thumb{background:var(--cream-dim); border-radius:8px;}
+  }
   .promo-cat-note{
     font-family:'Inter',sans-serif; font-weight:700; font-size:13.5px;
     color:#D5528C; background:rgba(213,82,140,0.12);
@@ -1622,9 +1642,10 @@ function renderMenu(){
   if(banners && banners.length){
     const slides = banners.map(b => `<div class="cat-banner-slide"><img src="${b.img}" alt="${b.alt}" loading="lazy" decoding="async"></div>`).join('');
     const dots = banners.length > 1
-      ? `<div class="cat-banner-dots">${banners.map((_,i)=>`<span class="cat-banner-dot${i===0?' active':''}"></span>`).join('')}</div>`
+      ? `<div class="cat-banner-dots">${banners.map((_,i)=>`<button type="button" class="cat-banner-dot${i===0?' active':''}" aria-label="Ver promoción ${i+1}" aria-current="${i===0?'true':'false'}"></button>`).join('')}</div>`
       : '';
-    bannerHtml = `<div class="cat-banner"><div class="cat-banner-track" id="catBannerTrack">${slides}</div>${dots}</div>`;
+    const controls = banners.length > 1 ? `<div class="cat-banner-controls"><button type="button" class="cat-banner-arrow" data-step="-1" aria-label="Promoción anterior">‹</button>${dots}<button type="button" class="cat-banner-arrow" data-step="1" aria-label="Promoción siguiente">›</button></div>` : '';
+    bannerHtml = `<div class="cat-banner"><div class="cat-banner-track" id="catBannerTrack" ${banners.length > 1 ? 'tabindex="0" role="region" aria-label="Promociones: usa las flechas para navegar"' : ''}>${slides}</div>${controls}</div>`;
   }
   const sectionLabelHtml = catsCollapsed ? '' : `<div class="section-label"><span class="cat-dot" style="background:${catColor(activeCat)}"></span>${activeCat}</div>`;
   el.innerHTML = sectionLabelHtml + bannerHtml + display.map(i=>{
@@ -1695,16 +1716,79 @@ function renderMenu(){
   }).join('');
   initBannerSlider();
 }
-// Los banners múltiples se recorren únicamente al deslizar.
+// El tacto conserva el scroll nativo; el mouse permite agarrar la pista.
+function enableMouseDrag(track, onRelease){
+  if(track.dataset.mouseDrag) return;
+  track.dataset.mouseDrag = 'true';
+  let drag = null;
+  let suppressClick = false;
+  track.addEventListener('dragstart', event => event.preventDefault());
+  track.addEventListener('pointerdown', event => {
+    if(event.pointerType !== 'mouse' || event.button !== 0 || track.scrollWidth <= track.clientWidth) return;
+    suppressClick = false;
+    drag = {id:event.pointerId, x:event.clientX, left:track.scrollLeft, moved:false};
+  });
+  track.addEventListener('pointermove', event => {
+    if(!drag || event.pointerId !== drag.id) return;
+    const distance = event.clientX - drag.x;
+    if(!drag.moved && Math.abs(distance) < 5) return;
+    if(!drag.moved){
+      drag.moved = true;
+      track.classList.add('mouse-dragging');
+      track.setPointerCapture(event.pointerId);
+    }
+    event.preventDefault();
+    track.scrollLeft = drag.left - distance;
+  });
+  function finish(event){
+    if(!drag || event.pointerId !== drag.id) return;
+    const moved = drag.moved;
+    const left = track.scrollLeft;
+    drag = null;
+    suppressClick = moved;
+    track.classList.remove('mouse-dragging');
+    if(track.hasPointerCapture(event.pointerId)) track.releasePointerCapture(event.pointerId);
+    if(moved && onRelease) onRelease(left);
+  }
+  track.addEventListener('pointerup', finish);
+  track.addEventListener('pointercancel', finish);
+  track.addEventListener('lostpointercapture', finish);
+  track.addEventListener('pointerleave', event => {if(drag && !drag.moved) finish(event);});
+  track.addEventListener('click', event => {
+    if(!suppressClick) return;
+    event.preventDefault();
+    event.stopImmediatePropagation();
+    suppressClick = false;
+  }, true);
+}
 function initBannerSlider(){
   const track = document.getElementById('catBannerTrack');
   if(!track) return;
   const dots = track.parentElement.querySelectorAll('.cat-banner-dot');
   if(!dots.length) return;
-  track.addEventListener('scroll', () => {
-    const idx = Math.round(track.scrollLeft / track.clientWidth);
-    dots.forEach((d,i) => d.classList.toggle('active', i === idx));
-  }, {passive:true});
+  const arrows = track.parentElement.querySelectorAll('.cat-banner-arrow');
+  const step = () => track.children[1].offsetLeft - track.children[0].offsetLeft;
+  const index = () => Math.round(track.scrollLeft / step());
+  const goTo = i => track.scrollTo({left:Math.max(0, Math.min(dots.length-1, i)) * step(), behavior:matchMedia('(prefers-reduced-motion: reduce)').matches ? 'instant' : 'smooth'});
+  enableMouseDrag(track, left => goTo(Math.round(left / step())));
+  dots.forEach((dot, i) => dot.addEventListener('click', () => goTo(i)));
+  arrows.forEach(button => button.addEventListener('click', () => goTo(index() + Number(button.dataset.step))));
+  track.addEventListener('keydown', event => {
+    if(!['ArrowLeft','ArrowRight','Home','End'].includes(event.key)) return;
+    event.preventDefault();
+    goTo(event.key === 'Home' ? 0 : event.key === 'End' ? dots.length-1 : index() + (event.key === 'ArrowRight' ? 1 : -1));
+  });
+  function sync(){
+    const idx = index();
+    dots.forEach((dot,i) => {
+      dot.classList.toggle('active', i === idx);
+      dot.setAttribute('aria-current', String(i === idx));
+    });
+    arrows[0].disabled = idx === 0;
+    arrows[1].disabled = idx === dots.length-1;
+  }
+  track.addEventListener('scroll', sync, {passive:true});
+  sync();
 }
 function truncate(s){ return s.length>18 ? s.slice(0,18)+'…' : s; }
 
@@ -2457,6 +2541,7 @@ setInterval(() => {
     updateBars();
   }
 }, 1000);
+enableMouseDrag(document.getElementById('cats'));
 renderCats();
 renderMenu();
 updateBars();

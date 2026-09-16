@@ -1,4 +1,4 @@
-const CACHE_NAME = 'clowder-pwa-v13-snack-sal-landing';
+const CACHE_NAME = 'clowder-pwa-v14-desktop-sliders';
 const APP_SHELL = [
   './',
   './index.html',
