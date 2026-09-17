@@ -1137,7 +1137,7 @@
     <div class="bigorder-body">
       <div class="bigorder-lead">Por aquí puedes pedir hasta 10 de cada producto.</div>
       <div class="bigorder-text">Si necesitas más, escríbenos por WhatsApp y lo coordinamos contigo: así nos aseguramos de tener todo listo y a tiempo.</div>
-      <a class="bigorder-cta" href="https://wa.me/593979982241" target="_blank" rel="noopener">Escríbenos por WhatsApp</a>
+      <a class="bigorder-cta" href="https://wa.me/593979864314" target="_blank" rel="noopener">Escríbenos por WhatsApp</a>
     </div>
     <button class="send-btn" onclick="closeBigOrder()">Seguir con mi pedido</button>
   </div>
@@ -1439,7 +1439,7 @@ function openBirthdayGift(event){
   const amount = Number(input.value);
   if(!Number.isFinite(amount) || amount < 1) return;
   const message = `🎂 ¡Feliz cumpleaños, gato mesero! Quiero aportar $${amount.toFixed(2)} como regalo solidario para los michis de la calle. Adjunto mi comprobante de transferencia para que puedan verificarlo.`;
-  document.getElementById('birthdayReceipt').href = 'https://wa.me/593979982241?text=' + encodeURIComponent(message);
+  document.getElementById('birthdayReceipt').href = 'https://wa.me/593979864314?text=' + encodeURIComponent(message);
   document.getElementById('birthdayGiftInstructions').hidden = false;
   openPayments();
 }
@@ -2448,7 +2448,7 @@ function sendOrder(){
   msg += `💬 Comunidad: https://chat.whatsapp.com/FmkJsNMPguv5i49yfS8rQF`;
 
   /* EDITA ESTE NÚMERO: código de país + número, sin + ni espacios */
-  const WHATSAPP_NUMBER = '593979982241';
+  const WHATSAPP_NUMBER = '593979864314';
 
   const url = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(msg)}`;
 
