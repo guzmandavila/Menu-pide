@@ -1977,15 +1977,17 @@ function estimatedPrepTime(){
     const item = MENU.find(m=>m.id===id);
     const range = item && (item.id === 'empanada-pollo' ? [10, 15] : PREP_TIME[item.cat]);
     if(!range) return;
-    const current = work.get(item.cat) || {range, qty:0};
+    const current = work.get(item.cat) || {range, qty:0, empanadaQty:0};
     current.range = [Math.max(current.range[0], range[0]), Math.max(current.range[1], range[1])];
-    current.qty += entry.qty;
+    if(item.group === 'empanada') current.empanadaQty += entry.qty;
+    else current.qty += entry.qty;
     work.set(item.cat, current);
   });
   if(!work.size) return null;
 
   // Una sola persona prepara el pedido: las categorías distintas suman trabajo;
-  // las unidades adicionales añaden un pequeño margen sin multiplicar todo el tiempo.
+  // Hasta 4 empanadas comparten el tiempo base; desde la quinta se suman 5 minutos.
+  // Los demás productos conservan su margen por unidades adicionales.
   const parts = [...work.values()].sort((a,b)=>b.range[1]-a.range[1]);
   let min = parts[0].range[0];
   let max = parts[0].range[1];
@@ -1993,9 +1995,11 @@ function estimatedPrepTime(){
     min += range[0];
     max += range[1];
   });
-  const extraUnits = [...work.values()].reduce((sum, part)=>sum + Math.max(0, part.qty - 1), 0);
+  const extraUnits = [...work.values()].reduce((sum, part)=>sum + Math.max(0, part.qty - (part.empanadaQty ? 0 : 1)), 0);
   min += Math.min(10, extraUnits * 2);
   max += Math.min(15, extraUnits * 3);
+  const empanadaQty = [...work.values()].reduce((sum, part)=>sum + part.empanadaQty, 0);
+  if(empanadaQty >= 5){ min += 5; max += 5; }
   return [min, max];
 }
 
