@@ -1913,8 +1913,8 @@ function isStoreCat(c){ return STORE_CATS.includes(c); }
 // Wachi y Toci requieren el horario de cocina; el resto conserva su disponibilidad.
 const KITCHEN_HOURS_ITEM_IDS = ['wachipapa', 'tocipapa'];
 const FULL_MENU_ORDERING_ENABLED = true; // Permite pedidos fuera del horario habitual.
-// Excepción manual: delivery habilitado solo por esta noche hasta las 23:00.
-const DELIVERY_MANUAL_DATE = '2026-09-14';
+// Excepción manual: delivery habilitado hoy hasta las 23:59 (Ecuador).
+const DELIVERY_MANUAL_DATE = '2026-09-16';
 const DELIVERY_MANUAL_CUTOFF_MINUTES = 23 * 60 + 59;
 const ALWAYS_OPEN_CATS = ['Bebidas Calientes', 'Congelados y Más', 'Combos'];
 const ALWAYS_OPEN_GROUPS = ['empanada']; // se puede pedir a cualquier hora, sin importar su categoría
@@ -2130,7 +2130,7 @@ function updateBars(){
     if(count === 0) faltan.push('tu pedido');
     if(!nameOk) faltan.push('tu nombre');
     if(!modeOk) faltan.push('cómo recibes tu pedido');
-    if(mode === 'delivery' && !deliveryOk) faltan.push('delivery disponible hasta las 23:00 esta noche');
+    if(mode === 'delivery' && !deliveryOk) faltan.push('delivery disponible hasta las 23:59 esta noche');
     if(mode === 'delivery' && deliveryOk && !addressOk) faltan.push('manzana y villa');
     if(payMethod === '') faltan.push('cómo pagas');
     if(cashActive && !cashOk) faltan.push('con cuánto pagas');
