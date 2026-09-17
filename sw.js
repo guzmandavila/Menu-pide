@@ -1,4 +1,4 @@
-const CACHE_NAME = 'clowder-pwa-v16-delivery-always';
+const CACHE_NAME = 'clowder-pwa-v17-prep-delivery-times';
 const APP_SHELL = [
   './',
   './index.html',

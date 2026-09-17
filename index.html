@@ -1190,7 +1190,7 @@
           <button id="btnLlevar" onclick="setMode('llevar')">Para llevar</button>
           <button id="btnDelivery" onclick="setMode('delivery')">Delivery</button>
         </div>
-        <div class="delivery-hint" id="deliveryHint"><strong>DELIVERY EN BICI</strong> · Canaria · Gratis · Según disponibilidad<br><span>Preparación + 15 min de entrega</span></div>
+        <div class="delivery-hint" id="deliveryHint"><strong>DELIVERY EN BICI</strong> · Canaria · Gratis · Según disponibilidad<br><span>Preparación + 5 min de entrega</span></div>
         <div class="delivery-fields" id="deliveryFields">
           <label>Manzana<input type="number" id="deliveryManzana" inputmode="numeric" pattern="[0-9]*" min="0" step="1" placeholder="Ej. 12" oninput="updateBars()"></label>
           <label>Villa<input type="number" id="deliveryVilla" inputmode="numeric" pattern="[0-9]*" min="0" step="1" placeholder="Ej. 8" oninput="updateBars()"></label>
@@ -1322,7 +1322,7 @@ const HIDDEN_ITEM_IDS = ['mini-cake-del-dia'];
 });
 MENU.filter(item => item.group === 'empanada').forEach(item => {
   item.name = `Empanada de Hojaldre de ${item.flavor.toLowerCase()}`;
-  item.processTag = '♨️ Horneada · sin sartén ni aceite';
+  item.processTag = '♨️ Horneada · sin sartén ni aceite' + (item.id === 'empanada-pollo' ? ' · Menos de 20 min' : '');
 });
 // MilkiShaki está de vuelta y disponible para pedir.
 const ICE_CREAM_AVAILABLE = true;
@@ -1975,9 +1975,10 @@ function estimatedPrepTime(){
   const work = new Map();
   Object.entries(cart).forEach(([id, entry])=>{
     const item = MENU.find(m=>m.id===id);
-    const range = item && PREP_TIME[item.cat];
+    const range = item && (item.id === 'empanada-pollo' ? [10, 15] : PREP_TIME[item.cat]);
     if(!range) return;
     const current = work.get(item.cat) || {range, qty:0};
+    current.range = [Math.max(current.range[0], range[0]), Math.max(current.range[1], range[1])];
     current.qty += entry.qty;
     work.set(item.cat, current);
   });
@@ -2149,7 +2150,7 @@ function updateBars(){
     prepLine.style.display = 'none';
   } else {
     prepLine.style.display = 'flex';
-    const deliveryExtra = mode === 'delivery' ? ` + <strong>15 min entrega</strong>` : '';
+    const deliveryExtra = mode === 'delivery' ? ` + <strong>5 min entrega</strong>` : '';
     prepLine.innerHTML = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><polyline points="12 7 12 12 16 14"/></svg><span><strong>${prepTime[0]}–${prepTime[1]} min</strong> preparación${deliveryExtra}</span>`;
   }
 
@@ -2429,7 +2430,7 @@ function sendOrder(){
   msg += `\n🛒 *${totalItems} producto${totalItems===1?'':'s'} · TOTAL: $${grandTotal().toFixed(2)}*\n`;
   const prepTimeMsg = estimatedPrepTime();
   if(prepTimeMsg) msg += mode === 'delivery'
-    ? `⏱ Preparación ${prepTimeMsg[0]}–${prepTimeMsg[1]} min + entrega 15 min\n`
+    ? `⏱ Preparación ${prepTimeMsg[0]}–${prepTimeMsg[1]} min + entrega 5 min\n`
     : `⏱ Listo en ${prepTimeMsg[0]}–${prepTimeMsg[1]} min\n`;
   // Los productos de Congelados y Más no se preparan al momento: son bajo stock/pedido,
   // así que en vez de un tiempo estimado avisamos que coordinamos la entrega aparte.
