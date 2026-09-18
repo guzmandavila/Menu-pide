@@ -2570,10 +2570,22 @@ window.addEventListener('appinstalled', () => {
   if(installToggle) installToggle.style.display = 'none';
 });
 
+window.addEventListener('pagehide', persistOrderDraft);
+
 // Habilita la experiencia instalable y el funcionamiento básico sin conexión.
 if ('serviceWorker' in navigator) {
   window.addEventListener('load', () => {
-    navigator.serviceWorker.register('./sw.js', { scope: './' }).catch(() => {});
+    navigator.serviceWorker.register('./sw.js', { scope: './', updateViaCache: 'none' }).then(registration => {
+      const checkForUpdate = () => {
+        if (document.visibilityState === 'visible' && navigator.onLine) {
+          registration.update().catch(() => {});
+        }
+      };
+      checkForUpdate();
+      setInterval(checkForUpdate, 60000);
+      document.addEventListener('visibilitychange', checkForUpdate);
+      window.addEventListener('online', checkForUpdate);
+    }).catch(() => {});
   });
 }
 </script>

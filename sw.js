@@ -1,4 +1,4 @@
-const CACHE_NAME = 'clowder-pwa-v19-whatsapp-fix';
+const CACHE_NAME = 'clowder-pwa-v20-refresh-open-menus';
 const APP_SHELL = [
   './',
   './index.html',
@@ -14,10 +14,17 @@ self.addEventListener('install', event => {
 });
 
 self.addEventListener('activate', event => {
-  event.waitUntil(caches.keys().then(keys => Promise.all(
-    keys.filter(key => key !== CACHE_NAME).map(key => caches.delete(key))
-  )));
-  self.clients.claim();
+  event.waitUntil((async () => {
+    const keys = await caches.keys();
+    await Promise.all(keys.filter(key => key.startsWith('clowder-pwa-') && key !== CACHE_NAME)
+      .map(key => caches.delete(key)));
+    await self.clients.claim();
+    // Old pages have no update listener: navigate them once to replace stale code.
+    const windows = await self.clients.matchAll({ type: 'window' });
+    const scope = new URL('./', self.location).href;
+    await Promise.all(windows.filter(client => client.url.startsWith(scope))
+      .map(client => client.navigate(client.url).catch(() => {})));
+  })());
 });
 
 self.addEventListener('fetch', event => {
