@@ -1,4 +1,4 @@
-const CACHE_NAME = 'clowder-pwa-v18-empanada-batch-times';
+const CACHE_NAME = 'clowder-pwa-v19-whatsapp-fix';
 const APP_SHELL = [
   './',
   './index.html',
@@ -22,6 +22,27 @@ self.addEventListener('activate', event => {
 
 self.addEventListener('fetch', event => {
   if (event.request.method !== 'GET') return;
+  // Always refresh the menu online so contact details cannot remain stale.
+  const url = new URL(event.request.url);
+  if (event.request.mode === 'navigate' ||
+      (url.origin === self.location.origin &&
+       (url.pathname === new URL('./', self.location).pathname ||
+        url.pathname === new URL('./index.html', self.location).pathname))) {
+    event.respondWith((async () => {
+      const cache = await caches.open(CACHE_NAME);
+      try {
+        const response = await fetch(event.request, { cache: 'no-store' });
+        if (!response.ok) throw new Error('Menu unavailable');
+        await cache.put('./index.html', response.clone());
+        return response;
+      } catch (error) {
+        const cached = await cache.match('./index.html');
+        if (cached) return cached;
+        throw error;
+      }
+    })());
+    return;
+  }
   event.respondWith(
     caches.match(event.request).then(cached => cached || fetch(event.request).then(response => {
       if (response.ok && new URL(event.request.url).origin === self.location.origin) {
