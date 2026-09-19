@@ -8,7 +8,7 @@ const MENU = [
   { id:'banana-bread-latte', cat:'Bebida del Mes', name:'Banana Bread Latte', desc:'Sirope casero de brown butter (mantequilla avellanada), banano real y un shot de espresso, servido frío.', price:3.75, img:'assets/image-b4e517cc3df03e47.jpg', featured:true, featuredTag:'Bebida del mes', promoNote:'El precio de lanzamiento ($2.75) ya terminó. Mantente atento a la Bebida del Mes: cada lanzamiento sale con descuento.' },
 
   // ---- Bebidas Calientes ----
-  { id:'strawberry-catpuccino', cat:'Bebidas Calientes', name:'Strawberry Catpuccino', classic:'Cappuccino de fresa', desc:'Dulce, cremoso y hecho para consentirte.', price:3.00, img:'banners/bc-strawberry-catpuccino.jpeg' },
+  { id:'strawberry-catpuccino', cat:'Bebidas Calientes', name:'Strawberry Catpuccino', classic:'Cappuccino de fresa', desc:'Dulce, cremoso y hecho para consentirte.', price:3.00, availableFrom:'2026-09-19T00:00:00-05:00', availableUntil:'2026-09-28T00:00:00-05:00', promoNote:'Disponible del 19 al 27 de septiembre, hasta las 23:59.', img:'banners/bc-strawberry-catpuccino.jpeg' },
   { id:'catpuccino', cat:'Bebidas Calientes', name:'Catpuccino', classic:'Cappuccino', syrupOption:['vainilla-francesa','avellana','caramelo-salado'], desc:'Espresso y leche.', price:2.6, milk:true, img:'miniaturas/bc-catpuccino.jpg' },
   { id:'cozy-claws', cat:'Bebidas Calientes', name:'Cozy Claws', classic:'Chocolate caliente', syrupOption:['vainilla-francesa','avellana','caramelo-salado'], desc:'Con base de cacao y leche.', price:2.8, milk:true, img:'miniaturas/bc-cozy-claws.jpg' },
   { id:'doble-sippi', cat:'Bebidas Calientes', name:'Doble Sippi', classic:'Espresso doble', syrupOption:['vainilla-francesa','avellana','caramelo-salado'], desc:'', price:1.8, img:'miniaturas/bc-doble-sippi.jpg' },
@@ -122,7 +122,7 @@ const CAT_BANNERS = {
     { img:'banners/mt-banner-01.jpg', alt:'Matcha Clowder' },
   ],
   'Bebidas Calientes': [
-    { img:'banners/bc-strawberry-catpuccino.jpeg', alt:'Strawberry Catpuccino — dulce, cremoso y hecho para consentirte' },
+    { productId:'strawberry-catpuccino', img:'banners/bc-strawberry-catpuccino.jpeg', alt:'Strawberry Catpuccino — dulce, cremoso y hecho para consentirte' },
     { img:'banners/bc-banner-01.jpg', alt:'Tu mañana empieza aquí — tu dosis de energía lista para llevar' },
   ],
   'Snack Dulce': [
@@ -173,8 +173,8 @@ function lighten(hex, amt){
 }
 function pastelBg(c){ const hex = catColor(c); return hex==='transparent' ? 'transparent' : lighten(hex, 0.45); }
 
-// Snack Sal es la portada del menú al abrir la app.
-let activeCat = MENU.some(i=>i.cat==='Snack Sal') ? 'Snack Sal' : CATS[0];
+// Calientes es la portada del menú al abrir la app.
+let activeCat = MENU.some(i=>i.cat==='Bebidas Calientes') ? 'Bebidas Calientes' : CATS[0];
 let cart = {}; // id -> {qty, note}
 let mode = '';
 let payMethod = '';
@@ -217,12 +217,16 @@ function openBirthdayGift(event){
   document.getElementById('birthdayGiftInstructions').hidden = false;
   openPayments();
 }
+function isWithinAvailability(item, now = Date.now()){
+  return (!item.availableFrom || now >= Date.parse(item.availableFrom))
+    && (!item.availableUntil || now < Date.parse(item.availableUntil));
+}
 function sanitizeCart(value){
   const clean = {};
   if(!value || typeof value !== 'object' || Array.isArray(value)) return clean;
   for(const [id, entry] of Object.entries(value)){
     const item = MENU.find(product => product.id === id);
-    if(!item || item.soldOut || item.comingSoon || HIDDEN_CATS.includes(item.cat) || HIDDEN_ITEM_IDS.includes(item.id) || !entry || typeof entry !== 'object') continue;
+    if(!item || !isWithinAvailability(item) || item.soldOut || item.comingSoon || HIDDEN_CATS.includes(item.cat) || HIDDEN_ITEM_IDS.includes(item.id) || !entry || typeof entry !== 'object') continue;
     if(!Number.isInteger(entry.qty) || entry.qty < 1) continue;
     clean[id] = {
       qty:Math.min(MAX_QTY, entry.qty), note:typeof entry.note === 'string' ? entry.note.slice(0,500) : '',
@@ -379,7 +383,7 @@ document.addEventListener('error', event => {
 
 function renderMenu(){
   const today = businessTime().day;
-  const items = MENU.filter(i=>i.cat===activeCat && !HIDDEN_ITEM_IDS.includes(i.id));
+  const items = MENU.filter(i=>i.cat===activeCat && !HIDDEN_ITEM_IDS.includes(i.id) && isWithinAvailability(i));
   const seenGroups = new Set();
   const display = [];
   items.forEach(i=>{
@@ -409,7 +413,7 @@ function renderMenu(){
   });
 
   const el = document.getElementById('menu');
-  const categoryBanners = CAT_BANNERS[activeCat];
+  const categoryBanners = (CAT_BANNERS[activeCat] || []).filter(b => !b.productId || MENU.some(item => item.id === b.productId && isWithinAvailability(item)));
   const dailyBanner = activeCat === 'Combos' && categoryBanners.find(b=>b.day===today);
   const banners = dailyBanner ? [dailyBanner] : categoryBanners;
   let bannerHtml = '';
@@ -583,7 +587,7 @@ function validCash(total){
 }
 function canAddItem(id){
   const item = MENU.find(product => product.id === id);
-  if(!item || item.soldOut || item.comingSoon || HIDDEN_CATS.includes(item.cat)) return false;
+  if(!item || !isWithinAvailability(item) || item.soldOut || item.comingSoon || HIDDEN_CATS.includes(item.cat)) return false;
   if(!isItemOrderable(item)){ showUnavailableNotice(id); return false; }
   return true;
 }
@@ -733,7 +737,7 @@ function shareLocation(){
 }
 function isItemOrderable(item){
   if(birthdayState().closed) return false;
-  if(item.soldOut || item.comingSoon || HIDDEN_CATS.includes(item.cat) || HIDDEN_ITEM_IDS.includes(item.id)) return false;
+  if(!isWithinAvailability(item) || item.soldOut || item.comingSoon || HIDDEN_CATS.includes(item.cat) || HIDDEN_ITEM_IDS.includes(item.id)) return false;
   if(item.days && !item.days.includes(businessTime().day)) return false;
   if(KITCHEN_HOURS_ITEM_IDS.includes(item.id)) return isMenuOpenNow();
   if(FULL_MENU_ORDERING_ENABLED) return true;
@@ -1066,6 +1070,10 @@ function itemDayNotice(item){
 function showUnavailableNotice(id){
   if(birthdayState().closed){ openHours('🎂 Cerrado por cumpleaños', 'Hoy cerramos a las 19h00 para celebrar al gato mesero. Puedes dejar un regalo desde $1 para los michis de la calle en el aviso de cumpleaños.'); return; }
   const item = MENU.find(product => product.id === id);
+  if(item && !isWithinAvailability(item)){
+    openHours('Promoción por tiempo limitado', item.promoNote || 'Este producto ya no está disponible.');
+    return;
+  }
   if(item?.days && !item.days.includes(businessTime().day)){
     openHours('Combo del día', itemDayNotice(item));
     return;
@@ -1307,9 +1315,10 @@ let lastAvailability = '';
 function refreshAvailability(){
   if(document.visibilityState !== 'visible' || document.activeElement?.matches('input,textarea,select')) return;
   const time = businessTime();
-  const key = `${time.day}:${isMenuOpenNow()}:${JSON.stringify(birthdayState())}`;
+  const key = `${time.day}:${isMenuOpenNow()}:${JSON.stringify(birthdayState())}:${MENU.map(item => isWithinAvailability(item)).join()}`;
   if(key === lastAvailability) return;
   lastAvailability = key;
+  cart = sanitizeCart(cart);
   refreshBirthday();
   renderMenu();
   updateBars();

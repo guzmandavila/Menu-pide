@@ -147,6 +147,37 @@ test('Carrito y mensaje distinguen los tamaños de papas', () => useFixture(asyn
   assert.match(message, /Wachipapa.*Grande/i);
 }));
 
+test('Strawberry abre en portada y vence al terminar el domingo 27 en Ecuador', () => useFixture(async ({ page }) => {
+  assert.equal(await page.evaluate(() => activeCat), 'Bebidas Calientes');
+  for (const [time, available] of [
+    ['2026-09-19T04:59:59Z', false],
+    ['2026-09-19T05:00:00Z', true],
+    ['2026-09-28T04:59:59Z', true],
+    ['2026-09-28T05:00:00Z', false],
+  ]) {
+    const state = await page.evaluate(time => {
+      window.__setTestTime(time);
+      renderMenu();
+      const item = MENU.find(i => i.id === 'strawberry-catpuccino');
+      return { orderable: isItemOrderable(item), price: item.price,
+        card: !!document.getElementById('qty-strawberry-catpuccino'),
+        banner: !!document.querySelector('.cat-banner-slide img[src="banners/bc-strawberry-catpuccino.jpeg"]'),
+        restored: !!sanitizeCart({ 'strawberry-catpuccino': { qty: 1 } })['strawberry-catpuccino'] };
+    }, time);
+    assert.deepEqual(state, { orderable: available, price: 3, card: available, banner: available, restored: available });
+  }
+  await page.evaluate(() => {
+    window.__setTestTime('2026-09-28T04:59:59Z');
+    renderMenu();
+    changeQty('strawberry-catpuccino', 1);
+    refreshAvailability();
+    window.__setTestTime('2026-09-28T05:00:00Z');
+    refreshAvailability();
+  });
+  assert.equal(await page.evaluate(() => !!cart['strawberry-catpuccino']), false);
+  assert.equal(await page.locator('.cat-banner-slide img[src="banners/bc-strawberry-catpuccino.jpeg"]').count(), 0);
+}));
+
 test('Los horarios incluyen todos los tamaños y sus límites de lunes y domingo', () => useFixture(async ({ page }) => {
   for (const [time, expected] of [
     ['2026-09-21T23:59:00Z', false], ['2026-09-22T00:00:00Z', true],
@@ -180,7 +211,7 @@ test('Abrir WhatsApp y recargar conserva todos los datos y el mismo código', ()
   assert.equal(before.cart.catpuccino.milk, 'almendra');
   assert.equal(before.cart.catpuccino.syrup, 'avellana');
   assert.equal(before.cart.catpuccino.note, 'Poca espuma');
-  assert.equal(before.draft.currentOrderCode, before.currentOrderCode);
+  assert.equal(before.draft.orderCode, before.currentOrderCode);
   await page.reload({ waitUntil: 'domcontentloaded' });
   await ready();
   const after = await orderState(page);
