@@ -69,9 +69,9 @@ for (let i = MENU.length - 1; i >= 0; i--) {
 // Nara Sunset se presenta sin una descripción redundante en la tarjeta.
 const naraSunset = MENU.find(item => item.id === 'nara-sunset');
 if (naraSunset) naraSunset.desc = '';
-// La empanada de queso vuelve a estar disponible.
+// La empanada de queso está agotada.
 const empanadaQueso = MENU.find(item => item.id === 'empanada-queso');
-if (empanadaQueso) delete empanadaQueso.soldOut;
+if (empanadaQueso) empanadaQueso.soldOut = true;
 // Especial semanal: reemplaza el Apple Crumble por minicake de banano.
 const miniCake = MENU.find(item => item.id === 'mini-cake-del-dia');
 if (miniCake) {
