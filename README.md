@@ -6,7 +6,7 @@ Menú estático publicado en [GitHub Pages](https://guzmandavila.github.io/Menu-
 
 Edita únicamente `menu-config.json` para estos datos:
 
-- `whatsappNumber`: número internacional, entre comillas, sin `+`, espacios ni guiones. Por ejemplo, **0979864314 → `"593979864314"`**: se elimina el cero inicial y se añade `593`.
+- `whatsappNumber`: número internacional, entre comillas, sin `+`, espacios ni guiones. Por ejemplo, **0984175463 → `"593984175463"`**: se elimina el cero inicial y se añade `593`.
 - `paymentsUrl`: enlace de pagos.
 - `instagramUrl`: perfil de Instagram.
 - `communityUrl`: invitación a la comunidad de WhatsApp.
