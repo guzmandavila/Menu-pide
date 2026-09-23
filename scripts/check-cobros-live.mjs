@@ -30,16 +30,16 @@ try{
  const cash=await makeOrder('efectivo');created.push(cash.code);await admin.click('#refresh');await admin.fill('#search',cash.code);await admin.getByRole('button',{name:'Confirmar cobro',exact:true}).click();await admin.waitForFunction(()=>document.querySelector('#orders').textContent.includes('No hay pedidos'));
  state=(await api('/api/admin')).data;assert.equal(state.orders.find(o=>o.code===cash.code).account,'Efectivo');assert.equal(state.orders.find(o=>o.code===bank.code).account,'Pichincha');
  const summary=await admin.evaluate(()=>ClowderLedger.summarize(snapshot.orders,snapshot.settlements,document.querySelector('#day').value));
- // La base de esta publicación es nueva. Si en el futuro hubiera registros, comparar deltas.
+ // Comparar deltas para conservar los registros previos del usuario.
  const beforeSum=await admin.evaluate(data=>ClowderLedger.summarize(data.orders,data.settlements,document.querySelector('#day').value),before.data);
  assert.equal(summary.pending-beforeSum.pending,bank.cents);assert.equal(summary.accounts.Efectivo.total-beforeSum.accounts.Efectivo.total,cash.cents);
- await admin.fill('#settlementAmount',(bank.cents/100).toFixed(2));await admin.fill('#settlementNote','PRUEBA TÉCNICA · sin transferencia real');await admin.click('#settlement button');await admin.waitForFunction(()=>document.querySelector('#settlements').textContent.includes('PRUEBA TÉCNICA'));
+ await admin.fill('#settlementAmount',(bank.cents/100).toFixed(2));await admin.fill('#settlementNote','PRUEBA TÉCNICA · sin transferencia real');await admin.click('#settlement button');await admin.waitForFunction(()=>!busy && document.querySelector('#settlementAmount').value==='');
  state=(await api('/api/admin')).data;deliveryId=state.settlements.find(s=>!before.data.settlements.some(b=>b.id===s.id)).id;
  assert.equal(await admin.evaluate(()=>ClowderLedger.summarize(snapshot.orders,snapshot.settlements,document.querySelector('#day').value).pending),beforeSum.pending);
  await admin.selectOption('#filter','paid');await admin.fill('#search',bank.code);await admin.getByRole('button',{name:'Cancelar pedido',exact:true}).click();await admin.waitForFunction(()=>document.querySelector('#orders').textContent.includes('No hay pedidos'));
  await admin.selectOption('#filter','cancelled');await admin.getByRole('button',{name:'Confirmar devolución realizada',exact:true}).click();await admin.waitForFunction(()=>document.querySelector('#orders').textContent.includes('Devolución registrada'));
  await admin.locator('#manualEntry summary').click();await admin.fill('#manualName','PRUEBA TÉCNICA · COBRO MANUAL');await admin.fill('#manualAmount','0.01');await admin.selectOption('#manualAccount','Efectivo');await admin.click('#manual button');
- await admin.waitForFunction(()=>document.querySelector('#manualName').value==='');
+ await admin.waitForFunction(()=>!busy && document.querySelector('#manualName').value==='');
  const manual=(await api('/api/admin')).data.orders.find(o=>o.payload.name==='PRUEBA TÉCNICA · COBRO MANUAL'&&!before.data.orders.some(b=>b.code===o.code));assert.ok(manual);created.push(manual.code);assert.equal(manual.status,'paid');assert.equal(manual.cents,1);
  await admin.setViewportSize({width:390,height:844});assert.equal(await admin.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),true);
  await admin.screenshot({path:'.sites-runtime/panel-publicado.png',fullPage:true});

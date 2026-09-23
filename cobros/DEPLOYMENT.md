@@ -31,3 +31,7 @@ Para recuperar datos se debe usar el servicio y su base D1; GitHub solo conserva
 `check.mjs` en el checkout del servicio comprueba autenticación, idempotencia, estados, auditoría, cobro manual y límites. `scripts/check-cobros-live.mjs` comprueba las URLs publicadas mediante credenciales suministradas solo por stdin. Intercepta WhatsApp, registra exclusivamente pedidos identificados como pruebas y al terminar cancela esos pedidos y anula su entrega. Los datos reales existentes se conservan.
 
 La versión del menú ya abierta en un teléfono puede necesitar recargarse para recibir el código nuevo.
+
+## Activación verificada
+
+2026-09-22 20:01 -05: prueba completada desde el menú y el panel públicos de GitHub, sin sesión de ChatGPT. Se verificaron cobros bancarios, efectivo, entrega, cancelación, devolución, entrada manual de cobro y pantalla móvil. Se conservaron los registros previos del usuario; los registros técnicos añadidos se cancelaron y su entrega se anuló.
