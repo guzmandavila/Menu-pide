@@ -28,6 +28,7 @@ const MENU = [
   { id:'sakuramatcha-latte', cat:'Matcha', name:'SakuraMatcha Latte', desc:'Matcha, leche y fresa, con hielo.', price:4.15, milk:true, img:'assets/image-73038c7da3c63e99.jpg' },
 
   // ---- Panadería ----
+  { id:'galleta', cat:'Snack Dulce', name:'Galleta', desc:'', price:2.0 },
   { id:'mini-cake-del-dia', cat:'Snack Dulce', name:'Apple Crumble Cake', desc:'Harina de almendra, harina de coco, ghee y manzana natural, cobertura de chocolate blanco.', price:2.6, scoop:true, accent:'#C8433B', img:'miniaturas/apple-crumble.jpg', imgScoop:'miniaturas/apple-crumble-helado.jpg' },
 
   { id:'brownie', cat:'Snack Dulce', name:'Brownie', desc:'Brownie intenso y húmedo, con cacao orgánico, endulzado con alulosa y panela.', price:3.0, scoop:true, img:'assets/image-6d3c530cc30feadd.jpg' },
@@ -84,8 +85,8 @@ if (miniCake) {
   miniCake.featured = true;
   miniCake.featuredTag = 'MINICAKE DE LA SEMANA';
 }
-// El minicake de banano está agotado y no debe aparecer en el menú.
-const HIDDEN_ITEM_IDS = ['mini-cake-del-dia'];
+// El minicake y el brownie siguen ocultos; Snack Dulce se reactiva solo con la galleta.
+const HIDDEN_ITEM_IDS = ['mini-cake-del-dia', 'brownie'];
 // Información de preparación visible en cada tarjeta.
 ['wachipapa','tocipapa','wachipapa-grande','tocipapa-grande'].forEach(id => {
   const item = MENU.find(product => product.id === id);
@@ -95,17 +96,11 @@ MENU.filter(item => item.group === 'empanada').forEach(item => {
   item.name = `Empanada de Hojaldre de ${item.flavor.toLowerCase()}`;
   item.processTag = '♨️ Horneada · sin sartén ni aceite' + (item.id === 'empanada-pollo' ? ' · Menos de 20 min' : '');
 });
-// MilkiShaki está de vuelta y disponible para pedir.
+// MilkiShaki y AffoCato agotados temporalmente.
 const ICE_CREAM_AVAILABLE = true;
-const ICE_CREAM_DRINK_IDS = ['milkishaki-nutella', 'milkishaki-fresa', 'milkishaki-salted-caramel'];
+const ICE_CREAM_DRINK_IDS = ['milkishaki-nutella', 'milkishaki-fresa', 'milkishaki-salted-caramel', 'affocato'];
 MENU.forEach(item => {
-  if (ICE_CREAM_DRINK_IDS.includes(item.id)) {
-    delete item.soldOut;
-    delete item.comingSoon;
-    item.featured = true;
-    item.featuredTag = '¡MILKISHAKI DE VUELTA!';
-    item.promoNote = '✨ ¡De vuelta! Pide tu MilkiShaki favorito hoy.';
-  }
+  if (ICE_CREAM_DRINK_IDS.includes(item.id)) item.soldOut = true;
   if (!ICE_CREAM_AVAILABLE && item.scoop) item.scoop = false;
 });
 ['brownie'].forEach(id => {
@@ -133,7 +128,6 @@ const CAT_BANNERS = {
     { img:'banners/ss-banner-02.jpg', alt:'Wachipapas — el cierre perfecto de tu fin de semana' },
   ],
   'Bebidas Frías': [
-    { img:'banners/bf-banner-01.jpg', alt:'¡MilkiShaki de vuelta! Nutella, brownie bites, salsa de chocolate casera y helado de vainilla' },
     { img:'banners/bf-banner-02.jpg', alt:'Berry Bloom — limonada con salsa de fresa, refrescante y sin café' },
   ],
   'Bebida del Mes': [
@@ -146,7 +140,7 @@ const CAT_BANNERS = {
 };
 // Categorías ocultas temporalmente: sus productos siguen en MENU (por si se reactivan),
 // pero no aparecen como pestaña hasta sacarlas de esta lista.
-const HIDDEN_CATS = ['Merch Clowder', 'Congelados y Más', 'Snack Dulce']; // categorías sin productos disponibles
+const HIDDEN_CATS = ['Merch Clowder', 'Congelados y Más']; // categorías sin productos disponibles
 const CATS = [...new Set(MENU.map(i=>i.cat))].filter(c => !HIDDEN_CATS.includes(c));
 function visibleCats(){
   return CATS;

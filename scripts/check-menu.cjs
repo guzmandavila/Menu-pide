@@ -121,7 +121,9 @@ test('Todos los menús se muestran en móvil sin errores ni desbordamiento horiz
 }));
 
 test('Pago exacto funciona con 3 × $4.90 y rechaza efectivo insuficiente o fracciones de centavo', () => useFixture(async ({ page }) => {
-  await prepare(page, { items: { 'milkishaki-fresa': 3 }, pay: 'efectivo' });
+  // Producto sintético para verificar centavos sin depender del stock del catálogo.
+  await page.evaluate(() => MENU.push({ id:'test-centavos', cat:'Bebidas Frías', name:'Prueba centavos', price:4.9 }));
+  await prepare(page, { items: { 'test-centavos': 3 }, pay: 'efectivo' });
   assert.equal(await page.locator('#drawerTotal').textContent(), '$14.70');
   assert.equal(await page.locator('#cashAmount').inputValue(), '14.70');
   assert.equal(await page.locator('#sendBtn').isDisabled(), false);
