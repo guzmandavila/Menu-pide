@@ -237,6 +237,28 @@ test('El bloqueo de popup conserva el pedido y prepara el destino alternativo', 
   assert.equal(state.draft.cart.catpuccino.qty, 1);
 }));
 
+test('Pedido registrado permite recuperar WhatsApp cuando la navegación falla o se bloquea', () => useFixture(async ({ page, state }) => {
+  state.config.ordersApiUrl = 'https://orders.test';
+  const orders = [];
+  await page.route('https://orders.test/api/orders', async route => {
+    orders.push(route.request().postDataJSON());
+    await route.fulfill({ status: 200, contentType: 'application/json', body: '{"ok":true}' });
+  });
+  await prepare(page);
+  await page.evaluate(() => { MenuContact.navigate = () => { throw new Error('Navigation blocked'); }; });
+  await page.evaluate(() => sendOrder());
+  assert.equal(orders.length, 1);
+  assert.equal(await page.locator('#contactError').isVisible(), false);
+  assert.equal(await page.locator('#whatsappRecovery').isVisible(), true);
+  const destination = await page.locator('#whatsappRecoveryLink').getAttribute('href');
+  assert.equal(new URL(destination).hostname, 'wa.me');
+  assert.ok(new URL(destination).searchParams.get('text').includes(orders[0].code));
+  await page.route('https://wa.me/**', route => route.fulfill({ status: 200, body: 'WhatsApp interceptado' }));
+  await page.locator('#whatsappRecoveryLink').click();
+  await page.waitForURL('https://wa.me/**');
+  assert.equal(orders.length, 1, 'El enlace de recuperación no debe registrar otro pedido');
+}));
+
 test('Nuevo pedido limpia carrito y código; el siguiente recibe otro código', () => useFixture(async ({ page }) => {
   await prepare(page);
   await page.evaluate(() => sendOrder());

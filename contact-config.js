@@ -47,8 +47,10 @@
     return target;
   }
   function navigate(target, destination) {
-    if (target && !target.closed) target.location.replace(destination);
-    else window.location.assign(destination);
+    try {
+      if (target && !target.closed) { target.location.replace(destination); return; }
+    } catch (_) {}
+    window.location.assign(destination);
   }
   window.MenuContact = { refresh, url, reserveWindow, navigate, get value() { return config; } };
   document.addEventListener('click', async event => {

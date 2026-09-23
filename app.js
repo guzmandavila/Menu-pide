@@ -1248,6 +1248,7 @@ async function sendOrder(){
   const target = MenuContact.reserveWindow();
   sendingOrder = true;
   document.getElementById('contactError').hidden = true;
+  document.getElementById('whatsappRecovery').hidden = true;
   document.getElementById('sendBtn').textContent = 'Conectando con WhatsApp…';
   updateBars();
   try {
@@ -1256,12 +1257,21 @@ async function sendOrder(){
     if(transfer) msg += `🏦 Cuentas: ${contact.paymentsUrl}\n`;
     msg += `📸 Instagram: ${contact.instagramUrl}\n`;
     msg += `💬 Comunidad: ${contact.communityUrl}`;
-    MenuContact.navigate(target, MenuContact.url(msg));
+    const destination = MenuContact.url(msg);
+    // Un enlace directo conserva el gesto del cliente si el navegador bloquea la apertura.
+    document.getElementById('whatsappRecoveryLink').href = destination;
+    document.getElementById('whatsappRecovery').hidden = false;
+    try {
+      MenuContact.navigate(target, destination);
+    } catch (_) {
+      // El pedido ya está registrado: el enlace permite continuar sin volver a registrarlo.
+      try { if(target) target.close(); } catch (_) {}
+    }
   const confirmation = document.getElementById('orderComplete');
   confirmation.classList.add('open');
   setTimeout(() => confirmation.classList.remove('open'), 7000);
   } catch(error) {
-    if(target) target.close();
+    try { if(target) target.close(); } catch (_) {}
     const message = document.getElementById('contactError');
     message.textContent = (error.message && error.name !== 'AbortError' ? error.message + ' ' : '') + 'No pudimos completar el envío. Revisa tu conexión e inténtalo otra vez. Tu pedido sigue guardado.';
     message.hidden = false;
@@ -1279,6 +1289,8 @@ function startNewOrder(){
 }
 
 function completeOrder(){
+  document.getElementById('whatsappRecovery').hidden = true;
+  document.getElementById('whatsappRecoveryLink').removeAttribute('href');
   // El mensaje se preparó en WhatsApp; su envío final ocurre allí.
   locationRequestVersion++;
   document.getElementById('locationStatus').textContent = '';
