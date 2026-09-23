@@ -42,7 +42,7 @@ const MENU = [
   { id:'wachipapa', cat:'Snack Sal', name:'Wachipapa', desc:'Papas corte recto con chorizo argentino y salsa mayochurri de la casa. 120 g (35–40 g de chorizo).', price:3.0, img:'assets/image-a77569a7a899b63a.jpg', group:'wachipapa', flavor:'Regular' },
   { id:'wachipapa-grande', cat:'Snack Sal', name:'Wachipapa', desc:'Papas corte recto con chorizo argentino y salsa mayochurri de la casa. 180 g (50–60 g de chorizo).', price:4.0, img:'assets/image-a77569a7a899b63a.jpg', group:'wachipapa', flavor:'Grande' },
   { id:'empanada-pollo', cat:'Snack Sal', name:'Empanada de Hojaldre', desc:'Pechuga de pollo con nuestra salsa de vegetales. No te pierdas nuestro aderezo de mayonesa de la casa.', price:2.4, img:'assets/image-b46285ee20adcc24.jpg', group:'empanada', flavor:'Pollo' },
-  { id:'empanada-queso', cat:'Snack Sal', name:'Empanada de Hojaldre', desc:'Hojaldre horneado y crocante, relleno de queso de búfala.', price:1.5, soldOut:true, img:'assets/image-b46285ee20adcc24.jpg', group:'empanada', flavor:'Queso' },
+  { id:'empanada-queso', cat:'Snack Sal', name:'Empanada de Hojaldre', desc:'Hojaldre horneado y crocante, relleno de queso de búfala.', price:1.5, img:'assets/image-b46285ee20adcc24.jpg', group:'empanada', flavor:'Queso' },
   { id:'empanada-pizza', cat:'Snack Sal', name:'Empanada de Hojaldre', desc:'Hojaldre horneado y crocante, relleno de queso mozzarella y tocineta.', price:0, img:'assets/image-b46285ee20adcc24.jpg', group:'empanada', flavor:'Pizza', comingSoon:true },
   { id:'virginia-melt', cat:'Snack Sal', name:'Virginia Melt', desc:'Pan de masa madre tostado con ghee, jamón Virginia, mozzarella de búfala y salsa panini, con chips de papa.', price:3.5, soldOut:true, img:'assets/image-96afa6196cb83296.jpg' },
   { id:'leche-almendras', cat:'Congelados y Más', name:'Leche de Almendras Casera', desc:'Nuestra leche de almendras hecha en casa, en botella para llevar.', price:0, img:'assets/image-f54974e93c477710.jpg', comingSoon:true },
@@ -70,9 +70,6 @@ for (let i = MENU.length - 1; i >= 0; i--) {
 // Nara Sunset se presenta sin una descripción redundante en la tarjeta.
 const naraSunset = MENU.find(item => item.id === 'nara-sunset');
 if (naraSunset) naraSunset.desc = '';
-// La empanada de queso está agotada.
-const empanadaQueso = MENU.find(item => item.id === 'empanada-queso');
-if (empanadaQueso) empanadaQueso.soldOut = true;
 // Especial semanal: reemplaza el Apple Crumble por minicake de banano.
 const miniCake = MENU.find(item => item.id === 'mini-cake-del-dia');
 if (miniCake) {
