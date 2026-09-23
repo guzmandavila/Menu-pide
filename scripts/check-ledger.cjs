@@ -1,0 +1,18 @@
+const assert = require('node:assert/strict');
+const {summarize,day}=require('../cobros/ledger.js');
+const date='2026-09-22T23:00:00Z';
+assert.equal(day('2026-09-23T03:59:00Z'),'2026-09-22');
+const paid=(account,cents,paid_at=date)=>({status:'paid',account,cents,paid_at});
+const orders=[paid('Guayaquil',10000),paid('Pichincha',8000),paid('Efectivo',2000),paid('Produbanco',5000,'2026-09-21T15:00:00Z'),{status:'pending',cents:null},{status:'cancelled',cents:9000,paid_at:date,account:'Pichincha'}];
+let result=summarize(orders,[],'2026-09-22');
+assert.equal(result.pending,23000);
+assert.equal(result.accounts.Efectivo.today,2000);
+assert.equal(result.accounts.Produbanco.today,0);
+assert.equal(result.refunds,9000);
+result=summarize(orders,[{cents:23000}],'2026-09-22');
+assert.equal(result.pending,0);
+orders[0].status='cancelled';orders[0].refunded_at=date;
+result=summarize(orders,[{cents:23000}],'2026-09-22');
+assert.equal(result.pending,-10000);
+assert.equal(result.refunds,9000);
+console.log('OK: efectivo separado, acumulados, entregas, cancelaciones, devoluciones y fecha de Ecuador');

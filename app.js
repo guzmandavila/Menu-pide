@@ -178,6 +178,9 @@ let activeCat = MENU.some(i=>i.cat==='Bebidas Calientes') ? 'Bebidas Calientes' 
 let cart = {}; // id -> {qty, note}
 let mode = '';
 let payMethod = '';
+const PAYMENT_BANKS = ['Guayaquil','Pichincha','Bolivariano','Pacífico','Produbanco'];
+let paymentBank = '';
+let orderReceiptKey = '';
 let deliveryLocationUrl = '';
 let lastCartCount = 0;
 let locationRequestVersion = 0;
@@ -245,6 +248,8 @@ try {
     cart = sanitizeCart(draft.cart);
     mode = ['mesa','llevar','delivery'].includes(draft.mode) ? draft.mode : '';
     payMethod = ['efectivo','transferencia'].includes(draft.payMethod) ? draft.payMethod : '';
+    paymentBank = PAYMENT_BANKS.includes(draft.paymentBank) ? draft.paymentBank : '';
+    orderReceiptKey = /^[a-f0-9]{64}$/.test(draft.orderReceiptKey || '') ? draft.orderReceiptKey : '';
     deliveryLocationUrl = typeof draft.deliveryLocationUrl === 'string' && /^https:\/\/www\.google\.com\/maps\?q=-?[\d.]+,-?[\d.]+$/.test(draft.deliveryLocationUrl) ? draft.deliveryLocationUrl : '';
   }
 } catch(e) {}
@@ -252,7 +257,7 @@ try {
 function persistOrderDraft(){
   try {
     localStorage.setItem('clowder_order_draft', JSON.stringify({
-      cart, mode, payMethod, deliveryLocationUrl, orderCode:currentOrderCode,
+      cart, mode, payMethod, paymentBank, orderReceiptKey, deliveryLocationUrl, orderCode:currentOrderCode,
           customerName: document.getElementById('customerName')?.value || '',
           cashAmount: document.getElementById('cashAmount')?.value || '',
           deliveryManzana: document.getElementById('deliveryManzana')?.value || '',
@@ -874,6 +879,9 @@ function updateBars(){
 
   const cashAmountEl = document.getElementById('cashAmount');
   const cashActive = payMethod === 'efectivo';
+  document.getElementById('bankField').hidden = payMethod !== 'transferencia';
+  document.getElementById('paymentBank').value = paymentBank;
+  const bankOk = payMethod !== 'transferencia' || PAYMENT_BANKS.includes(paymentBank);
   const cashOk = !cashActive || validCash(total);
   const cashChange = document.getElementById('cashChange');
   if(cashChange) cashChange.classList.toggle('open', cashActive);
@@ -892,7 +900,7 @@ function updateBars(){
   const modeOk = storeOnly || mode !== '';
   const addressOk = mode !== 'delivery' || deliveryAddressOk();
   const deliveryOk = mode !== 'delivery' || isDeliveryAvailableNow();
-  const listo = count > 0 && nameOk && modeOk && addressOk && deliveryOk && payMethod !== '' && cashOk;
+  const listo = count > 0 && nameOk && modeOk && addressOk && deliveryOk && payMethod !== '' && cashOk && bankOk;
   ['btnMesa','btnLlevar'].forEach(id => {
     const el = document.getElementById(id);
     if(el) el.classList.toggle('option-missing', count > 0 && !storeOnly && !modeOk);
@@ -911,6 +919,7 @@ function updateBars(){
     if(mode === 'delivery' && !deliveryOk) faltan.push('delivery disponible');
     if(mode === 'delivery' && deliveryOk && !addressOk) faltan.push('manzana y villa');
     if(payMethod === '') faltan.push('cómo pagas');
+    if(!bankOk) faltan.push('el banco al que transfieres');
     if(cashActive && !cashOk) faltan.push('con cuánto pagas');
     if(faltan.length){
       const lista = faltan.length === 1
@@ -1132,6 +1141,22 @@ function createOrderCode(now){
   return `CL-${parts.year}${parts.month}${parts.day}-${parts.hour}${parts.minute}-${random}`;
 }
 
+async function registerSharedOrder(apiUrl, order){
+  // Sin servidor configurado, el menú conserva su funcionamiento actual.
+  if(!apiUrl) return;
+  const url = new URL(apiUrl);
+  if(url.protocol !== 'https:' && !(['localhost','127.0.0.1'].includes(url.hostname) && url.protocol === 'http:')) throw new Error('La dirección del registro de pedidos no es válida.');
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), 15000);
+  try {
+    const response = await fetch(url.href.replace(/\/$/, '') + '/api/orders', {
+      method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify(order), signal:controller.signal
+    });
+    const result = await response.json();
+    if(!response.ok) throw new Error(result.error || 'No pudimos registrar el pedido.');
+  } finally { clearTimeout(timeout); }
+}
+
 async function sendOrder(){
   if(sendingOrder) return;
 
@@ -1172,6 +1197,10 @@ async function sendOrder(){
     currentOrderCode = createOrderCode(now);
     persistOrderDraft();
   }
+  if(!orderReceiptKey){
+    orderReceiptKey = Array.from(crypto.getRandomValues(new Uint8Array(32)), b => b.toString(16).padStart(2,'0')).join('');
+    persistOrderDraft();
+  }
   const orderCode = currentOrderCode;
   const totalItems = entries.reduce((s,[,c])=>s+c.qty,0);
 
@@ -1197,7 +1226,7 @@ async function sendOrder(){
   }
   if(payMethod) msg += (payMethod === 'efectivo'
     ? `💵 *Efectivo: paga con $${cashAmount.toFixed(2)}*\n`
-    : `🏦 *Pago: transferencia*\n`);
+    : `🏦 *Pago: transferencia a ${paymentBank}*\n`);
   msg += `\n*PRODUCTOS*\n`;
   entries.forEach(([id,c])=>{
     const item = MENU.find(m=>m.id===id);
@@ -1223,6 +1252,7 @@ async function sendOrder(){
   if(hasFrozenOrder) msg += `📦 Producto bajo stock: coordinamos contigo la entrega o retiro.\n`;
   msg += `\n☕ *¡Gracias! Te esperamos en Clowder.*\n`;
   const transfer = payMethod === 'transferencia';
+  const sharedOrder = {code:orderCode, receiptKey:orderReceiptKey, name, method:payMethod, bank:transfer ? paymentBank : '', totalCents:Math.round(grandTotal()*100), details:msg};
   // Build the complete order before the asynchronous contact check.
   const target = MenuContact.reserveWindow();
   sendingOrder = true;
@@ -1231,6 +1261,7 @@ async function sendOrder(){
   updateBars();
   try {
     const contact = await MenuContact.refresh();
+    await registerSharedOrder(contact.ordersApiUrl, sharedOrder);
     if(transfer) msg += `🏦 Cuentas: ${contact.paymentsUrl}\n`;
     msg += `📸 Instagram: ${contact.instagramUrl}\n`;
     msg += `💬 Comunidad: ${contact.communityUrl}`;
@@ -1241,7 +1272,7 @@ async function sendOrder(){
   } catch(error) {
     if(target) target.close();
     const message = document.getElementById('contactError');
-    message.textContent = 'No pudimos abrir WhatsApp. Revisa tu conexión e inténtalo otra vez. Tu pedido sigue guardado.';
+    message.textContent = (error.message && error.name !== 'AbortError' ? error.message + ' ' : '') + 'No pudimos completar el envío. Revisa tu conexión e inténtalo otra vez. Tu pedido sigue guardado.';
     message.hidden = false;
   } finally {
     sendingOrder = false;
@@ -1265,6 +1296,8 @@ function completeOrder(){
   cart = {};
   mode = '';
   payMethod = '';
+  paymentBank = '';
+  orderReceiptKey = '';
   deliveryLocationUrl = '';
   currentOrderCode = '';
   ['customerName','cashAmount','deliveryManzana','deliveryVilla'].forEach(id => {

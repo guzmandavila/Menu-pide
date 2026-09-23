@@ -286,6 +286,14 @@
           <button id="btnEfectivo" onclick="setPay('efectivo')">Efectivo</button>
           <button id="btnTransfer" onclick="setPay('transferencia')">Transferencia</button>
         </div>
+        <div id="bankField" hidden style="margin:12px 0">
+          <label for="paymentBank">¿A qué banco transfieres?</label>
+          <select id="paymentBank" class="name-input" onchange="paymentBank=this.value; updateBars()">
+            <option value="">Selecciona el banco receptor</option>
+            <option>Guayaquil</option><option>Pichincha</option><option>Bolivariano</option><option>Pacífico</option><option>Produbanco</option>
+          </select>
+          <p class="name-hint">El banco de la cuenta que recibe tu pago.</p>
+        </div>
         <div class="cash-change" id="cashChange">
           <label>¿Con cuánto pagas?
             <input type="number" id="cashAmount" inputmode="decimal" min="0.01" step="0.01" placeholder="Ej. 10.00" oninput="updateBars()">

@@ -1,3 +1,13 @@
 .DS_Store
 REVISION-WEB.md
 tests/
+
+# Datos privados del servicio de cobros
+cobros/*.sqlite3*
+cobros/.env
+__pycache__/
+
+# Checkout independiente del servicio alojado
+clowder-cobros-site/
+
+clowder-cobros-github/

@@ -58,3 +58,13 @@ git push origin main
 ```
 
 Si cambias código o imágenes, incluye también esos archivos. Espera a que termine el despliegue de Pages en GitHub y verifica el [menú publicado](https://guzmandavila.github.io/Menu-pide/) y su [configuración publicada](https://guzmandavila.github.io/Menu-pide/menu-config.json). Comprueba los botones de contacto y el destino de un pedido de prueba sin enviarlo. Un `push` correcto por sí solo no confirma que Pages ya sirva la versión nueva.
+
+## Registro de pedidos y cierre de cobros
+
+El menú guarda cada pedido como pendiente al abrir WhatsApp. El cliente indica efectivo o el banco receptor. Confirma el cobro en https://guzmandavila.github.io/clowder-cobros/ para sumarlo al cierre.
+
+El panel tiene su propio repositorio `guzmandavila/clowder-cobros`; las pantallas están en GitHub Pages y los datos en el servicio Sites/D1 configurado en `ordersApiUrl`. No se requiere iniciar sesión en ChatGPT. La clave administrativa se guarda solo como secreto del servicio, nunca en GitHub.
+
+El pendiente para Fernanda excluye efectivo y cancelados. Las entregas reducen el pendiente acumulado. Los cobros de hoy previos a la activación y los pedidos tomados fuera del menú pueden registrarse desde el panel con «Registrar un cobro de hoy fuera del menú». No se importan cobros históricos automáticamente.
+
+Más detalles de operación y publicación en [`cobros/DEPLOYMENT.md`](cobros/DEPLOYMENT.md). `cobros/server.py` es únicamente el prototipo local: el servicio de producción está en el checkout independiente `clowder-cobros-site`.

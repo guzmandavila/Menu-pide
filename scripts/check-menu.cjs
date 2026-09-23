@@ -22,7 +22,7 @@ let server;
 let baseURL;
 
 async function fixture(options = {}) {
-  const state = { config: { ...originalConfig }, failConfig: false, pageErrors: [], alerts: [] };
+  const state = { config: { ...originalConfig, ordersApiUrl: '' }, failConfig: false, pageErrors: [], alerts: [] };
   const context = await browser.newContext({
     viewport: { width: 390, height: 844 }, locale: 'es-EC', timezoneId: 'America/Guayaquil',
     serviceWorkers: 'block',
@@ -94,6 +94,7 @@ async function prepare(page, options = {}) {
       document.getElementById('deliveryManzana').value = '12';
       document.getElementById('deliveryVilla').value = '8';
     }
+    paymentBank = options.bank || 'Pichincha';
     setPay(options.pay || 'transferencia');
     updateBars();
     if (options.pay === 'efectivo') setExactCash();
