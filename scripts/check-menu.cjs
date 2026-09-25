@@ -120,6 +120,28 @@ test('Todos los menús se muestran en móvil sin errores ni desbordamiento horiz
   }
 }));
 
+test('Stock actual: helados disponibles, queso agotado, pollo limitado y promociones ocultas', () => useFixture(async ({ page }) => {
+  const result = await page.evaluate(() => {
+    const ids = ['affocato', 'milkishaki-nutella', 'milkishaki-fresa', 'milkishaki-salted-caramel'];
+    changeQty('empanada-queso', 1);
+    changeQty('empanada-pollo', 10);
+    return {
+      iceCream: ids.map(id => isItemOrderable(MENU.find(item => item.id === id))),
+      cheese: !!cart['empanada-queso'], chicken: cart['empanada-pollo'].qty,
+      restored: sanitizeCart({ 'empanada-pollo': { qty: 8 }, 'empanada-queso': { qty: 1 }, 'banana-bread-latte': { qty: 1 }, 'combo-cafe-empanada-queso': { qty: 1 } }),
+      hidden: ['Bebida del Mes', 'Combos'].every(cat => !CATS.includes(cat)),
+    };
+  });
+  assert.deepEqual(result.iceCream, [true, true, true, true]);
+  assert.equal(result.cheese, false);
+  assert.equal(result.chicken, 4);
+  assert.equal(result.hidden, true);
+  assert.deepEqual(Object.keys(result.restored), ['empanada-pollo']);
+  assert.equal(result.restored['empanada-pollo'].qty, 4);
+  await page.evaluate(() => selectCat('Snack Sal'));
+  assert.match(await page.locator('#menu').textContent(), /Últimas 4 empanadas de pollo/);
+}));
+
 test('Pago exacto funciona con 3 × $4.90 y rechaza efectivo insuficiente o fracciones de centavo', () => useFixture(async ({ page }) => {
   // Producto sintético para verificar centavos sin depender del stock del catálogo.
   await page.evaluate(() => MENU.push({ id:'test-centavos', cat:'Bebidas Frías', name:'Prueba centavos', price:4.9 }));

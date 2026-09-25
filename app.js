@@ -41,8 +41,8 @@ const MENU = [
   { id:'tocipapa-grande', cat:'Snack Sal', name:'Tocipapa', desc:'Papas corte recto con tocineta crocante y salsa de la casa. 180 g (30–40 g de tocineta).', price:3.5, img:'assets/image-9fa7a5da9f5e3cb0.jpg', group:'tocipapa', flavor:'Grande' },
   { id:'wachipapa', cat:'Snack Sal', name:'Wachipapa', desc:'Papas corte recto con chorizo argentino y salsa mayochurri de la casa. 120 g (35–40 g de chorizo).', price:3.0, img:'assets/image-a77569a7a899b63a.jpg', group:'wachipapa', flavor:'Regular' },
   { id:'wachipapa-grande', cat:'Snack Sal', name:'Wachipapa', desc:'Papas corte recto con chorizo argentino y salsa mayochurri de la casa. 180 g (50–60 g de chorizo).', price:4.0, img:'assets/image-a77569a7a899b63a.jpg', group:'wachipapa', flavor:'Grande' },
-  { id:'empanada-pollo', cat:'Snack Sal', name:'Empanada de Hojaldre', desc:'Pechuga de pollo con nuestra salsa de vegetales. No te pierdas nuestro aderezo de mayonesa de la casa.', price:2.4, img:'assets/image-b46285ee20adcc24.jpg', group:'empanada', flavor:'Pollo' },
-  { id:'empanada-queso', cat:'Snack Sal', name:'Empanada de Hojaldre', desc:'Hojaldre horneado y crocante, relleno de queso de búfala.', price:1.5, img:'assets/image-b46285ee20adcc24.jpg', group:'empanada', flavor:'Queso' },
+  { id:'empanada-pollo', cat:'Snack Sal', name:'Empanada de Hojaldre', desc:'Pechuga de pollo con nuestra salsa de vegetales. No te pierdas nuestro aderezo de mayonesa de la casa.', price:2.4, maxQty:4, promoNote:'¡Últimas 4 empanadas de pollo disponibles!', img:'assets/image-b46285ee20adcc24.jpg', group:'empanada', flavor:'Pollo' },
+  { id:'empanada-queso', cat:'Snack Sal', name:'Empanada de Hojaldre', desc:'Hojaldre horneado y crocante, relleno de queso de búfala.', price:1.5, soldOut:true, img:'assets/image-b46285ee20adcc24.jpg', group:'empanada', flavor:'Queso' },
   { id:'empanada-pizza', cat:'Snack Sal', name:'Empanada de Hojaldre', desc:'Hojaldre horneado y crocante, relleno de queso mozzarella y tocineta.', price:0, img:'assets/image-b46285ee20adcc24.jpg', group:'empanada', flavor:'Pizza', comingSoon:true },
   { id:'virginia-melt', cat:'Snack Sal', name:'Virginia Melt', desc:'Pan de masa madre tostado con ghee, jamón Virginia, mozzarella de búfala y salsa panini, con chips de papa.', price:3.5, soldOut:true, img:'assets/image-96afa6196cb83296.jpg' },
   { id:'leche-almendras', cat:'Congelados y Más', name:'Leche de Almendras Casera', desc:'Nuestra leche de almendras hecha en casa, en botella para llevar.', price:0, img:'assets/image-f54974e93c477710.jpg', comingSoon:true },
@@ -93,11 +93,11 @@ MENU.filter(item => item.group === 'empanada').forEach(item => {
   item.name = `Empanada de Hojaldre de ${item.flavor.toLowerCase()}`;
   item.processTag = '♨️ Horneada · sin sartén ni aceite' + (item.id === 'empanada-pollo' ? ' · Menos de 20 min' : '');
 });
-// MilkiShaki y AffoCato agotados temporalmente.
+// Disponibilidad de las bebidas con helado.
 const ICE_CREAM_AVAILABLE = true;
 const ICE_CREAM_DRINK_IDS = ['milkishaki-nutella', 'milkishaki-fresa', 'milkishaki-salted-caramel', 'affocato'];
 MENU.forEach(item => {
-  if (ICE_CREAM_DRINK_IDS.includes(item.id)) item.soldOut = true;
+  if (ICE_CREAM_DRINK_IDS.includes(item.id)) item.soldOut = !ICE_CREAM_AVAILABLE;
   if (!ICE_CREAM_AVAILABLE && item.scoop) item.scoop = false;
 });
 ['brownie'].forEach(id => {
@@ -137,7 +137,7 @@ const CAT_BANNERS = {
 };
 // Categorías ocultas temporalmente: sus productos siguen en MENU (por si se reactivan),
 // pero no aparecen como pestaña hasta sacarlas de esta lista.
-const HIDDEN_CATS = ['Merch Clowder', 'Congelados y Más']; // categorías sin productos disponibles
+const HIDDEN_CATS = ['Merch Clowder', 'Congelados y Más', 'Bebida del Mes', 'Combos']; // categorías ocultas temporalmente
 const CATS = [...new Set(MENU.map(i=>i.cat))].filter(c => !HIDDEN_CATS.includes(c));
 function visibleCats(){
   return CATS;
@@ -176,6 +176,7 @@ let deliveryLocationUrl = '';
 let lastCartCount = 0;
 let locationRequestVersion = 0;
 const MAX_QTY = 10;
+function itemQuantityLimit(item){ return Math.min(MAX_QTY, item?.maxQty ?? MAX_QTY); }
 function escapeHtml(value){
   return String(value).replace(/[&<>"']/g, char => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[char]));
 }
@@ -223,7 +224,7 @@ function sanitizeCart(value){
     if(!item || !isWithinAvailability(item) || item.soldOut || item.comingSoon || HIDDEN_CATS.includes(item.cat) || HIDDEN_ITEM_IDS.includes(item.id) || !entry || typeof entry !== 'object') continue;
     if(!Number.isInteger(entry.qty) || entry.qty < 1) continue;
     clean[id] = {
-      qty:Math.min(MAX_QTY, entry.qty), note:typeof entry.note === 'string' ? entry.note.slice(0,500) : '',
+      qty:Math.min(itemQuantityLimit(item), entry.qty), note:typeof entry.note === 'string' ? entry.note.slice(0,500) : '',
       milk:item.milk && ['almendra','avena'].includes(entry.milk) ? entry.milk : '',
       scoop:item.scoop && entry.scoop === 'si' ? 'si' : '',
       syrup:item.syrupOption?.includes(entry.syrup) ? entry.syrup : ''
@@ -590,11 +591,14 @@ function canAddItem(id){
 function changeQty(id, delta){
   if(delta > 0 && !canAddItem(id)) return;
   const current = cart[id]?.qty || 0;
-  if(delta > 0 && current >= MAX_QTY){
-    openBigOrder();
+  const item = MENU.find(product => product.id === id);
+  const limit = itemQuantityLimit(item);
+  if(delta > 0 && current >= limit){
+    if(limit < MAX_QTY) alert(`Solo quedan ${limit} unidades de este producto.`);
+    else openBigOrder();
     return;
   }
-  const next = Math.min(MAX_QTY, Math.max(0, current + delta));
+  const next = Math.min(limit, Math.max(0, current + delta));
   if(next===0){ delete cart[id]; }
   else { cart[id] = { qty: next, note: cart[id]?.note || '', milk: cart[id]?.milk || '', scoop: cart[id]?.scoop || '', syrup: cart[id]?.syrup || '' }; }
   const qtyEl = document.getElementById('qty-'+id);
