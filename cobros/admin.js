@@ -49,4 +49,7 @@ function render() {
   if(!$('orders').children.length)$('orders').append(element('p','No hay pedidos con estos filtros.'));
   $('settlements').replaceChildren(...snapshot.settlements.map(s=>element('p',`${date(s.created_at)} · ${money(s.cents)} · ${s.note}`)));
 }
-setInterval(()=>{if(token&&!busy&&!document.hidden&&!document.activeElement.matches('input,select,button'))run(refresh);},60000);
+setInterval(()=>{
+  const editing = document.activeElement.matches('input,select,textarea,[contenteditable="true"]');
+  if(token&&!busy&&!document.hidden&&!editing)run(refresh);
+},30000);
