@@ -29,6 +29,7 @@ const MENU = [
 
   // ---- Panadería ----
   { id:'galleta', cat:'Snack Dulce', name:'Galleta', desc:'', price:2.0 },
+  { id:'funbite', cat:'Snack Dulce', name:'Funbite', desc:'Mix de harinas sin gluten con chips de colores.', price:2.25, img:'assets/funbite.jpeg' },
   { id:'mini-cake-del-dia', cat:'Snack Dulce', name:'Apple Crumble Cake', desc:'Harina de almendra, harina de coco, ghee y manzana natural, cobertura de chocolate blanco.', price:2.6, scoop:true, accent:'#C8433B', img:'miniaturas/apple-crumble.jpg', imgScoop:'miniaturas/apple-crumble-helado.jpg' },
 
   { id:'brownie', cat:'Snack Dulce', name:'Brownie', desc:'Brownie intenso y húmedo, con cacao orgánico, endulzado con alulosa y panela.', price:3.0, scoop:true, img:'assets/image-6d3c530cc30feadd.jpg' },
@@ -82,7 +83,7 @@ if (miniCake) {
   miniCake.featured = true;
   miniCake.featuredTag = 'MINICAKE DE LA SEMANA';
 }
-// El minicake y el brownie siguen ocultos; Snack Dulce se reactiva solo con la galleta.
+// El minicake y el brownie siguen ocultos; Snack Dulce incluye galleta y Funbite.
 const HIDDEN_ITEM_IDS = ['mini-cake-del-dia', 'brownie'];
 // Información de preparación visible en cada tarjeta.
 ['wachipapa','tocipapa','wachipapa-grande','tocipapa-grande'].forEach(id => {
