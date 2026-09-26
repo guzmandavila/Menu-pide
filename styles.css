@@ -491,6 +491,14 @@
     transition:opacity .15s ease;
   }
   .item-info{flex:1; min-width:0;}
+  .funbite-photo{
+    display:block; width:76px; height:76px; flex-shrink:0;
+    overflow:hidden; border-radius:12px; border:2px solid rgba(0,0,0,0.15);
+  }
+  .funbite-photo .item-thumb{
+    display:block; width:100%; height:100%; border:0; border-radius:0;
+    object-position:50% 0%; transform:scale(1.45);
+  }
   .item-name-badge{
     display:inline-block;
     font-family:'Doughie','Inter',sans-serif; font-weight:400; font-size:20px;

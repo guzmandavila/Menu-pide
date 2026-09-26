@@ -448,7 +448,7 @@ function renderMenu(){
       ${i.featured ? `<div class="featured-ribbon">\u{1F43E} ${i.featuredTag||'Destacado'}</div>` : ''}
       ${i.comingSoon ? `<div class="coming-soon-status">✦ ${badgeText}</div>` : ''}
       <div class="item-top">
-        ${(() => { const currentImg = (i.imgScoop && scoop === 'si') ? i.imgScoop : i.img; return currentImg ? `<img class="item-thumb" id="thumb-${i.id}" src="${currentImg}" alt="${i.name}" loading="lazy" decoding="async">` : ''; })()}
+        ${(() => { const currentImg = (i.imgScoop && scoop === 'si') ? i.imgScoop : i.img; if (!currentImg) return ''; const image = `<img class="item-thumb" id="thumb-${i.id}" src="${currentImg}" alt="${i.name}" loading="lazy" decoding="async">`; return i.id === 'funbite' ? `<span class="funbite-photo">${image}</span>` : image; })()}
         <div class="item-info">
           <div class="item-name-badge">${i.__isGroup ? GROUP_NAMES[i.__group] : i.name}</div>
           ${i.classic ? `<span class="classic-tag ${i.classicTheme==='fresh'?'classic-tag-fresh':''}">${i.classic}</span>` : ''}
