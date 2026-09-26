@@ -28,7 +28,7 @@ const MENU = [
   { id:'sakuramatcha-latte', cat:'Matcha', name:'SakuraMatcha Latte', desc:'Matcha, leche y fresa, con hielo.', price:4.15, milk:true, img:'assets/image-73038c7da3c63e99.jpg' },
 
   // ---- Panadería ----
-  { id:'galleta', cat:'Snack Dulce', name:'Galleta', desc:'', price:2.0, img:'assets/galleta.jpeg' },
+  { id:'galleta', cat:'Snack Dulce', name:'Galleta', desc:'Gordita, hecha con mix de harinas sin gluten y trozos de chocolate sin leche.', price:2.0, img:'assets/galleta.jpeg' },
   { id:'funbite', cat:'Snack Dulce', name:'Funbite', desc:'Cupcake de mix de harinas sin gluten con chips de colores.', price:1.50, img:'assets/funbite.jpeg' },
   { id:'mini-cake-del-dia', cat:'Snack Dulce', name:'Apple Crumble Cake', desc:'Harina de almendra, harina de coco, ghee y manzana natural, cobertura de chocolate blanco.', price:2.6, scoop:true, accent:'#C8433B', img:'miniaturas/apple-crumble.jpg', imgScoop:'miniaturas/apple-crumble-helado.jpg' },
 
