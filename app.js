@@ -24,7 +24,7 @@ const MENU = [
   { id:'vanilatte', cat:'Bebidas Frías', name:'Ice Latte', classic:'Latte helado', classicTheme:'fresh', order:2, syrupOption:['vainilla-francesa','avellana','caramelo-salado'], desc:'Espresso, leche y jarabe de vainilla, con hielo.', price:2.75, milk:true, img:'assets/image-c2358fbf75d9fa28.jpg' },
 
   // Nombre provisional; confirmar precio antes de habilitar pedidos.
-  { id:'banana-caramel-latte', cat:'Bebidas Frías', name:'Banana Caramel Latte', classic:'Latte helado de banana y caramelo', classicTheme:'fresh', order:2.5, desc:'Café, leche, banana y caramelo, servido frío.', price:0, comingSoon:true, comingSoonLabel:'Precio por confirmar', comingSoonNote:'Pronto podrás pedirlo aquí.' },
+  { id:'banana-caramel-latte', cat:'Bebidas Frías', name:'Banana Caramel Latte', classic:'Latte helado de banana y caramelo', classicTheme:'fresh', order:2.5, desc:'Café, leche, banana y caramelo, servido frío.', price:0, comingSoon:true, comingSoonLabel:'Precio por confirmar', comingSoonNote:'Pronto podrás pedirlo aquí.', img:'banners/bf-banana-caramel-latte.jpeg' },
 
   // ---- Matcha ----
   { id:'nekomatchalatte', cat:'Matcha', name:'NekoMatchaLatte', syrupOption:['caramelo','vainilla'], desc:'Matcha, leche y hielo.', price:3.5, milk:true, img:'assets/image-a21806fe3017f9d8.jpg' },
@@ -131,6 +131,7 @@ const CAT_BANNERS = {
     { img:'banners/ss-banner-01.jpg', alt:'Empanada de pollo — vegetales frescos picaditos y pechuga de pollo mechada' },
   ],
   'Bebidas Frías': [
+    { productId:'banana-caramel-latte', img:'banners/bf-banana-caramel-latte.jpeg', alt:'Banana Caramel Latte — banana caramelizada, espresso y leche bien fría' },
     { img:'banners/bf-banner-02.jpg', alt:'Berry Bloom — limonada con salsa de fresa, refrescante y sin café' },
   ],
   'Bebida del Mes': [

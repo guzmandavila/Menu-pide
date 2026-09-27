@@ -400,6 +400,9 @@
     border-radius:18px; overflow:hidden; border:1px solid var(--line); line-height:0;
   }
   .cat-banner-slide img{ width:100%; height:auto; display:block; aspect-ratio:3/4; background:var(--bg-alt); }
+  .cat-banner-slide img[src="banners/bf-banana-caramel-latte.jpeg"]{
+    object-fit:contain; object-position:center;
+  }
   .cat-banner-slide img[src="assets/funbite.jpeg"]{
     transform:scale(1.4); transform-origin:50% 12%;
   }
