@@ -123,7 +123,7 @@ test('Todos los menús se muestran en móvil sin errores ni desbordamiento horiz
   }
 }));
 
-test('Stock actual: helados y queso disponibles, pollo y wachipapas agotados', () => useFixture(async ({ page }) => {
+test('Stock actual: helados, queso y wachipapas disponibles; pollo y tocipapas agotados', () => useFixture(async ({ page }) => {
   const result = await page.evaluate(() => {
     const ids = ['affocato', 'milkishaki-nutella', 'milkishaki-fresa', 'milkishaki-salted-caramel'];
     changeQty('empanada-queso', 1);
@@ -131,15 +131,15 @@ test('Stock actual: helados y queso disponibles, pollo y wachipapas agotados', (
     return {
       iceCream: ids.map(id => isItemOrderable(MENU.find(item => item.id === id))),
       cheese: !!cart['empanada-queso'], chicken: !!cart['empanada-pollo'],
-      potatoes: ['wachipapa', 'wachipapa-grande'].map(id => isItemOrderable(MENU.find(item => item.id === id))),
-      restored: sanitizeCart({ 'empanada-pollo': { qty: 8 }, 'wachipapa': { qty: 1 }, 'wachipapa-grande': { qty: 1 }, 'empanada-queso': { qty: 1 }, 'banana-bread-latte': { qty: 1 }, 'combo-cafe-empanada-queso': { qty: 1 } }),
+      potatoes: ['wachipapa', 'wachipapa-grande', 'tocipapa', 'tocipapa-grande'].map(id => isItemOrderable(MENU.find(item => item.id === id))),
+      restored: sanitizeCart({ 'empanada-pollo': { qty: 8 }, 'tocipapa': { qty: 1 }, 'tocipapa-grande': { qty: 1 }, 'empanada-queso': { qty: 1 }, 'banana-bread-latte': { qty: 1 }, 'combo-cafe-empanada-queso': { qty: 1 } }),
       hidden: ['Bebida del Mes', 'Combos'].every(cat => !CATS.includes(cat)),
     };
   });
   assert.deepEqual(result.iceCream, [true, true, true, true]);
   assert.equal(result.cheese, true);
   assert.equal(result.chicken, false);
-  assert.deepEqual(result.potatoes, [false, false]);
+  assert.deepEqual(result.potatoes, [true, true, false, false]);
   assert.equal(result.hidden, true);
   assert.deepEqual(Object.keys(result.restored), ['empanada-queso']);
   assert.equal(result.restored['empanada-queso'].qty, 1);
@@ -168,7 +168,7 @@ test('Pago exacto funciona con 3 × $4.90 y rechaza efectivo insuficiente o frac
 
 test('Carrito y mensaje distinguen los tamaños de papas', () => useFixture(async ({ page }) => {
   // Aislar el formato de tamaños de la disponibilidad temporal.
-  await page.evaluate(() => MENU.filter(item => item.group === 'wachipapa').forEach(item => item.soldOut = false));
+  await page.evaluate(() => MENU.filter(item => ['wachipapa', 'tocipapa'].includes(item.group)).forEach(item => item.soldOut = false));
   await prepare(page, { items: { 'tocipapa': 1, 'tocipapa-grande': 1, 'wachipapa': 1, 'wachipapa-grande': 1 } });
   const names = await page.locator('#cartList .n').allTextContents();
   assert.equal(names.length, 4);
@@ -213,7 +213,7 @@ test('Strawberry abre en portada y vence al terminar el domingo 27 en Ecuador', 
 }));
 
 test('Los horarios incluyen todos los tamaños y sus límites de lunes y domingo', () => useFixture(async ({ page }) => {
-  await page.evaluate(() => MENU.filter(item => item.group === 'wachipapa').forEach(item => item.soldOut = false));
+  await page.evaluate(() => MENU.filter(item => ['wachipapa', 'tocipapa'].includes(item.group)).forEach(item => item.soldOut = false));
   for (const [time, expected] of [
     ['2026-09-21T23:59:00Z', false], ['2026-09-22T00:00:00Z', true],
     ['2026-09-22T04:00:00Z', true], ['2026-09-22T04:01:00Z', false],
@@ -230,10 +230,10 @@ test('Los horarios incluyen todos los tamaños y sus límites de lunes y domingo
 
 test('Un botón renderizado antes de abrir cocina permite pedir al llegar la hora', () => useFixture(async ({ page }) => {
   await page.evaluate(() => { window.__setTestTime('2026-09-21T23:59:00Z'); selectCat('Snack Sal'); });
-  const plus = page.locator('#qty-tocipapa').locator('..').locator('button').last();
+  const plus = page.locator('#qty-wachipapa').locator('..').locator('button').last();
   await page.evaluate(() => window.__setTestTime('2026-09-22T00:00:00Z'));
   await plus.click();
-  assert.equal((await orderState(page)).cart.tocipapa?.qty, 1);
+  assert.equal((await orderState(page)).cart.wachipapa?.qty, 1);
 }));
 
 test('Abrir WhatsApp y recargar conserva todos los datos y el mismo código', () => useFixture(async ({ page, ready }) => {
