@@ -120,8 +120,11 @@ const CAT_BANNERS = {
   ],
   'Snack Dulce': [
     { productId:'galleta', img:'assets/galleta.jpeg', alt:'Galleta Clowder con trozos de chocolate' },
+    { productId:'funbite', img:'assets/funbite.jpeg', alt:'Funbite — cupcake con cobertura cremosa y chips de colores' },
   ],
-  'Snack Sal': [],
+  'Snack Sal': [
+    { img:'banners/ss-banner-01.jpg', alt:'Empanada de pollo — vegetales frescos picaditos y pechuga de pollo mechada' },
+  ],
   'Bebidas Frías': [
     { img:'banners/bf-banner-02.jpg', alt:'Berry Bloom — limonada con salsa de fresa, refrescante y sin café' },
   ],

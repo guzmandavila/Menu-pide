@@ -143,7 +143,7 @@ test('Stock actual: helados y queso disponibles, pollo y wachipapas agotados', (
   await page.evaluate(() => selectCat('Snack Sal'));
   assert.doesNotMatch(await page.locator('#menu').textContent(), /Últimas 4 empanadas de pollo/);
   assert.equal(await page.locator('#menu .item').first().locator('.variant-select').inputValue(), 'empanada-queso');
-  assert.equal(await page.locator('#menu .cat-banner').count(), 0);
+  assert.equal(await page.locator('#menu .cat-banner-slide img').getAttribute('src'), 'banners/ss-banner-01.jpg');
 }));
 
 test('Pago exacto funciona con 3 × $4.90 y rechaza efectivo insuficiente o fracciones de centavo', () => useFixture(async ({ page }) => {
