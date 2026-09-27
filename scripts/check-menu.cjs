@@ -36,8 +36,10 @@ async function fixture(options = {}) {
     };
     window.__setTestTime = value => { currentTime = new RealDate(value).getTime(); };
     window.__whatsappAttempts = [];
+    window.__openAttempts = [];
     window.__popupBlocked = false;
     window.open = url => {
+      window.__openAttempts.push(url);
       if (window.__popupBlocked) return null;
       if (url !== 'about:blank') window.__whatsappAttempts.push({ url });
       return { closed: false, opener: null, close() { this.closed = true; },
@@ -68,6 +70,7 @@ async function fixture(options = {}) {
     await page.waitForFunction(() => window.MenuContact?.value && typeof sendOrder === 'function');
     // Captura también la alternativa de misma pestaña cuando un popup es bloqueado.
     await page.evaluate(() => {
+      window.__realContactNavigate = window.MenuContact.navigate;
       window.MenuContact.navigate = (target, url) => window.__whatsappAttempts.push({ url, blocked: !target });
     });
   };
@@ -255,6 +258,45 @@ test('Abrir WhatsApp y recargar conserva todos los datos y el mismo código', ()
   assert.equal(after.currentOrderCode, before.currentOrderCode);
   await page.evaluate(() => sendOrder());
   assert.equal((await orderState(page)).currentOrderCode, before.currentOrderCode);
+}));
+
+
+test('El envío lento mantiene el menú visible y abre WhatsApp en la misma pestaña', () => useFixture(async ({ page, context, state }) => {
+  state.config.ordersApiUrl = 'https://orders.test';
+  let release;
+  const gate=new Promise(resolve=>{release=resolve;});
+  let received;
+  const requestSeen=new Promise(resolve=>{received=resolve;});
+  await page.route('https://orders.test/api/orders', async route=>{
+    received(); await gate;
+    await route.fulfill({status:200,contentType:'application/json',body:'{"ok":true}'});
+  });
+  await page.route('https://wa.me/**', route=>route.fulfill({status:200,body:'WhatsApp interceptado'}));
+  await prepare(page);
+  await page.evaluate(()=>{MenuContact.navigate=window.__realContactNavigate;});
+  await page.locator('#sendBtn').click();
+  await requestSeen;
+  try {
+    assert.equal(context.pages().length,1);
+    assert.deepEqual(await page.evaluate(()=>window.__openAttempts),[],'No debe abrir about:blank');
+    assert.equal(await page.locator('#sendBtn').textContent(),'Conectando con WhatsApp…');
+    assert.equal(await page.locator('#sendBtn').isDisabled(),true);
+    assert.equal((await orderState(page)).draft.cart.catpuccino.qty,1);
+  } finally { release(); }
+  await page.waitForURL('https://wa.me/**');
+  assert.equal(context.pages().length,1);
+  assert.ok(new URL(page.url()).searchParams.get('text').includes('Pedido Clowder'));
+  await page.goBack();
+  assert.equal((await orderState(page)).cart.catpuccino.qty,1);
+}));
+
+test('Un fallo de conexión no abre pestañas vacías y conserva el pedido', () => useFixture(async ({ page, state, context }) => {
+  await prepare(page); state.failConfig=true;
+  await page.evaluate(()=>sendOrder());
+  assert.deepEqual(await page.evaluate(()=>window.__openAttempts),[]);
+  assert.equal(context.pages().length,1);
+  assert.equal(await page.locator('#contactError').isVisible(),true);
+  assert.equal((await orderState(page)).draft.cart.catpuccino.qty,1);
 }));
 
 test('El bloqueo de popup conserva el pedido y prepara el destino alternativo', () => useFixture(async ({ page }) => {

@@ -40,16 +40,13 @@
     })();
     try { return await pending; } finally { pending = null; }
   }
-  // Reserve the tab within the click gesture to support Safari popup rules.
-  function reserveWindow() {
-    let target = null;
-    try { target = window.open('about:blank', '_blank'); if (target) target.opener = null; } catch (_) {}
-    return target;
-  }
+  // Keep the menu visible during network work. A blank popup can suspend its
+  // opener on mobile before the order is ready, leaving customers on about:blank.
+  // Retain this method for app.js already cached on older devices.
+  function reserveWindow() { return null; }
   function navigate(target, destination) {
-    try {
-      if (target && !target.closed) { target.location.replace(destination); return; }
-    } catch (_) {}
+    // Close a placeholder created by older callers, but never create a new tab.
+    try { if (target && !target.closed) target.close(); } catch (_) {}
     window.location.assign(destination);
   }
   window.MenuContact = { refresh, url, reserveWindow, navigate, get value() { return config; } };
