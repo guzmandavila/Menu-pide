@@ -9,19 +9,22 @@ const MENU = [
 
   // ---- Bebidas Calientes ----
   { id:'strawberry-catpuccino', cat:'Bebidas Calientes', name:'Strawberry Catpuccino', classic:'Cappuccino de fresa', desc:'Dulce, cremoso y hecho para consentirte.', price:3.00, availableFrom:'2026-09-19T00:00:00-05:00', availableUntil:'2026-09-28T00:00:00-05:00', promoNote:'Disponible del 19 al 27 de septiembre, hasta las 23:59.', img:'banners/bc-strawberry-catpuccino.jpeg' },
-  { id:'catpuccino', cat:'Bebidas Calientes', name:'Catpuccino', classic:'Cappuccino', syrupOption:['vainilla-francesa','avellana','caramelo-salado'], desc:'Espresso y leche.', price:2.6, milk:true, img:'miniaturas/bc-catpuccino.jpg' },
-  { id:'cozy-claws', cat:'Bebidas Calientes', name:'Cozy Claws', classic:'Chocolate caliente', syrupOption:['vainilla-francesa','avellana','caramelo-salado'], desc:'Con base de cacao y leche.', price:2.8, milk:true, img:'miniaturas/bc-cozy-claws.jpg' },
-  { id:'doble-sippi', cat:'Bebidas Calientes', name:'Doble Sippi', classic:'Espresso doble', syrupOption:['vainilla-francesa','avellana','caramelo-salado'], desc:'', price:1.8, img:'miniaturas/bc-doble-sippi.jpg' },
-  { id:'long-tail', cat:'Bebidas Calientes', name:'Long Tail', classic:'Americano', syrupOption:['vainilla-francesa','avellana','caramelo-salado'], desc:'', price:2.25, img:'miniaturas/bc-long-tail.jpg' },
+  { id:'catpuccino', cat:'Bebidas Calientes', name:'Catpuccino', classic:'Cappuccino', syrupOption:['vainilla-francesa','avellana','caramelo-salado'], desc:'Espresso y leche.', price:2.50, milk:true, img:'miniaturas/bc-catpuccino.jpg' },
+  { id:'cozy-claws', cat:'Bebidas Calientes', name:'Cozy Claws', classic:'Chocolate caliente', syrupOption:['vainilla-francesa','avellana','caramelo-salado'], desc:'Con base de cacao y leche.', price:2.75, milk:true, img:'miniaturas/bc-cozy-claws.jpg' },
+  { id:'doble-sippi', cat:'Bebidas Calientes', name:'Doble Sippi', classic:'Espresso doble', syrupOption:['vainilla-francesa','avellana','caramelo-salado'], desc:'', price:1.50, img:'miniaturas/bc-doble-sippi.jpg' },
+  { id:'long-tail', cat:'Bebidas Calientes', name:'Long Tail', classic:'Americano', syrupOption:['vainilla-francesa','avellana','caramelo-salado'], desc:'', price:1.80, img:'miniaturas/bc-long-tail.jpg' },
   { id:'moccatto', cat:'Bebidas Calientes', name:'Moccatto', classic:'Mocaccino', syrupOption:['vainilla-francesa','avellana','caramelo-salado'], desc:'Espresso con base de cacao y leche.', price:3.0, milk:true, img:'miniaturas/bc-moccatto.jpg' },
 
   // ---- Bebidas Frías ----
-  { id:'affocato', cat:'Bebidas Calientes', name:'AffoCato', desc:'Espresso doble sobre helado de vainilla Madagascar.', price:3.5, img:'miniaturas/bf-affocato.jpg' },
-  { id:'berrybloom', cat:'Bebidas Frías', name:'BerryBloom', classic:'Limonada de fresa', classicTheme:'fresh', order:6, desc:'Salsa de fresa, zumo de limón y miel, con hielo.', price:3.75, img:'assets/image-45bed35fc31fb6b1.jpg' },
-  { id:'ice-koffin', cat:'Bebidas Frías', name:'Ice Koffin', classic:'Americano helado', classicTheme:'fresh', order:1, desc:'Espresso y agua, con hielo.', price:2.5, img:'assets/image-cc920e9b95fa9297.jpg' },
+  { id:'affocato', cat:'Bebidas Calientes', name:'AffoCato', desc:'Espresso doble sobre helado de vainilla Madagascar.', price:3.00, img:'miniaturas/bf-affocato.jpg' },
+  { id:'berrybloom', cat:'Bebidas Frías', name:'BerryBloom', classic:'Limonada de fresa', classicTheme:'fresh', order:6, desc:'Salsa de fresa, zumo de limón y miel, con hielo.', price:2.75, img:'assets/image-45bed35fc31fb6b1.jpg' },
+  { id:'ice-koffin', cat:'Bebidas Frías', name:'Ice Koffin', classic:'Americano helado', classicTheme:'fresh', order:1, desc:'Espresso y agua, con hielo.', price:2.00, img:'assets/image-cc920e9b95fa9297.jpg' },
   { id:'nara-sunset', cat:'Bebidas Frías', name:'Nara Sunset', classic:'Naranja y café', classicTheme:'fresh', order:5, desc:'Con hielo.', price:3.5, img:'assets/image-564f15ba92421bf9.jpg' },
-  { id:'nimbus', cat:'Bebidas Frías', name:'Ice Moccatto', classic:'Mocaccino helado', classicTheme:'fresh', order:3, desc:'Espresso, leche y sirope de chocolate, con hielo.', price:4.0, milk:true, img:'assets/image-de2fc99b743f1564.jpg' },
-  { id:'vanilatte', cat:'Bebidas Frías', name:'Ice Latte', classic:'Latte helado', classicTheme:'fresh', order:2, syrupOption:['vainilla-francesa','avellana','caramelo-salado'], desc:'Espresso, leche y jarabe de vainilla, con hielo.', price:3.5, milk:true, img:'assets/image-c2358fbf75d9fa28.jpg' },
+  { id:'nimbus', cat:'Bebidas Frías', name:'Ice Moccatto', classic:'Mocaccino helado', classicTheme:'fresh', order:3, desc:'Espresso, leche y sirope de chocolate, con hielo.', price:3.25, milk:true, img:'assets/image-de2fc99b743f1564.jpg' },
+  { id:'vanilatte', cat:'Bebidas Frías', name:'Ice Latte', classic:'Latte helado', classicTheme:'fresh', order:2, syrupOption:['vainilla-francesa','avellana','caramelo-salado'], desc:'Espresso, leche y jarabe de vainilla, con hielo.', price:2.75, milk:true, img:'assets/image-c2358fbf75d9fa28.jpg' },
+
+  // Nombre provisional; confirmar precio antes de habilitar pedidos.
+  { id:'banana-caramel-latte', cat:'Bebidas Frías', name:'Banana Caramel Latte', classic:'Latte helado de banana y caramelo', classicTheme:'fresh', order:2.5, desc:'Café, leche, banana y caramelo, servido frío.', price:0, comingSoon:true, comingSoonLabel:'Precio por confirmar', comingSoonNote:'Pronto podrás pedirlo aquí.' },
 
   // ---- Matcha ----
   { id:'nekomatchalatte', cat:'Matcha', name:'NekoMatchaLatte', syrupOption:['caramelo','vainilla'], desc:'Matcha, leche y hielo.', price:3.5, milk:true, img:'assets/image-a21806fe3017f9d8.jpg' },
@@ -30,6 +33,8 @@ const MENU = [
   // ---- Panadería ----
   { id:'galleta', cat:'Snack Dulce', name:'Galleta', desc:'Gordita, hecha con mix de harinas sin gluten y trozos de chocolate sin leche.', price:2.0, img:'assets/galleta.jpeg' },
   { id:'funbite', cat:'Snack Dulce', name:'Funbite', desc:'Cupcake de mix de harinas sin gluten con chips de colores.', price:1.50, img:'assets/funbite.jpeg' },
+  // Cupcake Banana: foto y banner pendientes.
+  { id:'cupcake-banana', cat:'Snack Dulce', name:'Cupcake Banana', desc:'Cupcake con banana real y chispas de chocolate, sin chips de colores.', price:1.75 },
   { id:'mini-cake-del-dia', cat:'Snack Dulce', name:'Apple Crumble Cake', desc:'Harina de almendra, harina de coco, ghee y manzana natural, cobertura de chocolate blanco.', price:2.6, scoop:true, accent:'#C8433B', img:'miniaturas/apple-crumble.jpg', imgScoop:'miniaturas/apple-crumble-helado.jpg' },
 
   { id:'brownie', cat:'Snack Dulce', name:'Brownie', desc:'Brownie intenso y húmedo, con cacao orgánico, endulzado con alulosa y panela.', price:3.0, scoop:true, img:'assets/image-6d3c530cc30feadd.jpg' },
@@ -83,7 +88,7 @@ if (miniCake) {
   miniCake.featured = true;
   miniCake.featuredTag = 'MINICAKE DE LA SEMANA';
 }
-// El minicake y el brownie siguen ocultos; Snack Dulce incluye galleta y Funbite.
+// El minicake y el brownie siguen ocultos; Snack Dulce incluye galleta, Funbite y Cupcake Banana.
 const HIDDEN_ITEM_IDS = ['mini-cake-del-dia', 'brownie'];
 // Información de preparación visible en cada tarjeta.
 ['wachipapa','tocipapa','wachipapa-grande','tocipapa-grande'].forEach(id => {
