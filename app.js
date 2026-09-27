@@ -23,8 +23,7 @@ const MENU = [
   { id:'nimbus', cat:'Bebidas Frías', name:'Ice Moccatto', classic:'Mocaccino helado', classicTheme:'fresh', order:3, desc:'Espresso, leche y sirope de chocolate, con hielo.', price:3.25, milk:true, img:'assets/image-de2fc99b743f1564.jpg' },
   { id:'vanilatte', cat:'Bebidas Frías', name:'Ice Latte', classic:'Latte helado', classicTheme:'fresh', order:2, syrupOption:['vainilla-francesa','avellana','caramelo-salado'], desc:'Espresso, leche y jarabe de vainilla, con hielo.', price:2.75, milk:true, img:'assets/image-c2358fbf75d9fa28.jpg' },
 
-  // Nombre provisional; confirmar precio antes de habilitar pedidos.
-  { id:'banana-caramel-latte', cat:'Bebidas Frías', name:'Banana Caramel Latte', classic:'Latte helado de banana y caramelo', classicTheme:'fresh', order:2.5, desc:'Café, leche, banana y caramelo, servido frío.', price:0, comingSoon:true, comingSoonLabel:'Precio por confirmar', comingSoonNote:'Pronto podrás pedirlo aquí.', img:'banners/bf-banana-caramel-latte.jpeg' },
+  { id:'banana-caramel-latte', cat:'Bebidas Frías', name:'Banana Caramel Latte', classic:'Latte helado de banana y caramelo', classicTheme:'fresh', order:2.5, desc:'Café, leche, banana y caramelo, servido frío.', price:3.50, img:'banners/bf-banana-caramel-latte.jpeg' },
 
   // ---- Matcha ----
   { id:'nekomatchalatte', cat:'Matcha', name:'NekoMatchaLatte', syrupOption:['caramelo','vainilla'], desc:'Matcha, leche y hielo.', price:3.5, milk:true, img:'assets/image-a21806fe3017f9d8.jpg' },
