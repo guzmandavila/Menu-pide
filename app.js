@@ -30,7 +30,7 @@ const MENU = [
   { id:'sakuramatcha-latte', cat:'Matcha', name:'SakuraMatcha Latte', desc:'Matcha, leche y fresa, con hielo.', price:4.15, milk:true, img:'assets/image-73038c7da3c63e99.jpg' },
 
   // ---- Panadería ----
-  { id:'galleta', cat:'Snack Dulce', name:'Galleta', desc:'Gordita, hecha con mix de harinas sin gluten y trozos de chocolate sin leche.', price:2.0, img:'assets/galleta.jpeg' },
+  { id:'galleta', cat:'Snack Dulce', name:'Galleta', desc:'Gordita, hecha con mix de harinas sin gluten y trozos de chocolate sin leche.', price:2.0, soldOut:true, img:'assets/galleta.jpeg' },
   { id:'funbite', cat:'Snack Dulce', name:'Funbite', desc:'Cupcake de mix de harinas sin gluten con chips de colores.', price:1.50, img:'assets/funbite.jpeg' },
   // Cupcake Banana: foto y banner pendientes.
   { id:'cupcake-banana', cat:'Snack Dulce', name:'Cupcake Banana', desc:'Cupcake con banana real y chispas de chocolate, sin chips de colores.', price:1.75 },
