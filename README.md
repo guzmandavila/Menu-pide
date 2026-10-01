@@ -1,6 +1,14 @@
 # Menú Clowder
 
-Menú estático publicado en [GitHub Pages](https://guzmandavila.github.io/Menu-pide/). No requiere compilación.
+Menú estático publicado en [GitHub Pages](https://clowder.cafe/). No requiere compilación.
+
+## Dominio propio
+
+El dominio previsto es `clowder.cafe`; `CNAME` configura GitHub Pages. Durante la migración, coordina su publicación con el DNS de Namecheap para que la redirección del enlace anterior no apunte a un dominio sin configurar.
+
+En Namecheap → Domain List → Manage → Advanced DNS → Host Records, configura cuatro registros A para `@`: `185.199.108.153`, `185.199.109.153`, `185.199.110.153` y `185.199.111.153`; añade un CNAME para `www` con destino `guzmandavila.github.io`. TTL: Automatic. Sustituye únicamente registros de estacionamiento o redirección que entren en conflicto con estos hosts; conserva correo y verificaciones.
+
+En GitHub → Settings → Pages, el dominio personalizado debe ser `clowder.cafe`. Comprueba el DNS y la emisión del certificado antes de dar por terminada la migración; activa Enforce HTTPS cuando esté disponible. El servicio de pedidos debe permitir `https://clowder.cafe` y `https://www.clowder.cafe` en `CLOWDER_ORIGINS`, conservando `https://guzmandavila.github.io` para el panel.
 
 ## Cambiar el número, redes o pagos
 
@@ -57,7 +65,7 @@ git commit -m "Actualiza el contacto del menú"
 git push origin main
 ```
 
-Si cambias código o imágenes, incluye también esos archivos. Espera a que termine el despliegue de Pages en GitHub y verifica el [menú publicado](https://guzmandavila.github.io/Menu-pide/) y su [configuración publicada](https://guzmandavila.github.io/Menu-pide/menu-config.json). Comprueba los botones de contacto y el destino de un pedido de prueba sin enviarlo. Un `push` correcto por sí solo no confirma que Pages ya sirva la versión nueva.
+Si cambias código o imágenes, incluye también esos archivos. Espera a que termine el despliegue de Pages en GitHub y verifica el [menú publicado](https://clowder.cafe/) y su [configuración publicada](https://clowder.cafe/menu-config.json). Comprueba los botones de contacto y el destino de un pedido de prueba sin enviarlo. Un `push` correcto por sí solo no confirma que Pages ya sirva la versión nueva.
 
 ## Registro de pedidos y cierre de cobros
 
