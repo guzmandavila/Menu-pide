@@ -15,7 +15,7 @@ En GitHub → Settings → Pages, el dominio personalizado debe ser `clowder.caf
 Edita únicamente `menu-config.json` para estos datos:
 
 - `whatsappNumber`: número internacional, entre comillas, sin `+`, espacios ni guiones. Por ejemplo, **0979864314 → `"593979864314"`**: se elimina el cero inicial y se añade `593`.
-- `paymentsUrl`: enlace de pagos.
+- `paymentsUrl`: enlace de pagos, actualmente `https://clowder.cafe/pagos/`. La página y sus cuentas se editan en `pagos/index.html`.
 - `instagramUrl`: perfil de Instagram.
 - `communityUrl`: invitación a la comunidad de WhatsApp.
 
