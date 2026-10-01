@@ -39,13 +39,13 @@
     min-height:100vh;
     display:flex;
     justify-content:center;
-    align-items:center;
+    align-items:flex-start;
     padding:24px;
     background:var(--cream);
     font-family:'Nunito', ui-sans-serif, sans-serif;
     color:var(--ink);
     position:relative;
-    overflow:hidden;
+    overflow-x:hidden;
   }
 
   .blob{
@@ -61,6 +61,7 @@
   .card{
     position:relative;
     z-index:1;
+    margin-block:auto;
     width:340px;
     max-width:100%;
     background:var(--card);
@@ -186,7 +187,7 @@
 
   button.copy{
     width:100%;
-    margin-top:18px;
+    margin:0 0 16px;
     padding:15px;
     border:none;
     border-radius:999px;
@@ -208,21 +209,6 @@
   button.copy.copied{
     background:var(--verde);
     box-shadow:0 8px 18px rgba(63,133,74,.35);
-  }
-
-  .paw{
-    position:absolute;
-    top:-6px;
-    font-size:18px;
-    opacity:0;
-    pointer-events:none;
-    transform:translateY(0) rotate(0deg) scale(.6);
-  }
-  .paw.pop{ animation:pawpop .8s ease forwards; }
-  @keyframes pawpop{
-    0%{ opacity:0; transform:translateY(0) rotate(var(--rot,0deg)) scale(.5); }
-    30%{ opacity:1; }
-    100%{ opacity:0; transform:translateY(-46px) rotate(var(--rot,0deg)) scale(1.1); }
   }
 
   .footer-note{
@@ -264,19 +250,19 @@
           </span>
         </div>
         <div class="account-number" id="accountNumber"></div>
+        <div style="position:relative;">
+          <button class="copy" id="copyBtn">Copiar número</button>
+        </div>
 
         <div class="field"><b>Jorge Ronald Guzmán Dávila</b></div>
         <div class="field">Cuenta Ahorros</div>
         <div class="field">Cédula: 0926355850</div>
         <div class="field">guzmandavila@proton.me</div>
 
-        <div style="position:relative;">
-          <button class="copy" id="copyBtn">Copiar número</button>
-        </div>
       </div>
     </div>
 
-    <div class="footer-note">Gracias por tu compra 🐾</div>
+    <div class="footer-note">Gracias por tu compra</div>
   </div>
 
 <script>
@@ -342,21 +328,6 @@
     return window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   }
 
-  function launchPaws(){
-    if (prefersReducedMotion()) return;
-    const positions = [20, 45, 70, 90];
-    positions.forEach((left) => {
-      const paw = document.createElement('span');
-      paw.className = 'paw';
-      paw.textContent = '🐾';
-      paw.style.left = left + '%';
-      paw.style.setProperty('--rot', (Math.random() * 40 - 20) + 'deg');
-      copyBtn.parentElement.appendChild(paw);
-      requestAnimationFrame(() => paw.classList.add('pop'));
-      setTimeout(() => paw.remove(), 850);
-    });
-  }
-
   copyBtn.addEventListener('click', async () => {
     if (!currentNumber) return;
     try {
@@ -371,8 +342,7 @@
     }
 
     copyBtn.classList.add('copied');
-    copyBtn.textContent = '¡Copiado! 🐾';
-    launchPaws();
+    copyBtn.textContent = '¡Copiado!';
 
     clearTimeout(copyBtn._resetTimer);
     copyBtn._resetTimer = setTimeout(() => {
