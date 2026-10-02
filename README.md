@@ -69,9 +69,9 @@ Si cambias código o imágenes, incluye también esos archivos. Espera a que ter
 
 ## Registro de pedidos y cierre de cobros
 
-El menú guarda cada pedido como pendiente al abrir WhatsApp. El cliente indica efectivo o el banco receptor. Confirma el cobro en https://guzmandavila.github.io/clowder-cobros/ para sumarlo al cierre.
+El menú guarda cada pedido como pendiente al abrir WhatsApp. El cliente indica efectivo o el banco receptor. Confirma el cobro en https://clowder.cafe/backoffice/ para sumarlo al cierre.
 
-El panel tiene su propio repositorio `guzmandavila/clowder-cobros`; las pantallas están en GitHub Pages y los datos en el servicio Sites/D1 configurado en `ordersApiUrl`. No se requiere iniciar sesión en ChatGPT. La clave administrativa se guarda solo como secreto del servicio, nunca en GitHub.
+El panel se publica desde `backoffice/` en este repositorio; las pantallas están en GitHub Pages y los datos en el servicio Sites/D1 configurado en `ordersApiUrl`. No se requiere iniciar sesión en ChatGPT. La clave administrativa se guarda solo como secreto del servicio, nunca en GitHub.
 
 El pendiente para Fernanda excluye efectivo y cancelados. Las entregas reducen el pendiente acumulado. Los cobros de hoy previos a la activación y los pedidos tomados fuera del menú pueden registrarse desde el panel con «Registrar un cobro de hoy fuera del menú». No se importan cobros históricos automáticamente.
 

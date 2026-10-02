@@ -1,0 +1,34 @@
+@font-face{font-family:Doughie;src:url('./fuentes/Doughie.ttf') format('truetype');font-display:swap}
+:root{font-family:system-ui,sans-serif;color:#30251d;background:#f8f4ea;font-size:16px;--coffee:#231c17;--line:#dfd5c6;--muted:#716456}
+*{box-sizing:border-box}body{margin:0;line-height:1.5}header{background:var(--coffee);color:#f8f3e7;padding:22px max(20px,calc((100vw - 1050px)/2)) 26px;border-bottom:4px solid #cbb79a}header .brand{display:block;font:normal 54px/1.15 Doughie,serif;margin:4px 0 12px}header p{margin:6px 0;color:#d8ccbb;font-size:14px}h1{font-size:28px;line-height:1.2;margin:0 0 12px;letter-spacing:-.025em}.menu-link{color:#dfd1bb;display:inline-block;margin-bottom:12px;font-size:14px;text-underline-offset:4px}main{max-width:1090px;padding:24px 20px 48px;margin:auto}h2{margin:32px 0 12px;font-size:22px;letter-spacing:-.02em}label{display:grid;gap:7px;font-size:14px;font-weight:600}input,select,button{font:inherit;padding:11px 13px;border-radius:9px;border:1px solid #cdbfac;min-width:0;min-height:46px}input,select{background:#fffdf8;color:#30251d;width:100%}input::placeholder{color:#817264;font-weight:400}button{background:var(--coffee);color:#f8f3e7;cursor:pointer;align-self:end;font-weight:600;border-color:var(--coffee)}button:hover{background:#49382b}button:disabled{opacity:.55;cursor:wait}.secondary{background:#fffdf8;color:#49382b;border-color:#cdbfac}.secondary:hover{background:#eee5d2}.danger{background:#fff8f4;color:#943e31;border-color:#d9b6ac}.danger:hover{background:#f3dfd9}:focus-visible{outline:3px solid #a77440;outline-offset:3px}.toolbar,form{display:flex;flex-wrap:wrap;gap:14px;align-items:end}form label{flex:1;min-width:180px}.toolbar label{min-width:170px}#login{max-width:620px;background:#fffdf8;border:1px solid var(--line);padding:22px;border-radius:14px}#settlement{background:#eee5d2;border:1px solid var(--line);padding:20px;border-radius:14px}.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:14px;margin-top:20px}.card,article{background:#fffdf8;border:1px solid var(--line);border-radius:12px;padding:20px}.card span{font-size:14px}.card strong{display:block;font-size:32px;line-height:1.25;letter-spacing:-.025em;margin-top:10px;font-variant-numeric:tabular-nums}table{width:100%;border-collapse:collapse;background:#fffdf8;font-variant-numeric:tabular-nums}th,td{text-align:left;padding:14px;border-bottom:1px solid var(--line)}th{background:#eee5d2;font-size:14px}td:not(:first-child),th:not(:first-child){text-align:right}tbody tr:last-child{background:#f2ebde}article{margin:14px 0}article h3{margin:0 0 8px;font-size:18px;overflow-wrap:anywhere}article p{overflow-wrap:anywhere}pre{white-space:pre-wrap;overflow-wrap:anywhere;font:inherit;font-size:14px}article form{margin:15px 0}.muted{color:var(--muted);font-size:14px}#status{color:#943e31;margin:12px 0}#status:empty{display:none}details{margin:14px 0}summary{cursor:pointer;text-underline-offset:3px}#settlements p{border-bottom:1px solid var(--line);padding-bottom:14px;overflow-wrap:anywhere}#settlements button{margin-top:8px}[hidden]{display:none!important}
+@media(max-width:550px){header .brand{font-size:46px}h1{font-size:25px}main{padding:20px 16px 36px}.toolbar{gap:10px}.toolbar label{flex:1 1 100%;min-width:0}.toolbar button{flex:1}th,td{padding:12px 7px;font-size:14px}th:first-child{width:35%}.card,article{padding:18px}#settlement{padding:16px}form button{width:100%}}
+
+#manualEntry{margin-top:28px;padding:18px;border:1px solid var(--line);border-radius:12px;background:#fffdf8}#manualEntry summary{font-weight:600}#manual{margin-top:16px}
+
+/* Colores por destino del dinero; las etiquetas explican cada estado. */
+.cards{grid-template-columns:repeat(6,minmax(0,1fr))}
+.card{grid-column:span 2}
+.card:nth-child(n+4){grid-column:span 3}
+.card small{display:block;margin-top:12px;font-size:13px;line-height:1.45}
+.card--pending{background:#fff0cc;color:#704500;border:1px solid #d4a33d;border-top:5px solid #ad7100}
+.card--cash{background:#e7f2ff;color:#174b78;border:1px solid #8cb7df;border-top:5px solid #3178b7}
+.card--settled{background:#e7f4e9;color:#205b32;border:1px solid #94c39d;border-top:5px solid #38834b}
+tbody tr.account--cash{background:#e7f2ff;color:#174b78}
+#settlements p.settlement--paid{background:#e7f4e9;color:#205b32;border:1px solid #94c39d;border-left:5px solid #38834b;border-radius:9px;padding:14px}
+#settlements p.settlement--void{color:var(--muted,#716456)}
+@media(max-width:850px){.cards{grid-template-columns:repeat(2,minmax(0,1fr))}.card,.card:nth-child(n+4){grid-column:span 1}.card:last-child{grid-column:span 2}}
+@media(max-width:550px){.cards{grid-template-columns:minmax(0,1fr)}.card,.card:nth-child(n+4),.card:last-child{grid-column:span 1}}
+
+.table-scroll{overflow-x:auto;margin-bottom:1rem}.table-scroll table{min-width:960px}.table-scroll th,.table-scroll td{white-space:nowrap}#cashSummary{margin-bottom:1rem}#weeksTitle,#cashTitle{margin-top:2rem}#cashHistory{max-height:360px;overflow:auto}#manualChange{font-weight:700}section[aria-labelledby]{border-top:1px solid #555;padding-top:1rem;margin-top:2rem}
+
+/* Dos espacios de trabajo, con navegación accesible y sin recargar formularios. */
+.panel-tabs{display:flex;gap:6px;background:#eee5d2;padding:6px;border:1px solid var(--line);border-radius:12px;margin:20px 0 24px}
+.panel-tabs [role="tab"]{flex:1;background:transparent;color:var(--muted);border:1px solid transparent;min-height:50px}
+.panel-tabs [aria-selected="true"]{background:var(--coffee);color:#fffdf8;border-color:var(--coffee);box-shadow:0 2px 4px #231c1720}
+.panel-tabs [role="tab"]:hover{background:#dfd2bd;color:var(--coffee)}
+.panel-tabs [aria-selected="true"]:hover{background:#49382b;color:#fffdf8}
+section.workspace-panel{border:0;padding:0;margin:0}
+.section-intro h2{margin:0 0 4px}.section-intro p{margin:0}
+#dailySummary .card{grid-column:span 2}#dailySummary .card:last-child{grid-column:span 2}
+@media(max-width:850px){#dailySummary .card{grid-column:span 1}}
+@media(max-width:550px){.panel-tabs{gap:4px;padding:4px}.panel-tabs [role="tab"]{font-size:14px;padding:10px 8px}#dailySummary .card,#dailySummary .card:last-child{grid-column:span 1}}
