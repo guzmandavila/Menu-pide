@@ -8,22 +8,24 @@ const MENU = [
   { id:'banana-bread-latte', cat:'Bebida del Mes', name:'Banana Bread Latte', desc:'Banano real, espresso y sirope casero de mantequilla avellanada, bien frío. Como una tarde de pan recién hecho, pero con sorbete.', price:3.75, img:'assets/image-b4e517cc3df03e47.jpg', featured:true, featuredTag:'Bebida del mes', promoNote:'El precio de lanzamiento ($2.75) ya terminó. Mantente atento a la Bebida del Mes: cada lanzamiento sale con descuento.' },
 
   // ---- Bebidas Calientes ----
-  { id:'strawberry-catpuccino', cat:'Bebidas Calientes', name:'Strawberry Catpuccino', classic:'Cappuccino de fresa', desc:'Fresa, espresso y leche con espuma suave. Una pequeña excusa para quedarse un rato más.', price:3.00, availableFrom:'2026-09-19T00:00:00-05:00', availableUntil:'2026-09-28T00:00:00-05:00', promoNote:'Disponible del 19 al 27 de septiembre, hasta las 23:59.', img:'banners/bc-strawberry-catpuccino.jpeg' },
-  { id:'catpuccino', cat:'Bebidas Calientes', name:'Catpuccino', classic:'Cappuccino', syrupOption:['vainilla-francesa','avellana','caramelo-salado'], desc:'Espresso, leche y espuma suave. Hay mañanas que solo necesitan esto. Y cinco minutos más.', price:2.50, milk:true, img:'miniaturas/bc-catpuccino.jpg' },
-  { id:'cozy-claws', cat:'Bebidas Calientes', name:'Cozy Claws', classic:'Chocolate caliente', syrupOption:['vainilla-francesa','avellana','caramelo-salado'], desc:'Cacao y leche caliente para abrazar la taza con las dos manos. Hoy el apuro puede esperar.', price:2.75, milk:true, img:'miniaturas/bc-cozy-claws.jpg' },
-  { id:'doble-sippi', cat:'Bebidas Calientes', name:'Doble Sippi', classic:'Espresso doble', syrupOption:['vainilla-francesa','avellana','caramelo-salado'], desc:'Dos shots de espresso y pocas palabras. El primer sorbo pone la conversación en marcha.', price:1.50, img:'miniaturas/bc-doble-sippi.jpg' },
-  { id:'long-tail', cat:'Bebidas Calientes', name:'Long Tail', classic:'Americano', syrupOption:['vainilla-francesa','avellana','caramelo-salado'], desc:'Espresso y agua caliente, para alargar el café y la charla. Siempre queda algo por contar.', price:1.80, img:'miniaturas/bc-long-tail.jpg' },
-  { id:'moccatto', cat:'Bebidas Calientes', name:'Moccatto', classic:'Mocaccino', syrupOption:['vainilla-francesa','avellana','caramelo-salado'], desc:'Espresso, cacao y leche caliente. Para cuando quieres café, pero el chocolate también te está mirando.', price:3.0, milk:true, img:'miniaturas/bc-moccatto.jpg' },
+  { id:'strawberry-catpuccino', cat:'Bebidas Calientes', name:'Strawberry Catpuccino', classic:'Cappuccino de fresa', desc:'Espresso, fresa y leche espumada.', price:3.00, availableFrom:'2026-09-19T00:00:00-05:00', availableUntil:'2026-09-28T00:00:00-05:00', promoNote:'Disponible del 19 al 27 de septiembre, hasta las 23:59.', img:'banners/bc-strawberry-catpuccino.jpeg' },
+  { id:'catpuccino', cat:'Bebidas Calientes', name:'Catpuccino', classic:'Cappuccino', syrupOption:['vainilla-francesa','avellana','caramelo-salado'], desc:'Espresso con leche y espuma suave.', price:2.50, milk:true, img:'miniaturas/bc-catpuccino.jpg' },
+  { id:'cozy-claws', cat:'Bebidas Calientes', name:'Cozy Claws', classic:'Chocolate caliente', syrupOption:['vainilla-francesa','avellana','caramelo-salado'], desc:'Cacao con leche caliente.', price:2.75, milk:true, img:'miniaturas/bc-cozy-claws.jpg' },
+  { id:'doble-sippi', cat:'Bebidas Calientes', name:'Doble Sippi', classic:'Espresso doble', syrupOption:['vainilla-francesa','avellana','caramelo-salado'], desc:'Doble shot, doble felicidad.', price:1.50, img:'miniaturas/bc-doble-sippi.jpg' },
+  { id:'long-tail', cat:'Bebidas Calientes', name:'Long Tail', classic:'Americano', syrupOption:['vainilla-francesa','avellana','caramelo-salado'], group:'long-tail-intensity', flavor:'Intensidad: Estándar', strengthLevel:'estandar', desc:'Espresso + agua caliente, perfecto para charlas largas.', price:1.80, img:'miniaturas/bc-long-tail.jpg' },
+  { id:'long-tail-suave', cat:'Bebidas Calientes', name:'Long Tail', classic:'Americano', syrupOption:['vainilla-francesa','avellana','caramelo-salado'], group:'long-tail-intensity', flavor:'Intensidad: Suave', strengthLevel:'suave', desc:'Espresso + agua caliente, perfecto para charlas largas.', price:1.80, img:'miniaturas/bc-long-tail.jpg' },
+  { id:'long-tail-muy-suave', cat:'Bebidas Calientes', name:'Long Tail', classic:'Americano', syrupOption:['vainilla-francesa','avellana','caramelo-salado'], group:'long-tail-intensity', flavor:'Intensidad: Muy Suave', strengthLevel:'muy-suave', desc:'Espresso + agua caliente, perfecto para charlas largas.', price:1.80, img:'miniaturas/bc-long-tail.jpg' },
+  { id:'moccatto', cat:'Bebidas Calientes', name:'Moccatto', classic:'Mocaccino', syrupOption:['vainilla-francesa','avellana','caramelo-salado'], desc:'Espresso, cacao y leche caliente.', price:3.0, milk:true, img:'miniaturas/bc-moccatto.jpg' },
 
   // ---- Bebidas Frías ----
-  { id:'affocato', cat:'Bebidas Calientes', name:'AffoCato', desc:'Helado de vainilla Madagascar bajo un espresso doble. Se derrite mientras decides si usar cuchara o beberlo.', price:3.00, img:'miniaturas/bf-affocato.jpg' },
-  { id:'berrybloom', cat:'Bebidas Frías', name:'BerryBloom', classic:'Limonada de fresa', classicTheme:'fresh', order:6, desc:'Fresa, limón y miel sobre hielo. Un sorbo dulce, otro ácido. Así se lleva mejor el calor.', price:2.75, img:'assets/image-45bed35fc31fb6b1.jpg' },
-  { id:'ice-koffin', cat:'Bebidas Frías', name:'Ice Koffin', classic:'Americano helado', classicTheme:'fresh', order:1, desc:'Espresso, agua y hielo. El café de los días en que hasta la sombra tiene calor.', price:2.00, img:'assets/image-cc920e9b95fa9297.jpg' },
-  { id:'nara-sunset', cat:'Bebidas Frías', name:'Nara Sunset', classic:'Naranja y café', classicTheme:'fresh', order:5, desc:'Naranja y café sobre hielo. Un pequeño atardecer en el vaso, aunque apenas sea mediodía.', price:3.5, img:'assets/image-564f15ba92421bf9.jpg' },
-  { id:'nimbus', cat:'Bebidas Frías', name:'Ice Moccatto', classic:'Mocaccino helado', classicTheme:'fresh', order:3, desc:'Espresso, leche y chocolate, bien fríos. Ibas a pedir solo un café, pero pasó esto.', price:3.25, milk:true, img:'assets/image-de2fc99b743f1564.jpg' },
-  { id:'vanilatte', cat:'Bebidas Frías', name:'Ice Latte', classic:'Latte helado', classicTheme:'fresh', order:2, syrupOption:['vainilla-francesa','avellana','caramelo-salado'], desc:'Espresso, leche y vainilla sobre hielo. La tarde se pone un poco más amable desde el primer sorbo.', price:2.75, milk:true, img:'assets/image-c2358fbf75d9fa28.jpg' },
+  { id:'affocato', cat:'Bebidas Calientes', name:'AffoCato', desc:'Helado de vainilla Madagascar con espresso doble.', price:3.00, img:'miniaturas/bf-affocato.jpg' },
+  { id:'berrybloom', cat:'Bebidas Frías', name:'BerryBloom', classic:'Limonada de fresa', classicTheme:'fresh', order:6, desc:'Fresa, limón y miel sobre hielo.', price:2.75, img:'assets/image-45bed35fc31fb6b1.jpg' },
+  { id:'ice-koffin', cat:'Bebidas Frías', name:'Ice Koffin', classic:'Americano helado', classicTheme:'fresh', order:1, desc:'Espresso, agua y hielo.', price:2.00, img:'assets/image-cc920e9b95fa9297.jpg' },
+  { id:'nara-sunset', cat:'Bebidas Frías', name:'Nara Sunset', classic:'Naranja y café', classicTheme:'fresh', order:5, desc:'Naranja y café sobre hielo.', price:3.5, img:'assets/image-564f15ba92421bf9.jpg' },
+  { id:'nimbus', cat:'Bebidas Frías', name:'Ice Moccatto', classic:'Mocaccino helado', classicTheme:'fresh', order:3, desc:'Espresso, leche y chocolate, bien fríos.', price:3.25, milk:true, img:'assets/image-de2fc99b743f1564.jpg' },
+  { id:'vanilatte', cat:'Bebidas Frías', name:'Ice Latte', classic:'Latte helado', classicTheme:'fresh', order:2, syrupOption:['vainilla-francesa','avellana','caramelo-salado'], desc:'Espresso, leche y hielo.', price:2.75, milk:true, img:'assets/image-c2358fbf75d9fa28.jpg' },
 
-  { id:'banana-caramel-latte', cat:'Bebidas Frías', name:'Banana Caramel Latte', classic:'Latte helado de banana y caramelo', classicTheme:'fresh', order:2.5, desc:'Banana caramelizada, espresso y leche bien fría, coronados con una nube de cold foam de vainilla y un toque de canela. Dulce, cremoso y peligrosamente fácil de terminar.', featured:true, featuredTag:'Bebida especial', promoNote:'Disponible hasta el 15 de octubre.', price:3.50, img:'banners/bf-banana-caramel-latte.jpeg' },
+  { id:'banana-caramel-latte', cat:'Bebidas Frías', name:'Banana Caramel Latte', classic:'Latte helado de banana y caramelo', classicTheme:'fresh', order:2.5, desc:'Banana caramelizada, espresso y leche fría, con cold foam de vainilla y canela.', featured:true, featuredTag:'Bebida especial', promoNote:'Disponible hasta el 15 de octubre.', price:3.50, img:'banners/bf-banana-caramel-latte.jpeg' },
 
   // ---- Matcha ----
   { id:'nekomatchalatte', cat:'Matcha', name:'NekoMatchaLatte', syrupOption:['caramelo','vainilla'], desc:'Matcha y leche bien fría. Verde, suave y cremoso. Se bebe despacio, si te acuerdas.', price:3.5, milk:true, img:'assets/image-a21806fe3017f9d8.jpg' },
@@ -36,9 +38,9 @@ const MENU = [
   { id:'mini-cake-del-dia', cat:'Snack Dulce', name:'Apple Crumble Cake', desc:'Harina de almendra, harina de coco, ghee y manzana natural, cobertura de chocolate blanco.', price:2.6, scoop:true, accent:'#C8433B', img:'miniaturas/apple-crumble.jpg', imgScoop:'miniaturas/apple-crumble-helado.jpg' },
 
   { id:'brownie', cat:'Snack Dulce', name:'Brownie', desc:'Brownie intenso y húmedo, con cacao orgánico, endulzado con alulosa y panela.', price:3.0, scoop:true, img:'assets/image-6d3c530cc30feadd.jpg' },
-  { id:'milkishaki-nutella', cat:'Bebidas Frías', name:'MilkiShaki - Nutella + Brownie Bites', classic:'Milkshake', classicTheme:'fresh', order:4, desc:'Nutella, leche, helado premium y bocados de brownie. La merienda se nos fue de las manos. Por suerte.', price:4.9, milk:true, img:'assets/image-2b43f2fe510398fb.jpg', group:'milkishaki', flavor:'Nutella + Brownie Bites'  },
-  { id:'milkishaki-fresa', cat:'Bebidas Frías', name:'MilkiShaki - Fresa', classic:'Milkshake', classicTheme:'fresh', order:4, desc:'Fresa, leche y helado premium. Sabe a una tarde sin tareas, aunque todavía te queden tres.', price:4.9, milk:true, img:'assets/image-299c9fd9ebdf031a.jpg', group:'milkishaki', flavor:'Fresa'  },
-  { id:'milkishaki-salted-caramel', cat:'Bebidas Frías', name:'MilkiShaki - Salted Caramel', classic:'Milkshake', classicTheme:'fresh', order:4, desc:'Leche, helado premium y caramelo con un toque de sal. Te deja un poquito en los labios y ganas de volver.', price:4.9, milk:true, img:'assets/image-861d6d271de84321.jpg', group:'milkishaki', flavor:'Salted Caramel'  },
+  { id:'milkishaki-nutella', cat:'Bebidas Frías', name:'MilkiShaki - Hazelnut + Brownie Bites', classic:'Milkshake', classicTheme:'fresh', order:4, desc:'Sirope de hazelnut, leche, helado premium y bocados de brownie.', price:4.9, milk:true, img:'assets/image-2b43f2fe510398fb.jpg', group:'milkishaki', flavor:'Hazelnut + Brownie Bites'  },
+  { id:'milkishaki-fresa', cat:'Bebidas Frías', name:'MilkiShaki - Fresa', classic:'Milkshake', classicTheme:'fresh', order:4, desc:'Fresa, leche y helado premium.', price:4.9, milk:true, img:'assets/image-299c9fd9ebdf031a.jpg', group:'milkishaki', flavor:'Fresa'  },
+  { id:'milkishaki-salted-caramel', cat:'Bebidas Frías', name:'MilkiShaki - Salted Caramel', classic:'Milkshake', classicTheme:'fresh', order:4, desc:'Leche, helado premium y caramelo con un toque de sal.', price:4.9, milk:true, img:'assets/image-861d6d271de84321.jpg', group:'milkishaki', flavor:'Salted Caramel'  },
 
   // ---- Snacks ----
   { id:'tocipapa', cat:'Snack Sal', name:'Tocipapa', desc:'Papas corte recto con tocineta crocante y salsa de la casa. 120 g (20–25 g de tocineta).', price:2.5, soldOut:true, img:'assets/image-9fa7a5da9f5e3cb0.jpg' },
@@ -170,6 +172,7 @@ function pastelBg(c){ const hex = catColor(c); return hex==='transparent' ? 'tra
 // Bebidas Frías es la portada del menú al abrir la app.
 let activeCat = CATS.includes('Bebidas Frías') ? 'Bebidas Frías' : CATS[0];
 let cart = {}; // id -> {qty, note}
+let pendingOptions = {}; // product id -> currently selected milk/scoop/syrup options
 let mode = '';
 let payMethod = '';
 const PAYMENT_BANKS = ['Guayaquil','Pichincha','Bolivariano','Pacífico','Produbanco'];
@@ -219,18 +222,69 @@ function isWithinAvailability(item, now = Date.now()){
   return (!item.availableFrom || now >= Date.parse(item.availableFrom))
     && (!item.availableUntil || now < Date.parse(item.availableUntil));
 }
+function cartProductId(lineId){ return String(lineId).split('::')[0]; }
+function cartLineId(productId, options = {}){
+  const modifiers = [];
+  if(options.milk) modifiers.push(`milk=${options.milk}`);
+  if(options.scoop) modifiers.push(`scoop=${options.scoop}`);
+  if(options.syrup) modifiers.push(`syrup=${options.syrup}`);
+  return modifiers.length ? `${productId}::${modifiers.join('&')}` : productId;
+}
+function productForCartLine(lineId){
+  const id = cartProductId(lineId);
+  return MENU.find(product => product.id === id);
+}
+function productOptions(productId){
+  const item = MENU.find(product => product.id === productId);
+  const lines = Object.entries(cart).filter(([lineId]) => cartProductId(lineId) === productId);
+  const saved = pendingOptions[productId] || (lines.length === 1 ? lines[0][1] : {});
+  return {
+    milk:item?.milk && ['almendra','avena'].includes(saved.milk) ? saved.milk : '',
+    scoop:item?.scoop && saved.scoop === 'si' ? 'si' : '',
+    syrup:item?.syrupOption?.includes(saved.syrup) ? saved.syrup : ''
+  };
+}
+function currentProductOptions(productId){
+  const options = productOptions(productId);
+  for(const key of ['milk','scoop','syrup']){
+    const select = document.getElementById(`${key}-${productId}`);
+    if(select) options[key] = select.value;
+  }
+  return options;
+}
 function sanitizeCart(value){
   const clean = {};
   if(!value || typeof value !== 'object' || Array.isArray(value)) return clean;
-  for(const [id, entry] of Object.entries(value)){
-    const item = MENU.find(product => product.id === id);
+  for(const [storedLineId, entry] of Object.entries(value)){
+    let productId = cartProductId(storedLineId);
+    const legacyStrength = productId === 'long-tail' && ['estandar','suave','muy-suave'].includes(entry?.strength) ? entry.strength : '';
+    if(legacyStrength) productId = MENU.find(product => product.group === 'long-tail-intensity' && product.strengthLevel === legacyStrength)?.id || productId;
+    const item = MENU.find(product => product.id === productId);
     if(!item || !isWithinAvailability(item) || item.soldOut || item.comingSoon || HIDDEN_CATS.includes(item.cat) || HIDDEN_ITEM_IDS.includes(item.id) || !entry || typeof entry !== 'object') continue;
     if(!Number.isInteger(entry.qty) || entry.qty < 1) continue;
-    clean[id] = {
-      qty:Math.min(itemQuantityLimit(item), entry.qty), note:typeof entry.note === 'string' ? entry.note.slice(0,500) : '',
+    const options = {
       milk:item.milk && ['almendra','avena'].includes(entry.milk) ? entry.milk : '',
       scoop:item.scoop && entry.scoop === 'si' ? 'si' : '',
       syrup:item.syrupOption?.includes(entry.syrup) ? entry.syrup : ''
+    };
+    const lineId = cartLineId(productId, options);
+    clean[lineId] = {
+      qty:Math.min(itemQuantityLimit(item), entry.qty), note:typeof entry.note === 'string' ? entry.note.slice(0,500) : '',
+      ...options
+    };
+  }
+  return clean;
+}
+function sanitizePendingOptions(value){
+  const clean = {};
+  if(!value || typeof value !== 'object' || Array.isArray(value)) return clean;
+  for(const [id, options] of Object.entries(value)){
+    const item = MENU.find(product => product.id === id);
+    if(!item || !options || typeof options !== 'object') continue;
+    clean[id] = {
+      milk:item.milk && ['almendra','avena'].includes(options.milk) ? options.milk : '',
+      scoop:item.scoop && options.scoop === 'si' ? 'si' : '',
+      syrup:item.syrupOption?.includes(options.syrup) ? options.syrup : ''
     };
   }
   return clean;
@@ -241,6 +295,7 @@ try {
   const draft = JSON.parse(localStorage.getItem('clowder_order_draft') || 'null');
   if(draft){
     cart = sanitizeCart(draft.cart);
+    pendingOptions = sanitizePendingOptions(draft.pendingOptions);
     mode = ['mesa','llevar','delivery'].includes(draft.mode) ? draft.mode : '';
     payMethod = ['efectivo','transferencia'].includes(draft.payMethod) ? draft.payMethod : '';
     paymentBank = PAYMENT_BANKS.includes(draft.paymentBank) ? draft.paymentBank : '';
@@ -252,7 +307,7 @@ try {
 function persistOrderDraft(){
   try {
     localStorage.setItem('clowder_order_draft', JSON.stringify({
-      cart, mode, payMethod, paymentBank, orderReceiptKey, deliveryLocationUrl, orderCode:currentOrderCode,
+      cart, pendingOptions, mode, payMethod, paymentBank, orderReceiptKey, deliveryLocationUrl, orderCode:currentOrderCode,
           customerName: document.getElementById('customerName')?.value || '',
           cashAmount: document.getElementById('cashAmount')?.value || '',
           deliveryManzana: document.getElementById('deliveryManzana')?.value || '',
@@ -337,7 +392,7 @@ function selectCat(c){
 
 const FLAVOR_COLORS = {
   'Salted Caramel': '#C68642',
-  'Nutella + Brownie Bites': '#4A2C17',
+  'Hazelnut + Brownie Bites': '#4A2C17',
   'Fresa': '#E8536B',
   'Regular': '#D8C9A3',
   'Grande': '#B5542C',
@@ -358,11 +413,24 @@ function arrowSvg(color){
   const svg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="${color}" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>`;
   return `url('data:image/svg+xml,${encodeURIComponent(svg)}')`;
 }
+const SYRUP_COLORS = {
+  '': '#F2EEE7',
+  'vainilla-francesa': '#E8DDC7',
+  'avellana': '#C7B59B',
+  'caramelo-salado': '#C9977F',
+  'caramelo': '#D2AA70',
+  'vainilla': '#E5D1A7',
+};
+function syrupSelectStyle(value){
+  const color = SYRUP_COLORS[value] || SYRUP_COLORS[''];
+  return `--flavor-tone:${color};`;
+}
 
 const GROUP_NAMES = {
   'milkishaki': 'MilkiShaki',
   'empanada': 'Empanada de Hojaldre',
   'cake-grande': 'Cake Grande',
+  'long-tail-intensity': 'Long Tail',
 };
 let groupView = {}; // group -> currently displayed variant id
 
@@ -440,12 +508,14 @@ function renderMenu(){
   }
   const sectionLabelHtml = catsCollapsed ? '' : `<div class="section-label"><span class="cat-dot" style="background:${catColor(activeCat)}"></span>${activeCat}</div>`;
   el.innerHTML = sectionLabelHtml + bannerHtml + display.map(i=>{
-    const inCart = cart[i.id];
+    const options = productOptions(i.id);
+    const lineId = cartLineId(i.id, options);
+    const inCart = cart[lineId];
     const qty = inCart ? inCart.qty : 0;
     const note = inCart ? inCart.note : '';
-    const milk = inCart ? (inCart.milk || '') : '';
-    const scoop = inCart ? (inCart.scoop || '') : '';
-    const syrup = inCart ? (inCart.syrup || '') : '';
+    const milk = options.milk;
+    const scoop = options.scoop;
+    const syrup = options.syrup;
     const flavorColor = FLAVOR_COLORS[i.flavor] || '#1a1310';
     const flavorText = textColorFor(flavorColor);
     const closedNow = !i.comingSoon && !i.soldOut && !isItemOrderable(i);
@@ -501,9 +571,9 @@ function renderMenu(){
         <option value="si" ${scoop==='si'?'selected':''}>+ Bola de helado de vainilla Madagascar (+$0.75)</option>
       </select>` : ''}
       ${i.syrupOption ? `
-      <select class="milk-select" id="syrup-${i.id}" onchange="setSyrup('${i.id}', this.value)">
-        <option value="" ${syrup===''?'selected':''}>Sin sirope</option>
-        ${i.syrupOption.map(flavorKey => `<option value="${flavorKey}" ${syrup===flavorKey?'selected':''}>+ Sirope de ${SYRUP_LABELS[flavorKey]} (+$0.50)</option>`).join('')}
+      <select class="milk-select syrup-select" id="syrup-${i.id}" style="${syrupSelectStyle(syrup)}" onchange="setSyrup('${i.id}', this.value)">
+        <option value="" ${syrup===''?'selected':''}>Personaliza tu bebida con un toque de sabor (opcional)</option>
+        ${i.syrupOption.map(flavorKey => { const color = SYRUP_COLORS[flavorKey] || SYRUP_COLORS['']; return `<option value="${flavorKey}" style="background-color:${color};color:${textColorFor(color)}" ${syrup===flavorKey?'selected':''}>Toque de ${SYRUP_LABELS[flavorKey]} (+$0.50)</option>`; }).join('')}
       </select>` : ''}
       <textarea class="note-input" id="note-${i.id}" rows="2" placeholder="Ej: sin cebolla, para llevar aparte..." maxlength="500" oninput="saveNote('${i.id}', this.value)">${escapeHtml(note)}</textarea>`}
     </div>`;
@@ -623,7 +693,7 @@ function initBannerSlider(){
 function truncate(s){ return s.length>18 ? s.slice(0,18)+'…' : s; }
 
 function unitPrice(id){
-  const item = MENU.find(m=>m.id===id);
+  const item = productForCartLine(id);
   let p = item.price;
   if(cart[id] && cart[id].milk) p += 0.5;
   if(cart[id] && cart[id].scoop) p += 0.75;
@@ -643,10 +713,15 @@ function canAddItem(id){
   if(!isItemOrderable(item)){ showUnavailableNotice(id); return false; }
   return true;
 }
-function changeQty(id, delta){
-  if(delta > 0 && !canAddItem(id)) return;
-  const current = cart[id]?.qty || 0;
-  const item = MENU.find(product => product.id === id);
+function changeQty(id, delta, exactLine = false){
+  const productId = cartProductId(id);
+  if(delta > 0 && !canAddItem(productId)) return;
+  const item = MENU.find(product => product.id === productId);
+  const options = exactLine || id.includes('::')
+    ? {milk:cart[id]?.milk || '', scoop:cart[id]?.scoop || '', syrup:cart[id]?.syrup || ''}
+    : currentProductOptions(productId);
+  const lineId = exactLine || id.includes('::') ? id : cartLineId(productId, options);
+  const current = cart[lineId]?.qty || 0;
   const limit = itemQuantityLimit(item);
   if(delta > 0 && current >= limit){
     if(limit < MAX_QTY) alert(`Solo quedan ${limit} unidades de este producto.`);
@@ -654,12 +729,13 @@ function changeQty(id, delta){
     return;
   }
   const next = Math.min(limit, Math.max(0, current + delta));
-  if(next===0){ delete cart[id]; }
-  else { cart[id] = { qty: next, note: cart[id]?.note || '', milk: cart[id]?.milk || '', scoop: cart[id]?.scoop || '', syrup: cart[id]?.syrup || '' }; }
-  const qtyEl = document.getElementById('qty-'+id);
+  if(next===0){ delete cart[lineId]; }
+  else { cart[lineId] = { qty: next, note: cart[lineId]?.note || '', ...options }; }
+  const qtyEl = document.getElementById('qty-'+productId);
   if(qtyEl) qtyEl.textContent = next;
-  if(next === 0) renderMenu();
+  renderMenu();
   updateBars();
+  renderCartList();
 }
 function openBigOrder(){
   const el = document.getElementById('bigOrderOverlay');
@@ -672,10 +748,9 @@ function closeBigOrder(){
 
 function setMilk(id, value){
   if(!canAddItem(id)){ renderMenu(); return; }
-  if(!cart[id] && !value) return;
-  if(cart[id]) cart[id].milk = value;
-  else { cart[id] = { qty:1, note:'', milk: value, scoop:'', syrup:'' }; const qtyEl = document.getElementById('qty-'+id); if(qtyEl) qtyEl.textContent = 1; }
-  updateBars();
+  const item = MENU.find(product => product.id === id);
+  if(!item?.milk || !['','almendra','avena'].includes(value)) return;
+  setProductOption(id, 'milk', value);
 }
 
 // Nombres simples del sirope, para quien no sabe qué es "hazelnut" o "salted caramel"
@@ -686,36 +761,58 @@ const SYRUP_LABELS = {
   'caramelo': 'caramelo',
   'vainilla': 'vainilla',
 };
-
+const STRENGTH_LABELS = { 'estandar':'Estándar', 'suave':'Suave', 'muy-suave':'Muy Suave' };
+function setProductOption(id, key, value){
+  const options = currentProductOptions(id);
+  options[key] = value;
+  pendingOptions[id] = options;
+  if(key === 'syrup'){
+    const select = document.getElementById(`syrup-${id}`);
+    if(select) select.setAttribute('style', syrupSelectStyle(value));
+  }
+  const lineId = cartLineId(id, options);
+  const qtyEl = document.getElementById('qty-'+id);
+  if(qtyEl) qtyEl.textContent = cart[lineId]?.qty || 0;
+  updateBars();
+  renderCartList();
+}
 function setSyrup(id, value){
   if(!canAddItem(id)){ renderMenu(); return; }
-  if(!cart[id] && !value) return;
-  if(cart[id]) cart[id].syrup = value;
-  else { cart[id] = { qty:1, note:'', milk:'', scoop:'', syrup: value }; const qtyEl = document.getElementById('qty-'+id); if(qtyEl) qtyEl.textContent = 1; }
-  updateBars();
+  const item = MENU.find(product => product.id === id);
+  if(!item?.syrupOption || (value && !item.syrupOption.includes(value))) return;
+  setProductOption(id, 'syrup', value);
 }
 
 function setScoop(id, value){
-  if(value && (!ICE_CREAM_AVAILABLE || !MENU.find(item => item.id === id)?.scoop)) return;
+  const item = MENU.find(product => product.id === id);
+  if(value && (!ICE_CREAM_AVAILABLE || !item?.scoop)) return;
   if(!canAddItem(id)){ renderMenu(); return; }
-  if(!cart[id] && !value) return;
-  if(cart[id]) cart[id].scoop = value;
-  else { cart[id] = { qty:1, note:'', milk:'', scoop: value, syrup:'' }; const qtyEl = document.getElementById('qty-'+id); if(qtyEl) qtyEl.textContent = 1; }
+  if(!item?.scoop || (value && value !== 'si')) return;
   // Si el producto tiene una foto especial para cuando lleva helado (ej. Apple Crumble Cake),
   // la cambiamos al vuelo con un pequeño fundido, en vez de esperar a un re-render completo.
-  const item = MENU.find(m=>m.id===id);
   const thumb = document.getElementById('thumb-'+id);
   if(item && item.imgScoop && thumb){
     const nextSrc = value === 'si' ? item.imgScoop : item.img;
     thumb.style.opacity = '0';
     setTimeout(() => { thumb.src = nextSrc; thumb.style.opacity = '1'; }, 150);
   }
-  updateBars();
+  setProductOption(id, 'scoop', value);
 }
 
 function removeExtra(id, type){
   if(!cart[id]) return;
-  cart[id][type] = '';
+  const productId = cartProductId(id);
+  const options = {milk:cart[id].milk || '', scoop:cart[id].scoop || '', syrup:cart[id].syrup || ''};
+  if(!Object.hasOwn(options, type)) return;
+  options[type] = '';
+  const nextLineId = cartLineId(productId, options);
+  const entry = {...cart[id], ...options};
+  if(nextLineId !== id){
+    if(cart[nextLineId]) cart[nextLineId].qty = Math.min(itemQuantityLimit(productForCartLine(nextLineId)), cart[nextLineId].qty + entry.qty);
+    else cart[nextLineId] = entry;
+    delete cart[id];
+  } else cart[id] = entry;
+  pendingOptions[productId] = options;
   renderMenu();
   updateBars();
 }
@@ -728,8 +825,14 @@ function toggleNote(id){
 function saveNote(id, val){
   if(!canAddItem(id)){ renderMenu(); return; }
   val = val.slice(0,500);
-  if(cart[id]) cart[id].note = val.trim();
-  else if(val.trim()){ cart[id] = { qty:1, note: val.trim(), milk:'', scoop:'', syrup:'' }; const qtyEl = document.getElementById('qty-'+id); if(qtyEl) qtyEl.textContent = 1; }
+  const lineId = cartLineId(id, currentProductOptions(id));
+  if(cart[lineId]) cart[lineId].note = val.trim();
+  else if(val.trim()){
+    const options = currentProductOptions(id);
+    cart[lineId] = { qty:1, note: val.trim(), ...options };
+    const qtyEl = document.getElementById('qty-'+id);
+    if(qtyEl) qtyEl.textContent = 1;
+  }
   const btn = document.getElementById('notebtn-'+id);
   if(btn){
     if(val.trim()){ btn.textContent = '✎ '+truncate(val.trim()); btn.classList.add('has-note'); }
@@ -814,7 +917,7 @@ const PREP_TIME = {
 function estimatedPrepTime(){
   const work = new Map();
   Object.entries(cart).forEach(([id, entry])=>{
-    const item = MENU.find(m=>m.id===id);
+    const item = productForCartLine(id);
     const range = item && (item.id === 'empanada-pollo' ? [10, 15] : PREP_TIME[item.cat]);
     if(!range) return;
     const current = work.get(item.cat) || {range, qty:0, empanadaQty:0};
@@ -847,16 +950,16 @@ function packagingReasons(){
   if(mode!=='llevar') return [];
   const reasons = [];
   const hasOtherSnack = Object.keys(cart).some(id=>{
-    const item = MENU.find(m=>m.id===id);
+    const item = productForCartLine(id);
     return item && SNACK_CATS.includes(item.cat) && item.group !== 'empanada';
   });
   const empanadaQty = Object.entries(cart).reduce((sum,[id,c])=>{
-    const item = MENU.find(m=>m.id===id);
+    const item = productForCartLine(id);
     return sum + (item && item.group === 'empanada' ? c.qty : 0);
   },0);
   if(hasOtherSnack || empanadaQty >= 3) reasons.push({label:'empaque', fee:0.5});
   const drinkQty = Object.entries(cart).reduce((sum,[id,c])=>{
-    const item = MENU.find(m=>m.id===id);
+    const item = productForCartLine(id);
     return sum + (item && DRINK_CATS.includes(item.cat) ? c.qty : 0);
   },0);
   if(drinkQty > 1) reasons.push({label:'portavasos', fee:0.25});
@@ -896,7 +999,7 @@ function updateBars(){
   // no tiene sentido: se esconde el selector y no se exige para poder enviar el pedido.
   const cartIds = Object.keys(cart);
   const storeOnly = cartIds.length > 0 && cartIds.every(id => {
-    const item = MENU.find(m=>m.id===id);
+    const item = productForCartLine(id);
     return item && STORE_CATS.includes(item.cat);
   });
   document.getElementById('modeFieldWrap').style.display = storeOnly ? 'none' : 'block';
@@ -1016,13 +1119,16 @@ function renderCartList(){
     return;
   }
   el.innerHTML = entries.map(([id,c])=>{
-    const item = MENU.find(m=>m.id===id);
+    const item = productForCartLine(id);
     const baseTotal = item.price * c.qty;
     const extrasTotal = (unitPrice(id) - item.price) * c.qty;
     const modifierChips = [];
-    if(c.milk) modifierChips.push(`<span class="modifier-chip">Leche vegetal (${c.milk === 'almendra' ? 'almendra' : 'avena'}) <strong>+$0.50</strong><button aria-label="Quitar leche vegetal" onclick="removeExtra('${id}','milk')">×</button></span>`);
+    if(item.milk) modifierChips.push(c.milk
+      ? `<span class="modifier-chip">Leche vegetal (${c.milk === 'almendra' ? 'almendra' : 'avena'}) <strong>+$0.50</strong><button aria-label="Quitar leche vegetal" onclick="removeExtra('${id}','milk')">×</button></span>`
+      : `<span class="modifier-chip">Leche deslactosada</span>`);
     if(c.scoop) modifierChips.push(`<span class="modifier-chip">Bola de helado <strong>+$0.75</strong><button aria-label="Quitar bola de helado" onclick="removeExtra('${id}','scoop')">×</button></span>`);
-    if(c.syrup) modifierChips.push(`<span class="modifier-chip">Sirope de ${SYRUP_LABELS[c.syrup]} <strong>+$0.50</strong><button aria-label="Quitar sirope" onclick="removeExtra('${id}','syrup')">×</button></span>`);
+    if(c.syrup) modifierChips.push(`<span class="modifier-chip">Toque de ${SYRUP_LABELS[c.syrup]} <strong>+$0.50</strong><button aria-label="Quitar toque de sabor" onclick="removeExtra('${id}','syrup')">×</button></span>`);
+    if(item.strengthLevel) modifierChips.push(`<span class="modifier-chip">${STRENGTH_LABELS[item.strengthLevel]}</span>`);
     const priceHtml = extrasTotal > 0.001
       ? `<div class="price-breakdown"><div><span>Precio base</span><b>$${baseTotal.toFixed(2)}</b></div><div><span>Extras</span><b>+$${extrasTotal.toFixed(2)}</b></div></div><strong class="price-total">Total $${(baseTotal + extrasTotal).toFixed(2)}</strong>`
       : `$${baseTotal.toFixed(2)}`;
@@ -1032,7 +1138,7 @@ function renderCartList(){
         <div class="n">${c.qty}x ${escapeHtml(productLabel(item))}</div>
         ${modifierChips.length ? `<div class="cart-modifiers">${modifierChips.join('')}</div>` : ''}
         ${c.note ? `<div class="note">nota: ${escapeHtml(c.note)}</div>` : ''}
-        <button class="rm" onclick="changeQty('${id}', -${c.qty})">Quitar producto</button>
+        <button class="rm" onclick="changeQty('${id}', -${c.qty}, true)">Quitar producto</button>
       </div>
       <div class="price">${priceHtml}</div>
     </div>`;
@@ -1212,7 +1318,7 @@ async function sendOrder(){
 
   if(birthdayState().closed){ showUnavailableNotice(); return; }
   const unavailable = Object.keys(cart).some(id => {
-    const item = MENU.find(product => product.id === id);
+    const item = productForCartLine(id);
     return !item || !isItemOrderable(item);
   });
   if(unavailable){
@@ -1259,7 +1365,7 @@ async function sendOrder(){
   // Si el pedido es solo de Congelados/Merch, "para servir/llevar" no aplica: se reemplaza
   // por la línea de retiro/envío coordinado (misma lógica que en updateBars()).
   const storeOnlyOrder = entries.every(([id]) => {
-    const item = MENU.find(m=>m.id===id);
+    const item = productForCartLine(id);
     return item && STORE_CATS.includes(item.cat);
   });
   if(storeOnlyOrder){
@@ -1279,11 +1385,12 @@ async function sendOrder(){
     : `🏦 *Pago: transferencia a ${paymentBank}*\n`);
   msg += `\n*PRODUCTOS*\n`;
   entries.forEach(([id,c])=>{
-    const item = MENU.find(m=>m.id===id);
+    const item = productForCartLine(id);
     msg += `• ${c.qty}x *${productLabel(item)}* — $${(unitPrice(id)*c.qty).toFixed(2)}\n`;
-    if(c.milk) msg += `  + Leche ${c.milk}\n`;
+    if(item.milk) msg += `  + Leche ${c.milk ? `vegetal de ${c.milk}` : 'deslactosada'}\n`;
     if(c.scoop) msg += `  + Helado de vainilla\n`;
-    if(c.syrup) msg += `  + Sirope de ${SYRUP_LABELS[c.syrup]}\n`;
+    if(c.syrup) msg += `  + Toque de ${SYRUP_LABELS[c.syrup]}\n`;
+    if(item.strengthLevel) msg += `  + Intensidad: ${STRENGTH_LABELS[item.strengthLevel]}\n`;
     if(c.note) msg += `  + Nota: ${c.note}\n`;
   });
   const fees = packagingReasons();
@@ -1296,7 +1403,7 @@ async function sendOrder(){
   // Los productos de Congelados y Más no se preparan al momento: son bajo stock/pedido,
   // así que en vez de un tiempo estimado avisamos que coordinamos la entrega aparte.
   const hasFrozenOrder = Object.keys(cart).some(id => {
-    const item = MENU.find(m=>m.id===id);
+    const item = productForCartLine(id);
     return item && item.cat === 'Congelados y Más';
   });
   if(hasFrozenOrder) msg += `📦 Producto bajo stock: coordinamos contigo la entrega o retiro.\n`;

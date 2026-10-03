@@ -611,9 +611,28 @@
   }
   .note-input.open{display:block;}
   .milk-select{
-    width:100%; margin-top:9px; background:rgba(255,255,255,0.6); border:1px solid rgba(26,19,16,0.35);
-    border-radius:8px; color:#1a1310; font-family:'Inter',sans-serif; font-size:13.5px;
-    padding:9px 10px; font-weight:600;
+    width:100%; margin-top:9px; background:#faf8f4; border:1px solid rgba(65,49,36,0.14);
+    border-radius:12px; color:#4a4037; font-family:'Inter',sans-serif; font-size:13px;
+    padding:10px 12px; font-weight:550;
+  }
+  .milk-select.syrup-select{
+    margin-top:11px; min-height:46px; padding:11px 40px 11px 14px;
+    border:1px solid color-mix(in srgb, var(--flavor-tone, #d8c9b2) 72%, #5b4737);
+    border-radius:13px; color:#33271f; font-size:13px; font-weight:650;
+    background-color:color-mix(in srgb, var(--flavor-tone, #f2eee7) 34%, #fffdf9);
+    box-shadow:0 3px 10px rgba(48,35,25,.07), inset 0 1px 0 rgba(255,255,255,.75);
+    cursor:pointer; appearance:none; -webkit-appearance:none;
+    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%236c5745' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
+    background-repeat:no-repeat; background-position:right 13px center; background-size:16px;
+    transition:background-color .2s ease,border-color .2s ease,box-shadow .2s ease,transform .2s ease;
+  }
+  .milk-select.syrup-select:hover{
+    border-color:color-mix(in srgb, var(--flavor-tone, #d8c9b2) 78%, #3f3026);
+    box-shadow:0 5px 14px rgba(48,35,25,.11), inset 0 1px 0 rgba(255,255,255,.8);
+  }
+  .milk-select.syrup-select:focus-visible{
+    outline:2px solid color-mix(in srgb, var(--flavor-tone, #d8c9b2) 78%, #5b4737);
+    outline-offset:2px;
   }
   .variant-select{
     display:block; margin-top:6px; border:1.5px solid rgba(26,19,16,0.25);
