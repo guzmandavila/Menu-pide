@@ -399,6 +399,7 @@
     flex:0 0 100%; scroll-snap-align:center;
     border-radius:18px; overflow:hidden; border:1px solid var(--line); line-height:0;
   }
+  .cat-banner-slide video, .cat-banner-slide .banner-video-poster{ width:100%; display:block; aspect-ratio:3/4; object-fit:cover; object-position:50% 65%; background:var(--bg-alt); }
   .cat-banner-slide img{ width:100%; height:auto; display:block; aspect-ratio:3/4; background:var(--bg-alt); }
   .cat-banner-slide img[src="banners/bf-banana-caramel-latte.jpeg"]{
     object-fit:contain; object-position:center;
@@ -459,10 +460,14 @@
   .item-featured{
     border:2px solid #D5528C; border-left-width:5px; border-left-color:#D5528C;
     box-shadow:0 4px 14px rgba(213,82,140,0.22);
-    padding-top:30px;
   }
+  .item-heading{
+    display:flex; align-items:flex-start; justify-content:space-between; gap:10px;
+    margin:-16px 0 10px;
+  }
+  .item-heading .item-price-col{ margin-top:10px; }
   .featured-ribbon{
-    position:absolute; top:0; left:18px;
+    min-width:0; max-width:100%;
     background:#D5528C; color:#fff; font-family:'Inter',sans-serif;
     font-size:11px; font-weight:800; letter-spacing:.4px; text-transform:uppercase;
     padding:5px 14px; border-radius:0 0 10px 10px;
@@ -471,7 +476,7 @@
   .item.item-combo{border-color:#D8891A; border-left-color:#D06F12; box-shadow:0 4px 14px rgba(208,111,18,.24);}
   .item.item-combo .featured-ribbon,
   .item.item-combo .item-name-badge{background:#E8891A; color:#1a1310;}
-  .item-price-col{ display:flex; flex-direction:column; align-items:flex-end; gap:3px; }
+  .item-price-col{ display:flex; flex:0 0 auto; flex-direction:column; align-items:flex-end; gap:3px; }
   .item-price-was{
     font-family:'IBM Plex Mono',monospace; font-size:12px; font-weight:700;
     color:#8a7d68; text-decoration:line-through; white-space:nowrap;
@@ -489,14 +494,19 @@
     line-height:1.25; box-shadow:0 2px 5px rgba(80,45,15,.16);
   }
   .item-top{
-    display:flex; justify-content:space-between; align-items:flex-start; gap:14px;
+    display:grid; grid-template-columns:76px minmax(0,1fr); align-items:start; gap:8px 12px;
   }
+  .item-top:not(:has(.item-thumb)) { grid-template-columns:minmax(0,1fr); }
   .item-thumb{
     width:76px; height:76px; border-radius:12px; object-fit:cover; object-position:center;
     flex-shrink:0; border:2px solid rgba(0,0,0,0.15);
     transition:opacity .15s ease;
   }
-  .item-info{flex:1; min-width:0;}
+  .item-info{ display:flex; flex-direction:column; align-items:flex-start; gap:6px; min-width:0; }
+  .item-title-row{ display:flex; align-items:flex-start; justify-content:space-between; gap:8px; width:100%; min-width:0; }
+  .item-title-row .item-name-badge{ min-width:0; }
+  .item-info .variant-select{ width:100%; max-width:100%; margin-top:0; }
+  .item-top > .process-tag{ grid-column:1 / -1; margin-top:0; max-width:100%; }
   .funbite-photo{
     display:block; width:76px; height:76px; flex-shrink:0;
     overflow:hidden; border-radius:12px; border:2px solid rgba(0,0,0,0.15);
@@ -513,7 +523,7 @@
     max-width:100%; overflow-wrap:anywhere; word-break:break-word;
   }
   .classic-tag{
-    display:inline-block; margin-left:7px; vertical-align:middle;
+    display:inline-block; max-width:100%; vertical-align:middle;
     font-family:'Inter',sans-serif; font-weight:800; font-size:13px;
     color:#1a1310; background:#E8D9B0;
     padding:4px 10px; border-radius:8px; line-height:1.3;
@@ -523,7 +533,7 @@
   .classic-tag-fresh{
     color:#fff; background:#2F9C95;
   }
-  .item-desc{font-size:14px; color:#1a1310; margin-top:6px; line-height:1.5; font-weight:600;}
+  .item-desc{grid-column:1 / -1; font-size:14px; color:#1a1310; margin-top:0; line-height:1.45; font-weight:600;}
   .coming-soon-note{
     font-family:'Inter',sans-serif; font-size:13px; color:#4a4032; font-style:italic;
     padding:2px 0 4px;
@@ -575,59 +585,22 @@
     font-size:13.5px; border-radius:8px; padding:9px 12px; cursor:pointer; font-family:'Inter',sans-serif;
     flex:1;
   }
-  /* En móvil la tarjeta deja de forzar tres columnas: la descripción recupera todo
-     el ancho y el estado/precio queda anclado arriba a la derecha. */
+  /* La cabecera comparte espacio con el precio y el texto fluye sin filas vacías. */
   @media (max-width:560px){
     .item{ padding:14px 12px; border-radius:16px; }
-    .item.item-featured{ padding-top:70px; }
-    .item.item-featured .featured-ribbon{
-      left:12px; right:auto; max-width:calc(100% - 24px);
-      line-height:1.2; white-space:nowrap;
-    }
-    .item-top{
-      display:grid;
-      grid-template-columns:84px minmax(0,1fr);
-      gap:10px 12px;
-      align-items:start;
-    }
-    .item-thumb{ width:84px; height:84px; grid-column:1; grid-row:1 / span 2; }
-    .item-info{ display:contents; }
-    .item-name-badge{
-      grid-column:2; grid-row:1; align-self:start;
-      max-width:calc(100% - 88px);
-      font-size:19px;
-    }
-    .item:has(.coming-soon-status) .item-name-badge{ max-width:100%; }
-    .item-info > .classic-tag,
-    .item-info > .variant-select{
-      grid-column:2; grid-row:2;
-      justify-self:start; align-self:start;
-      margin-left:0;
-    }
-    /* Si hay subtítulo y selector, cada uno obtiene su propia fila para evitar
-       superposiciones en teléfonos estrechos. */
-    .item-top:has(.classic-tag) .variant-select{
-      grid-column:1 / -1; grid-row:3; width:100%;
-    }
-    .item-top:has(.classic-tag) .item-desc{ grid-row:4; }
-    .item-top .process-tag{
-      grid-column:1 / -1; grid-row:4; justify-self:start;
-      max-width:100%; white-space:nowrap;
-    }
-    .item-top:has(.classic-tag) .process-tag{ grid-row:5; }
-    .item-desc{
-      grid-column:1 / -1; grid-row:3;
-      margin-top:2px; font-size:15px; line-height:1.42;
-    }
-    .item-price-col{
-      position:absolute; top:14px; right:12px;
-      z-index:2; align-items:flex-end;
-    }
-    .item-price{ font-size:14px; padding:4px 10px; }
+    .item-heading{ margin-top:-14px; margin-bottom:10px; }
+    .item-heading .item-price-col{ margin-top:10px; }
+    .featured-ribbon{ line-height:1.3; padding:6px 10px; }
+    .item-top{ grid-template-columns:76px minmax(0,1fr); gap:8px 10px; }
+    .item-name-badge{ font-size:19px; padding:4px 10px 6px; }
+    .classic-tag{ font-size:12px; padding:4px 8px; }
+    .item-desc{ font-size:14px; line-height:1.45; }
+    .item-price{ font-size:14px; padding:4px 8px; }
     .item-price.closed-price,
-    .item-price.sold-out-price{ font-size:12.5px; padding:7px 13px; }
-    .item-controls{ margin-top:12px; gap:8px; }
-    .stepper button{ width:38px; }
+    .item-price.sold-out-price{ font-size:12px; padding:6px 9px; }
+    .item-controls{ margin-top:10px; gap:8px; }
+    .stepper button{ width:40px; height:40px; }
+    .note-toggle{ min-height:44px; }
   }
   .note-toggle.has-note{border-color:#1a1310; border-style:solid; color:#1a1310; font-weight:600;}
   .note-input{

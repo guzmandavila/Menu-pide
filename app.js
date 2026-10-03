@@ -5,29 +5,29 @@
 const MENU = [
   { id:'combo-cafe-empanada-queso', cat:'Combos', name:'Café + Empanada de queso', desc:'Un café de la casa y una empanada de queso. Disponible únicamente los lunes, todo el día.', price:3.25, originalPrice:3.75, img:'miniaturas/combo-cafe-empanada.jpg', featured:true, featuredTag:'COMBO DEL LUNES', accent:'#D8A24A', order:0, days:[1] },
   { id:'combo-bananacake-catpuccino', cat:'Combos', name:'Bananacake + Catpuccino', desc:'Bananacake con harina de almendras, panela y drizzle de vainilla, acompañado de un Catpuccino. Disponible solo los martes, todo el día.', price:4.60, originalPrice:5.20, img:'banners/cmb-banner-02.jpg', featured:true, featuredTag:'COMBO DEL MARTES', accent:'#D8A24A', order:1, days:[2] },
-  { id:'banana-bread-latte', cat:'Bebida del Mes', name:'Banana Bread Latte', desc:'Sirope casero de brown butter (mantequilla avellanada), banano real y un shot de espresso, servido frío.', price:3.75, img:'assets/image-b4e517cc3df03e47.jpg', featured:true, featuredTag:'Bebida del mes', promoNote:'El precio de lanzamiento ($2.75) ya terminó. Mantente atento a la Bebida del Mes: cada lanzamiento sale con descuento.' },
+  { id:'banana-bread-latte', cat:'Bebida del Mes', name:'Banana Bread Latte', desc:'Banano real, espresso y sirope casero de mantequilla avellanada, bien frío. Como una tarde de pan recién hecho, pero con sorbete.', price:3.75, img:'assets/image-b4e517cc3df03e47.jpg', featured:true, featuredTag:'Bebida del mes', promoNote:'El precio de lanzamiento ($2.75) ya terminó. Mantente atento a la Bebida del Mes: cada lanzamiento sale con descuento.' },
 
   // ---- Bebidas Calientes ----
-  { id:'strawberry-catpuccino', cat:'Bebidas Calientes', name:'Strawberry Catpuccino', classic:'Cappuccino de fresa', desc:'Dulce, cremoso y hecho para consentirte.', price:3.00, availableFrom:'2026-09-19T00:00:00-05:00', availableUntil:'2026-09-28T00:00:00-05:00', promoNote:'Disponible del 19 al 27 de septiembre, hasta las 23:59.', img:'banners/bc-strawberry-catpuccino.jpeg' },
-  { id:'catpuccino', cat:'Bebidas Calientes', name:'Catpuccino', classic:'Cappuccino', syrupOption:['vainilla-francesa','avellana','caramelo-salado'], desc:'Espresso y leche.', price:2.50, milk:true, img:'miniaturas/bc-catpuccino.jpg' },
-  { id:'cozy-claws', cat:'Bebidas Calientes', name:'Cozy Claws', classic:'Chocolate caliente', syrupOption:['vainilla-francesa','avellana','caramelo-salado'], desc:'Con base de cacao y leche.', price:2.75, milk:true, img:'miniaturas/bc-cozy-claws.jpg' },
-  { id:'doble-sippi', cat:'Bebidas Calientes', name:'Doble Sippi', classic:'Espresso doble', syrupOption:['vainilla-francesa','avellana','caramelo-salado'], desc:'', price:1.50, img:'miniaturas/bc-doble-sippi.jpg' },
-  { id:'long-tail', cat:'Bebidas Calientes', name:'Long Tail', classic:'Americano', syrupOption:['vainilla-francesa','avellana','caramelo-salado'], desc:'', price:1.80, img:'miniaturas/bc-long-tail.jpg' },
-  { id:'moccatto', cat:'Bebidas Calientes', name:'Moccatto', classic:'Mocaccino', syrupOption:['vainilla-francesa','avellana','caramelo-salado'], desc:'Espresso con base de cacao y leche.', price:3.0, milk:true, img:'miniaturas/bc-moccatto.jpg' },
+  { id:'strawberry-catpuccino', cat:'Bebidas Calientes', name:'Strawberry Catpuccino', classic:'Cappuccino de fresa', desc:'Fresa, espresso y leche con espuma suave. Una pequeña excusa para quedarse un rato más.', price:3.00, availableFrom:'2026-09-19T00:00:00-05:00', availableUntil:'2026-09-28T00:00:00-05:00', promoNote:'Disponible del 19 al 27 de septiembre, hasta las 23:59.', img:'banners/bc-strawberry-catpuccino.jpeg' },
+  { id:'catpuccino', cat:'Bebidas Calientes', name:'Catpuccino', classic:'Cappuccino', syrupOption:['vainilla-francesa','avellana','caramelo-salado'], desc:'Espresso, leche y espuma suave. Hay mañanas que solo necesitan esto. Y cinco minutos más.', price:2.50, milk:true, img:'miniaturas/bc-catpuccino.jpg' },
+  { id:'cozy-claws', cat:'Bebidas Calientes', name:'Cozy Claws', classic:'Chocolate caliente', syrupOption:['vainilla-francesa','avellana','caramelo-salado'], desc:'Cacao y leche caliente para abrazar la taza con las dos manos. Hoy el apuro puede esperar.', price:2.75, milk:true, img:'miniaturas/bc-cozy-claws.jpg' },
+  { id:'doble-sippi', cat:'Bebidas Calientes', name:'Doble Sippi', classic:'Espresso doble', syrupOption:['vainilla-francesa','avellana','caramelo-salado'], desc:'Dos shots de espresso y pocas palabras. El primer sorbo pone la conversación en marcha.', price:1.50, img:'miniaturas/bc-doble-sippi.jpg' },
+  { id:'long-tail', cat:'Bebidas Calientes', name:'Long Tail', classic:'Americano', syrupOption:['vainilla-francesa','avellana','caramelo-salado'], desc:'Espresso y agua caliente, para alargar el café y la charla. Siempre queda algo por contar.', price:1.80, img:'miniaturas/bc-long-tail.jpg' },
+  { id:'moccatto', cat:'Bebidas Calientes', name:'Moccatto', classic:'Mocaccino', syrupOption:['vainilla-francesa','avellana','caramelo-salado'], desc:'Espresso, cacao y leche caliente. Para cuando quieres café, pero el chocolate también te está mirando.', price:3.0, milk:true, img:'miniaturas/bc-moccatto.jpg' },
 
   // ---- Bebidas Frías ----
-  { id:'affocato', cat:'Bebidas Calientes', name:'AffoCato', desc:'Espresso doble sobre helado de vainilla Madagascar.', price:3.00, img:'miniaturas/bf-affocato.jpg' },
-  { id:'berrybloom', cat:'Bebidas Frías', name:'BerryBloom', classic:'Limonada de fresa', classicTheme:'fresh', order:6, desc:'Salsa de fresa, zumo de limón y miel, con hielo.', price:2.75, img:'assets/image-45bed35fc31fb6b1.jpg' },
-  { id:'ice-koffin', cat:'Bebidas Frías', name:'Ice Koffin', classic:'Americano helado', classicTheme:'fresh', order:1, desc:'Espresso y agua, con hielo.', price:2.00, img:'assets/image-cc920e9b95fa9297.jpg' },
-  { id:'nara-sunset', cat:'Bebidas Frías', name:'Nara Sunset', classic:'Naranja y café', classicTheme:'fresh', order:5, desc:'Con hielo.', price:3.5, img:'assets/image-564f15ba92421bf9.jpg' },
-  { id:'nimbus', cat:'Bebidas Frías', name:'Ice Moccatto', classic:'Mocaccino helado', classicTheme:'fresh', order:3, desc:'Espresso, leche y sirope de chocolate, con hielo.', price:3.25, milk:true, img:'assets/image-de2fc99b743f1564.jpg' },
-  { id:'vanilatte', cat:'Bebidas Frías', name:'Ice Latte', classic:'Latte helado', classicTheme:'fresh', order:2, syrupOption:['vainilla-francesa','avellana','caramelo-salado'], desc:'Espresso, leche y jarabe de vainilla, con hielo.', price:2.75, milk:true, img:'assets/image-c2358fbf75d9fa28.jpg' },
+  { id:'affocato', cat:'Bebidas Calientes', name:'AffoCato', desc:'Helado de vainilla Madagascar bajo un espresso doble. Se derrite mientras decides si usar cuchara o beberlo.', price:3.00, img:'miniaturas/bf-affocato.jpg' },
+  { id:'berrybloom', cat:'Bebidas Frías', name:'BerryBloom', classic:'Limonada de fresa', classicTheme:'fresh', order:6, desc:'Fresa, limón y miel sobre hielo. Un sorbo dulce, otro ácido. Así se lleva mejor el calor.', price:2.75, img:'assets/image-45bed35fc31fb6b1.jpg' },
+  { id:'ice-koffin', cat:'Bebidas Frías', name:'Ice Koffin', classic:'Americano helado', classicTheme:'fresh', order:1, desc:'Espresso, agua y hielo. El café de los días en que hasta la sombra tiene calor.', price:2.00, img:'assets/image-cc920e9b95fa9297.jpg' },
+  { id:'nara-sunset', cat:'Bebidas Frías', name:'Nara Sunset', classic:'Naranja y café', classicTheme:'fresh', order:5, desc:'Naranja y café sobre hielo. Un pequeño atardecer en el vaso, aunque apenas sea mediodía.', price:3.5, img:'assets/image-564f15ba92421bf9.jpg' },
+  { id:'nimbus', cat:'Bebidas Frías', name:'Ice Moccatto', classic:'Mocaccino helado', classicTheme:'fresh', order:3, desc:'Espresso, leche y chocolate, bien fríos. Ibas a pedir solo un café, pero pasó esto.', price:3.25, milk:true, img:'assets/image-de2fc99b743f1564.jpg' },
+  { id:'vanilatte', cat:'Bebidas Frías', name:'Ice Latte', classic:'Latte helado', classicTheme:'fresh', order:2, syrupOption:['vainilla-francesa','avellana','caramelo-salado'], desc:'Espresso, leche y vainilla sobre hielo. La tarde se pone un poco más amable desde el primer sorbo.', price:2.75, milk:true, img:'assets/image-c2358fbf75d9fa28.jpg' },
 
-  { id:'banana-caramel-latte', cat:'Bebidas Frías', name:'Banana Caramel Latte', classic:'Latte helado de banana y caramelo', classicTheme:'fresh', order:2.5, desc:'Café, leche, banana y caramelo, servido frío. Disponible hasta el 15 de octubre.', featured:true, featuredTag:'Bebida especial', price:3.50, img:'banners/bf-banana-caramel-latte.jpeg' },
+  { id:'banana-caramel-latte', cat:'Bebidas Frías', name:'Banana Caramel Latte', classic:'Latte helado de banana y caramelo', classicTheme:'fresh', order:2.5, desc:'Banana caramelizada, espresso y leche bien fría, coronados con una nube de cold foam de vainilla y un toque de canela. Dulce, cremoso y peligrosamente fácil de terminar.', featured:true, featuredTag:'Bebida especial', promoNote:'Disponible hasta el 15 de octubre.', price:3.50, img:'banners/bf-banana-caramel-latte.jpeg' },
 
   // ---- Matcha ----
-  { id:'nekomatchalatte', cat:'Matcha', name:'NekoMatchaLatte', syrupOption:['caramelo','vainilla'], desc:'Matcha, leche y hielo.', price:3.5, milk:true, img:'assets/image-a21806fe3017f9d8.jpg' },
-  { id:'sakuramatcha-latte', cat:'Matcha', name:'SakuraMatcha Latte', desc:'Matcha, leche y fresa, con hielo.', price:4.15, milk:true, img:'assets/image-73038c7da3c63e99.jpg' },
+  { id:'nekomatchalatte', cat:'Matcha', name:'NekoMatchaLatte', syrupOption:['caramelo','vainilla'], desc:'Matcha y leche bien fría. Verde, suave y cremoso. Se bebe despacio, si te acuerdas.', price:3.5, milk:true, img:'assets/image-a21806fe3017f9d8.jpg' },
+  { id:'sakuramatcha-latte', cat:'Matcha', name:'SakuraMatcha Latte', desc:'Matcha, leche y fresa sobre hielo. Un jardín pequeño en el vaso, con permiso para mezclarlo todo.', price:4.15, milk:true, img:'assets/image-73038c7da3c63e99.jpg' },
 
   // ---- Panadería ----
   { id:'galleta', cat:'Snack Dulce', name:'Galleta', desc:'Gordita, hecha con mix de harinas sin gluten y trozos de chocolate sin leche.', price:2.0, soldOut:true, img:'assets/galleta.jpeg' },
@@ -36,15 +36,13 @@ const MENU = [
   { id:'mini-cake-del-dia', cat:'Snack Dulce', name:'Apple Crumble Cake', desc:'Harina de almendra, harina de coco, ghee y manzana natural, cobertura de chocolate blanco.', price:2.6, scoop:true, accent:'#C8433B', img:'miniaturas/apple-crumble.jpg', imgScoop:'miniaturas/apple-crumble-helado.jpg' },
 
   { id:'brownie', cat:'Snack Dulce', name:'Brownie', desc:'Brownie intenso y húmedo, con cacao orgánico, endulzado con alulosa y panela.', price:3.0, scoop:true, img:'assets/image-6d3c530cc30feadd.jpg' },
-  { id:'milkishaki-nutella', cat:'Bebidas Frías', name:'MilkiShaki - Nutella + Brownie Bites', classic:'Milkshake', classicTheme:'fresh', order:4, desc:'Hecho en casa, con leche y helado premium.', price:4.9, milk:true, img:'assets/image-2b43f2fe510398fb.jpg', group:'milkishaki', flavor:'Nutella + Brownie Bites'  },
-  { id:'milkishaki-fresa', cat:'Bebidas Frías', name:'MilkiShaki - Fresa', classic:'Milkshake', classicTheme:'fresh', order:4, desc:'Hecho en casa, con leche y helado premium.', price:4.9, milk:true, img:'assets/image-299c9fd9ebdf031a.jpg', group:'milkishaki', flavor:'Fresa'  },
-  { id:'milkishaki-salted-caramel', cat:'Bebidas Frías', name:'MilkiShaki - Salted Caramel', classic:'Milkshake', classicTheme:'fresh', order:4, desc:'Hecho en casa, con leche y helado premium.', price:4.9, milk:true, img:'assets/image-861d6d271de84321.jpg', group:'milkishaki', flavor:'Salted Caramel'  },
+  { id:'milkishaki-nutella', cat:'Bebidas Frías', name:'MilkiShaki - Nutella + Brownie Bites', classic:'Milkshake', classicTheme:'fresh', order:4, desc:'Nutella, leche, helado premium y bocados de brownie. La merienda se nos fue de las manos. Por suerte.', price:4.9, milk:true, img:'assets/image-2b43f2fe510398fb.jpg', group:'milkishaki', flavor:'Nutella + Brownie Bites'  },
+  { id:'milkishaki-fresa', cat:'Bebidas Frías', name:'MilkiShaki - Fresa', classic:'Milkshake', classicTheme:'fresh', order:4, desc:'Fresa, leche y helado premium. Sabe a una tarde sin tareas, aunque todavía te queden tres.', price:4.9, milk:true, img:'assets/image-299c9fd9ebdf031a.jpg', group:'milkishaki', flavor:'Fresa'  },
+  { id:'milkishaki-salted-caramel', cat:'Bebidas Frías', name:'MilkiShaki - Salted Caramel', classic:'Milkshake', classicTheme:'fresh', order:4, desc:'Leche, helado premium y caramelo con un toque de sal. Te deja un poquito en los labios y ganas de volver.', price:4.9, milk:true, img:'assets/image-861d6d271de84321.jpg', group:'milkishaki', flavor:'Salted Caramel'  },
 
   // ---- Snacks ----
-  { id:'tocipapa', cat:'Snack Sal', name:'Tocipapa', desc:'Papas corte recto con tocineta crocante y salsa de la casa. 120 g (20–25 g de tocineta).', price:2.5, soldOut:true, img:'assets/image-9fa7a5da9f5e3cb0.jpg', group:'tocipapa', flavor:'Regular' },
-  { id:'tocipapa-grande', cat:'Snack Sal', name:'Tocipapa', desc:'Papas corte recto con tocineta crocante y salsa de la casa. 180 g (30–40 g de tocineta).', price:3.5, soldOut:true, img:'assets/image-9fa7a5da9f5e3cb0.jpg', group:'tocipapa', flavor:'Grande' },
-  { id:'wachipapa', cat:'Snack Sal', name:'Wachipapa', desc:'Papas corte recto con chorizo argentino y salsa mayochurri de la casa. 120 g (35–40 g de chorizo).', price:3.0, img:'assets/image-a77569a7a899b63a.jpg', group:'wachipapa', flavor:'Regular' },
-  { id:'wachipapa-grande', cat:'Snack Sal', name:'Wachipapa', desc:'Papas corte recto con chorizo argentino y salsa mayochurri de la casa. 180 g (50–60 g de chorizo).', price:4.0, img:'assets/image-a77569a7a899b63a.jpg', group:'wachipapa', flavor:'Grande' },
+  { id:'tocipapa', cat:'Snack Sal', name:'Tocipapa', desc:'Papas corte recto con tocineta crocante y salsa de la casa. 120 g (20–25 g de tocineta).', price:2.5, soldOut:true, img:'assets/image-9fa7a5da9f5e3cb0.jpg' },
+  { id:'wachipapa', cat:'Snack Sal', name:'Wachipapa', desc:'Papas corte recto con chorizo argentino y salsa mayochurri de la casa. 120 g (35–40 g de chorizo).', price:3.0, img:'banners/snack-papas.jpg' },
   { id:'empanada-queso', cat:'Snack Sal', name:'Empanada de Hojaldre', desc:'Hojaldre horneado y crocante, relleno de queso.', price:1.5, order:0, img:'assets/image-b46285ee20adcc24.jpg', group:'empanada', flavor:'Queso' },
   { id:'empanada-pollo', cat:'Snack Sal', name:'Empanada de Hojaldre', desc:'Pechuga de pollo con nuestra salsa de vegetales. No te pierdas nuestro aderezo de mayonesa de la casa.', price:2.4, order:0, img:'assets/image-b46285ee20adcc24.jpg', group:'empanada', flavor:'Pollo' },
   { id:'empanada-pizza', cat:'Snack Sal', name:'Empanada de Hojaldre', desc:'Hojaldre horneado y crocante, relleno de queso mozzarella y tocineta.', price:0, img:'assets/image-b46285ee20adcc24.jpg', group:'empanada', flavor:'Pizza', comingSoon:true },
@@ -71,9 +69,6 @@ const MENU = [
 for (let i = MENU.length - 1; i >= 0; i--) {
   if (MENU[i].name === 'Virginia Melt' || MENU[i].id === 'empanada-pizza') MENU.splice(i, 1);
 }
-// Nara Sunset se presenta sin una descripción redundante en la tarjeta.
-const naraSunset = MENU.find(item => item.id === 'nara-sunset');
-if (naraSunset) naraSunset.desc = '';
 // Especial semanal: reemplaza el Apple Crumble por minicake de banano.
 const miniCake = MENU.find(item => item.id === 'mini-cake-del-dia');
 if (miniCake) {
@@ -89,7 +84,7 @@ if (miniCake) {
 // El minicake y el brownie siguen ocultos; Snack Dulce incluye galleta, Funbite y Cupcake Banana.
 const HIDDEN_ITEM_IDS = ['mini-cake-del-dia', 'brownie'];
 // Información de preparación visible en cada tarjeta.
-['wachipapa','tocipapa','wachipapa-grande','tocipapa-grande'].forEach(id => {
+['wachipapa','tocipapa'].forEach(id => {
   const item = MENU.find(product => product.id === id);
   if (item) item.processTag = '♨️ Freidora de aire · papas y proteína';
 });
@@ -112,7 +107,7 @@ MENU.forEach(item => {
   }
 });
 
-/* Banners promocionales por categoría — array = slider. Para quitar uno, borra su entrada */
+/* Banners por categoría: usa img para fotos o video + poster para clips. */
 const CAT_BANNERS = {
   'Matcha': [
     { img:'banners/mt-banner-01.jpg', alt:'Matcha Clowder' },
@@ -127,6 +122,8 @@ const CAT_BANNERS = {
     { productId:'funbite', img:'assets/funbite.jpeg', alt:'Funbite — cupcake con cobertura cremosa y chips de colores' },
   ],
   'Snack Sal': [
+    { img:'banners/snack-papas.jpg', alt:'Papas y carne grillada en un vaso Clowder' },
+    { hidden:true, video:'banners/snack-papas.mp4', poster:'banners/snack-papas-poster.jpg', alt:'Papas Clowder, recién preparadas' },
     { img:'banners/ss-banner-01.jpg', alt:'Empanada de pollo — vegetales frescos picaditos y pechuga de pollo mechada' },
   ],
   'Bebidas Frías': [
@@ -364,8 +361,6 @@ function arrowSvg(color){
 
 const GROUP_NAMES = {
   'milkishaki': 'MilkiShaki',
-  'tocipapa': 'Tocipapa',
-  'wachipapa': 'Wachipapa',
   'empanada': 'Empanada de Hojaldre',
   'cake-grande': 'Cake Grande',
 };
@@ -379,6 +374,16 @@ function selectVariant(group, id){
 // Un recurso ausente no debe dejar un ícono roto ni un banner vacío.
 document.addEventListener('error', event => {
   const img = event.target;
+  if(img instanceof HTMLVideoElement && img.closest('.cat-banner')) {
+    if(img.poster) {
+      const fallback = document.createElement('img');
+      fallback.src = img.poster;
+      fallback.className = 'banner-video-poster';
+      fallback.alt = img.getAttribute('aria-label') || 'Promoción Clowder';
+      img.replaceWith(fallback);
+    } else img.closest('.cat-banner').remove();
+    return;
+  }
   if(!(img instanceof HTMLImageElement)) return;
   if(img.closest('.cat-banner')) img.closest('.cat-banner').remove();
   else if(img.classList.contains('item-thumb')) img.hidden = true;
@@ -416,12 +421,17 @@ function renderMenu(){
   });
 
   const el = document.getElementById('menu');
-  const categoryBanners = (CAT_BANNERS[activeCat] || []).filter(b => !b.productId || MENU.some(item => item.id === b.productId && isWithinAvailability(item)));
+  const categoryBanners = (CAT_BANNERS[activeCat] || []).filter(b => !b.hidden && (!b.productId || MENU.some(item => item.id === b.productId && isWithinAvailability(item))));
   const dailyBanner = activeCat === 'Combos' && categoryBanners.find(b=>b.day===today);
   const banners = dailyBanner ? [dailyBanner] : categoryBanners;
   let bannerHtml = '';
   if(banners && banners.length){
-    const slides = banners.map(b => `<div class="cat-banner-slide"><img src="${b.img}" alt="${b.alt}" loading="lazy" decoding="async"></div>`).join('');
+    const slides = banners.map(b => {
+      const media = b.video
+        ? `<video src="${escapeHtml(b.video)}" poster="${escapeHtml(b.poster || b.img || '')}" aria-label="${escapeHtml(b.alt || 'Promoción Clowder')}" muted loop playsinline controls preload="metadata"></video>`
+        : `<img src="${escapeHtml(b.img)}" alt="${escapeHtml(b.alt)}" loading="lazy" decoding="async">`;
+      return `<div class="cat-banner-slide">${media}</div>`;
+    }).join('');
     const dots = banners.length > 1
       ? `<div class="cat-banner-dots">${banners.map((_,i)=>`<button type="button" class="cat-banner-dot${i===0?' active':''}" aria-label="Ver promoción ${i+1}" aria-current="${i===0?'true':'false'}"></button>`).join('')}</div>`
       : '';
@@ -448,23 +458,26 @@ function renderMenu(){
       <select class="variant-select" style="background-color:${flavorColor}; color:${flavorText}; background-image:${arrowSvg(flavorText)};" onchange="selectVariant('${i.__group}', this.value)">
         ${i.__variants.map(v=>`<option value="${v.id}" ${v.id===i.id?'selected':''}>${v.flavor}</option>`).join('')}
       </select>` : '';
+    const priceHtml = !i.comingSoon ? `<div class="item-price-col">
+      ${i.originalPrice ? `<div class="item-price-was">$${i.originalPrice.toFixed(2)}</div>` : ''}
+      <div class="item-price ${badgeClass}">${badgeText ? badgeText : '$'+i.price.toFixed(2)}</div>
+    </div>` : '';
     return `
     <div class="item ${i.featured?'item-featured':''} ${i.cat==='Combos'?'item-combo':''}" style="background:${i.accent ? lighten(i.accent, 0.82) : (isStoreCat(i.cat) ? '#F2EEE6' : pastelBg(i.cat))}; border-left-color:${i.accent || (catColor(i.cat)==='transparent' ? 'var(--line)' : catColor(i.cat))};">
-      ${i.featured ? `<div class="featured-ribbon">\u{1F43E} ${i.featuredTag||'Destacado'}</div>` : ''}
+      ${i.featured ? `<div class="item-heading"><div class="featured-ribbon">\u{1F43E} ${i.featuredTag||'Destacado'}</div>${priceHtml}</div>` : ''}
       ${i.comingSoon ? `<div class="coming-soon-status">✦ ${badgeText}</div>` : ''}
       <div class="item-top">
         ${(() => { const currentImg = (i.imgScoop && scoop === 'si') ? i.imgScoop : i.img; if (!currentImg) return ''; const image = `<img class="item-thumb" id="thumb-${i.id}" src="${currentImg}" alt="${i.name}" loading="lazy" decoding="async">`; return i.id === 'funbite' ? `<span class="funbite-photo">${image}</span>` : image; })()}
         <div class="item-info">
-          <div class="item-name-badge">${i.__isGroup ? GROUP_NAMES[i.__group] : i.name}</div>
+          <div class="item-title-row">
+            <div class="item-name-badge">${i.__isGroup ? GROUP_NAMES[i.__group] : i.name}</div>
+            ${!i.featured ? priceHtml : ''}
+          </div>
           ${i.classic ? `<span class="classic-tag ${i.classicTheme==='fresh'?'classic-tag-fresh':''}">${i.classic}</span>` : ''}
           ${variantSelect}
-          ${i.desc ? `<div class="item-desc">${i.desc}</div>` : ''}
-          ${i.processTag ? `<div class="process-tag">${i.processTag}</div>` : ''}
         </div>
-        ${!i.comingSoon ? `<div class="item-price-col">
-          ${i.originalPrice ? `<div class="item-price-was">$${i.originalPrice.toFixed(2)}</div>` : ''}
-          <div class="item-price ${badgeClass}">${badgeText ? badgeText : '$'+i.price.toFixed(2)}</div>
-        </div>` : ''}
+        ${i.desc ? `<div class="item-desc">${i.desc}</div>` : ''}
+        ${i.processTag ? `<div class="process-tag">${i.processTag}</div>` : ''}
       </div>
       ${i.promoNote ? `<div class="promo-note">${i.promoNote}</div>` : ''}
       ${badgeText ? `
@@ -496,6 +509,7 @@ function renderMenu(){
     </div>`;
   }).join('');
   initBannerSlider();
+  initBannerVideos();
 }
 // El tacto conserva el scroll nativo; el mouse permite agarrar la pista.
 function enableMouseDrag(track, onRelease){
@@ -505,7 +519,7 @@ function enableMouseDrag(track, onRelease){
   let suppressClick = false;
   track.addEventListener('dragstart', event => event.preventDefault());
   track.addEventListener('pointerdown', event => {
-    if(event.pointerType !== 'mouse' || event.button !== 0 || track.scrollWidth <= track.clientWidth) return;
+    if(event.pointerType !== 'mouse' || event.button !== 0 || event.target.closest('video') || track.scrollWidth <= track.clientWidth) return;
     suppressClick = false;
     drag = {id:event.pointerId, x:event.clientX, left:track.scrollLeft, moved:false};
   });
@@ -542,6 +556,41 @@ function enableMouseDrag(track, onRelease){
     suppressClick = false;
   }, true);
 }
+// Solo reproduce los clips visibles; conserva una pausa elegida por el cliente.
+let bannerVideoObserver = null;
+let bannerVideoStates = [];
+function syncBannerVideo(state){
+  const active = state.inView && !document.hidden;
+  if(active === state.active) return;
+  if(active) {
+    if(state.resume) state.video.play().catch(() => {});
+  } else {
+    if(state.active) state.resume = !state.video.paused;
+    state.video.pause();
+  }
+  state.active = active;
+}
+function initBannerVideos(){
+  if(bannerVideoObserver) bannerVideoObserver.disconnect();
+  bannerVideoStates.forEach(state => state.video.pause());
+  const autoplay = !matchMedia('(prefers-reduced-motion: reduce)').matches && !navigator.connection?.saveData;
+  bannerVideoStates = [...document.querySelectorAll('.cat-banner video')].map(video => {
+    video.muted = true;
+    return { video, inView:false, active:false, resume:autoplay };
+  });
+  if(!bannerVideoStates.length) return;
+  bannerVideoObserver = new IntersectionObserver(entries => {
+    entries.forEach(entry => {
+      const state = bannerVideoStates.find(state => state.video === entry.target);
+      if(!state) return;
+      state.inView = entry.isIntersecting && entry.intersectionRatio >= 0.25;
+      syncBannerVideo(state);
+    });
+  }, { threshold:[0, 0.25] });
+  bannerVideoStates.forEach(state => bannerVideoObserver.observe(state.video));
+}
+document.addEventListener('visibilitychange', () => bannerVideoStates.forEach(syncBannerVideo));
+
 function initBannerSlider(){
   const track = document.getElementById('catBannerTrack');
   if(!track) return;
@@ -582,7 +631,7 @@ function unitPrice(id){
   return Math.round(p * 100) / 100;
 }
 function productLabel(item){
-  return ['wachipapa','tocipapa'].includes(item.group) ? `${item.name} · ${item.flavor}` : item.name;
+  return item.name;
 }
 function validCash(total){
   const input = document.getElementById('cashAmount');
@@ -702,7 +751,7 @@ const STORE_CATS = ['Congelados y Más','Merch Clowder'];
 function isStoreCat(c){ return STORE_CATS.includes(c); }
 
 // Wachi y Toci requieren el horario de cocina; el resto conserva su disponibilidad.
-const KITCHEN_HOURS_ITEM_IDS = MENU.filter(item => ['wachipapa', 'tocipapa'].includes(item.group)).map(item => item.id);
+const KITCHEN_HOURS_ITEM_IDS = ['wachipapa', 'tocipapa'];
 const FULL_MENU_ORDERING_ENABLED = true; // Permite pedidos fuera del horario habitual.
 const ALWAYS_OPEN_CATS = ['Bebidas Calientes', 'Congelados y Más', 'Combos'];
 const ALWAYS_OPEN_GROUPS = ['empanada']; // se puede pedir a cualquier hora, sin importar su categoría

@@ -131,7 +131,7 @@ test('Stock actual: helados, queso y wachipapas disponibles; pollo y tocipapas a
     return {
       iceCream: ids.map(id => isItemOrderable(MENU.find(item => item.id === id))),
       cheese: !!cart['empanada-queso'], chicken: !!cart['empanada-pollo'],
-      potatoes: ['wachipapa', 'wachipapa-grande', 'tocipapa', 'tocipapa-grande'].map(id => isItemOrderable(MENU.find(item => item.id === id))),
+      potatoes: ['wachipapa', 'tocipapa'].map(id => isItemOrderable(MENU.find(item => item.id === id))),
       restored: sanitizeCart({ 'empanada-pollo': { qty: 8 }, 'tocipapa': { qty: 1 }, 'tocipapa-grande': { qty: 1 }, 'empanada-queso': { qty: 1 }, 'banana-bread-latte': { qty: 1 }, 'combo-cafe-empanada-queso': { qty: 1 } }),
       hidden: ['Bebida del Mes', 'Combos'].every(cat => !CATS.includes(cat)),
     };
@@ -139,14 +139,14 @@ test('Stock actual: helados, queso y wachipapas disponibles; pollo y tocipapas a
   assert.deepEqual(result.iceCream, [true, true, true, true]);
   assert.equal(result.cheese, true);
   assert.equal(result.chicken, false);
-  assert.deepEqual(result.potatoes, [true, true, false, false]);
+  assert.deepEqual(result.potatoes, [true, false]);
   assert.equal(result.hidden, true);
   assert.deepEqual(Object.keys(result.restored), ['empanada-queso']);
   assert.equal(result.restored['empanada-queso'].qty, 1);
   await page.evaluate(() => selectCat('Snack Sal'));
   assert.doesNotMatch(await page.locator('#menu').textContent(), /Últimas 4 empanadas de pollo/);
   assert.equal(await page.locator('#menu .item').first().locator('.variant-select').inputValue(), 'empanada-queso');
-  assert.equal(await page.locator('#menu .cat-banner-slide img').getAttribute('src'), 'banners/ss-banner-01.jpg');
+  assert.equal(await page.locator('#menu .cat-banner-slide img[src="banners/ss-banner-01.jpg"]').count(), 1);
 }));
 
 test('Pago exacto funciona con 3 × $4.90 y rechaza efectivo insuficiente o fracciones de centavo', () => useFixture(async ({ page }) => {
@@ -166,19 +166,81 @@ test('Pago exacto funciona con 3 × $4.90 y rechaza efectivo insuficiente o frac
   }
 }));
 
-test('Carrito y mensaje distinguen los tamaños de papas', () => useFixture(async ({ page }) => {
-  // Aislar el formato de tamaños de la disponibilidad temporal.
-  await page.evaluate(() => MENU.filter(item => ['wachipapa', 'tocipapa'].includes(item.group)).forEach(item => item.soldOut = false));
-  await prepare(page, { items: { 'tocipapa': 1, 'tocipapa-grande': 1, 'wachipapa': 1, 'wachipapa-grande': 1 } });
+test('Video del banner: reproduce en silencio, pausa fuera de pantalla y respeta una pausa manual', () => useFixture(async ({ page }) => {
+  await page.evaluate(() => {
+    CAT_BANNERS['Snack Sal'].find(b => b.video).hidden = false;
+    CAT_BANNERS['Snack Sal'].find(b => b.img === 'banners/snack-papas.jpg').hidden = true;
+    selectCat('Snack Sal');
+  });
+  const video = page.locator('.cat-banner video');
+  await video.scrollIntoViewIfNeeded();
+  await page.waitForFunction(() => {
+    const video = document.querySelector('.cat-banner video');
+    return video && !video.paused && video.currentTime > 0;
+  });
+  assert.deepEqual(await video.evaluate(video => [video.muted, video.loop, video.playsInline, video.controls]), [true, true, true, true]);
+  await page.locator('.cat-banner-arrow[data-step="1"]').click();
+  await page.waitForFunction(() => document.querySelector('.cat-banner video').paused);
+  await page.locator('.cat-banner-arrow[data-step="-1"]').click();
+  await page.waitForFunction(() => !document.querySelector('.cat-banner video').paused);
+  await video.evaluate(video => video.pause());
+  await page.locator('.cat-banner-arrow[data-step="1"]').click();
+  await page.waitForFunction(() => document.querySelector('.cat-banner-dot[aria-current="true"]').getAttribute('aria-label') === 'Ver promoción 2');
+  await page.locator('.cat-banner-arrow[data-step="-1"]').click();
+  await page.waitForFunction(() => document.querySelector('.cat-banner-dot[aria-current="true"]').getAttribute('aria-label') === 'Ver promoción 1');
+  assert.equal(await video.evaluate(video => video.paused), true);
+}));
+
+test('Video con movimiento reducido no arranca automáticamente', () => useFixture(async ({ page }) => {
+  await page.emulateMedia({ reducedMotion:'reduce' });
+  await page.evaluate(() => {
+    CAT_BANNERS['Snack Sal'].find(b => b.video).hidden = false;
+    CAT_BANNERS['Snack Sal'].find(b => b.img === 'banners/snack-papas.jpg').hidden = true;
+    selectCat('Snack Sal');
+  });
+  const video = page.locator('.cat-banner video');
+  await video.scrollIntoViewIfNeeded();
+  await page.waitForFunction(() => document.querySelector('.cat-banner video').readyState >= 2);
+  assert.equal(await video.evaluate(video => video.paused), true);
+  assert.equal(await video.evaluate(video => video.controls), true);
+}));
+
+test('Si falla el video se conserva su foto y el resto del carrusel', () => useFixture(async ({ page }) => {
+  await page.route('**/banners/snack-papas.mp4', route => route.abort());
+  await page.evaluate(() => {
+    CAT_BANNERS['Snack Sal'].find(b => b.video).hidden = false;
+    CAT_BANNERS['Snack Sal'].find(b => b.img === 'banners/snack-papas.jpg').hidden = true;
+    selectCat('Snack Sal');
+  });
+  await page.locator('.cat-banner img[src$="/banners/snack-papas-poster.jpg"]').waitFor();
+  assert.equal(await page.locator('.cat-banner video').count(), 0);
+  assert.equal(await page.locator('.cat-banner-slide').count(), 2);
+}));
+
+test('Papas con presentación única: sin selector, sin tamaños en el pedido y sin variantes antiguas', () => useFixture(async ({ page }) => {
+  // Aislar la presentación del stock; los horarios se comprueban por separado.
+  await page.evaluate(() => MENU.filter(item => ['wachipapa', 'tocipapa'].includes(item.id)).forEach(item => item.soldOut = false));
+  await page.evaluate(() => selectCat('Snack Sal'));
+  for (const [id, name, price] of [['tocipapa', 'Tocipapa', '$2.50'], ['wachipapa', 'Wachipapa', '$3.00']]) {
+    const card = page.locator('.item').filter({ has: page.locator('#qty-' + id) });
+    assert.equal(await card.locator('.variant-select').count(), 0);
+    assert.equal(await card.locator('.item-name-badge').textContent(), name);
+    assert.equal(await card.locator('.item-price').textContent(), price);
+  }
+  const restored = await page.evaluate(() => sanitizeCart({
+    'tocipapa': { qty: 1 }, 'wachipapa': { qty: 1 },
+    'tocipapa-grande': { qty: 1 }, 'wachipapa-grande': { qty: 1 },
+  }));
+  assert.deepEqual(Object.keys(restored), ['tocipapa', 'wachipapa']);
+  await prepare(page, { items: { 'tocipapa': 1, 'wachipapa': 1 } });
   const names = await page.locator('#cartList .n').allTextContents();
-  assert.equal(names.length, 4);
-  assert.equal(new Set(names).size, 4, 'Los tamaños tienen nombres idénticos');
-  assert.ok(names.some(name => /Tocipapa.*Grande/i.test(name)));
-  assert.ok(names.some(name => /Wachipapa.*Grande/i.test(name)));
+  assert.deepEqual(names, ['1x Tocipapa', '1x Wachipapa']);
+  assert.equal(await page.evaluate(() => cartTotal()), 5.50);
   await page.evaluate(() => sendOrder());
   const message = new URL((await orderState(page)).destinations.at(-1).url).searchParams.get('text');
-  assert.match(message, /Tocipapa.*Grande/i);
-  assert.match(message, /Wachipapa.*Grande/i);
+  assert.match(message, /Tocipapa/);
+  assert.match(message, /Wachipapa/);
+  assert.doesNotMatch(message, /Regular|Grande/);
 }));
 
 test('Strawberry abre en portada y vence al terminar el domingo 27 en Ecuador', () => useFixture(async ({ page }) => {
@@ -212,8 +274,8 @@ test('Strawberry abre en portada y vence al terminar el domingo 27 en Ecuador', 
   assert.equal(await page.locator('.cat-banner-slide img[src="banners/bc-strawberry-catpuccino.jpeg"]').count(), 0);
 }));
 
-test('Los horarios incluyen todos los tamaños y sus límites de lunes y domingo', () => useFixture(async ({ page }) => {
-  await page.evaluate(() => MENU.filter(item => ['wachipapa', 'tocipapa'].includes(item.group)).forEach(item => item.soldOut = false));
+test('Tocipapa y Wachipapa conservan los límites de cocina de lunes y domingo', () => useFixture(async ({ page }) => {
+  await page.evaluate(() => MENU.filter(item => ['wachipapa', 'tocipapa'].includes(item.id)).forEach(item => item.soldOut = false));
   for (const [time, expected] of [
     ['2026-09-21T23:59:00Z', false], ['2026-09-22T00:00:00Z', true],
     ['2026-09-22T04:00:00Z', true], ['2026-09-22T04:01:00Z', false],
@@ -222,9 +284,9 @@ test('Los horarios incluyen todos los tamaños y sus límites de lunes y domingo
   ]) {
     const result = await page.evaluate(time => {
       window.__setTestTime(time);
-      return ['tocipapa', 'tocipapa-grande', 'wachipapa', 'wachipapa-grande'].map(id => isItemOrderable(MENU.find(item => item.id === id)));
+      return ['tocipapa', 'wachipapa'].map(id => isItemOrderable(MENU.find(item => item.id === id)));
     }, time);
-    assert.deepEqual(result, [expected, expected, expected, expected], time);
+    assert.deepEqual(result, [expected, expected], time);
   }
 }));
 

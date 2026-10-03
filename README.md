@@ -38,6 +38,12 @@ Esto funciona en páginas que ya cargaron este código. Una página antigua que 
 | Imágenes | `assets/`, `miniaturas/` y `banners/`; usa rutas relativas, sin `/` inicial, para GitHub Pages. |
 | Actualización del contacto y caché | `contact-config.js` y `sw.js`. No hace falta modificarlos para cambiar el número. |
 
+## Banners de video
+
+En `CAT_BANNERS` de `app.js`, un banner puede usar `video` (ruta a un MP4), `poster` (foto mientras carga y alternativa si falla) y `alt` (descripción). Las fotos siguen usando `img`. Usa `hidden:true` para conservar un banner sin mostrarlo ni cargar su video.
+
+El clip se reproduce en silencio y en bucle cuando está visible. Se pausa al salir de pantalla o al ocultar la pestaña; los controles permiten pausarlo manualmente. Con movimiento reducido o ahorro de datos no arranca automáticamente. Los videos conservan el marco 3:4 del banner; ajusta `object-position` en CSS si cambia el encuadre. Conviene exportar H.264, sin audio, a 720 píxeles de ancho con `faststart`.
+
 ## Comprobar antes de publicar
 
 Necesitas Node.js 18 o posterior. La prueba del menú requiere Playwright y Google Chrome; inicia su propio servidor local. Instala Playwright si falta con `npm install --no-save --package-lock=false playwright`. En otro entorno puedes indicar `PLAYWRIGHT_PATH` (módulo) y `CHROME_PATH` (ejecutable), o configurar `NODE_PATH` si tus módulos están instalados fuera del proyecto.
