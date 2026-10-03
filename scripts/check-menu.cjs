@@ -243,8 +243,9 @@ test('Papas con presentación única: sin selector, sin tamaños en el pedido y 
   assert.doesNotMatch(message, /Regular|Grande/);
 }));
 
-test('Strawberry abre en portada y vence al terminar el domingo 27 en Ecuador', () => useFixture(async ({ page }) => {
-  assert.equal(await page.evaluate(() => activeCat), 'Bebidas Calientes');
+test('El menú abre en Bebidas Frías y Strawberry vence al terminar el domingo 27 en Ecuador', () => useFixture(async ({ page }) => {
+  assert.equal(await page.evaluate(() => activeCat), 'Bebidas Frías');
+  await page.evaluate(() => selectCat('Bebidas Calientes'));
   for (const [time, available] of [
     ['2026-09-19T04:59:59Z', false],
     ['2026-09-19T05:00:00Z', true],

@@ -167,8 +167,8 @@ function lighten(hex, amt){
 }
 function pastelBg(c){ const hex = catColor(c); return hex==='transparent' ? 'transparent' : lighten(hex, 0.45); }
 
-// Calientes es la portada del menú al abrir la app.
-let activeCat = MENU.some(i=>i.cat==='Bebidas Calientes') ? 'Bebidas Calientes' : CATS[0];
+// Bebidas Frías es la portada del menú al abrir la app.
+let activeCat = CATS.includes('Bebidas Frías') ? 'Bebidas Frías' : CATS[0];
 let cart = {}; // id -> {qty, note}
 let mode = '';
 let payMethod = '';
