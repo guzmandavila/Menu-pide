@@ -38,8 +38,8 @@ const MENU = [
   { id:'mini-cake-del-dia', cat:'Snack Dulce', name:'Apple Crumble Cake', desc:'Harina de almendra, harina de coco, ghee y manzana natural, cobertura de chocolate blanco.', price:2.6, scoop:true, accent:'#C8433B', img:'miniaturas/apple-crumble.jpg', imgScoop:'miniaturas/apple-crumble-helado.jpg' },
 
   { id:'brownie', cat:'Snack Dulce', name:'Brownie', desc:'Brownie intenso y húmedo, con cacao orgánico, endulzado con alulosa y panela.', price:3.0, scoop:true, img:'assets/image-6d3c530cc30feadd.jpg' },
-  { id:'milkishaki-nutella', cat:'Bebidas Frías', name:'MilkiShaki - Hazelnut + Brownie Bites', classic:'Milkshake', classicTheme:'fresh', order:4, desc:'Sirope de hazelnut, leche, helado premium y bocados de brownie.', price:4.9, milk:true, img:'assets/image-2b43f2fe510398fb.jpg', group:'milkishaki', flavor:'Hazelnut + Brownie Bites'  },
-  { id:'milkishaki-fresa', cat:'Bebidas Frías', name:'MilkiShaki - Fresa', classic:'Milkshake', classicTheme:'fresh', order:4, desc:'Fresa, leche y helado premium.', price:4.9, milk:true, img:'assets/image-299c9fd9ebdf031a.jpg', group:'milkishaki', flavor:'Fresa'  },
+  { id:'milkishaki-nutella', cat:'Bebidas Frías', name:'MilkiShaki - Hazelnut + Brownie Bites', classic:'Milkshake', classicTheme:'fresh', order:4, desc:'Sirope de hazelnut, leche, helado premium y bocados de brownie.', price:4.9, milk:true, comingSoon:true, comingSoonLabel:'Vuelve pronto', comingSoonNote:'El sirope de hazelnut se terminó.', img:'assets/image-2b43f2fe510398fb.jpg', group:'milkishaki', flavor:'Hazelnut + Brownie Bites'  },
+  { id:'milkishaki-fresa', cat:'Bebidas Frías', name:'MilkiShaki - Fresa', classic:'Milkshake', classicTheme:'fresh', order:4, desc:'Fresa, leche y helado premium.', price:4.9, milk:true, featured:true, featuredTag:'Disponible', img:'assets/image-299c9fd9ebdf031a.jpg', group:'milkishaki', flavor:'Fresa'  },
   { id:'milkishaki-salted-caramel', cat:'Bebidas Frías', name:'MilkiShaki - Salted Caramel', classic:'Milkshake', classicTheme:'fresh', order:4, desc:'Leche, helado premium y caramelo con un toque de sal.', price:4.9, milk:true, img:'assets/image-861d6d271de84321.jpg', group:'milkishaki', flavor:'Salted Caramel'  },
 
   // ---- Snacks ----
@@ -432,7 +432,7 @@ const GROUP_NAMES = {
   'cake-grande': 'Cake Grande',
   'long-tail-intensity': 'Long Tail',
 };
-let groupView = {}; // group -> currently displayed variant id
+let groupView = {milkishaki:'milkishaki-fresa'}; // group -> currently displayed variant id
 
 function selectVariant(group, id){
   groupView[group] = id;
@@ -526,7 +526,7 @@ function renderMenu(){
     const unavailableNote = i.comingSoon ? (i.comingSoonNote || 'Todavía no está disponible para pedir.') : (i.soldOut ? 'Se agotó por hoy — vuelve pronto.' : '');
     const variantSelect = i.__isGroup ? `
       <select class="variant-select" style="background-color:${flavorColor}; color:${flavorText}; background-image:${arrowSvg(flavorText)};" onchange="selectVariant('${i.__group}', this.value)">
-        ${i.__variants.map(v=>`<option value="${v.id}" ${v.id===i.id?'selected':''}>${v.flavor}</option>`).join('')}
+        ${i.__variants.map(v=>`<option value="${v.id}" ${v.id===i.id?'selected':''}>${v.flavor}${v.comingSoon ? ' — Vuelve pronto' : ''}</option>`).join('')}
       </select>` : '';
     const priceHtml = !i.comingSoon ? `<div class="item-price-col">
       ${i.originalPrice ? `<div class="item-price-was">$${i.originalPrice.toFixed(2)}</div>` : ''}
