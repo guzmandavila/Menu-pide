@@ -5,7 +5,8 @@
 const MENU = [
   { id:'combo-cafe-empanada-queso', cat:'Combos', name:'Café + Empanada de queso', desc:'Un café de la casa y una empanada de queso. Disponible únicamente los lunes, todo el día.', price:3.25, originalPrice:3.75, img:'miniaturas/combo-cafe-empanada.jpg', featured:true, featuredTag:'COMBO DEL LUNES', accent:'#D8A24A', order:0, days:[1] },
   { id:'combo-bananacake-catpuccino', cat:'Combos', name:'Bananacake + Catpuccino', desc:'Bananacake con harina de almendras, panela y drizzle de vainilla, acompañado de un Catpuccino. Disponible solo los martes, todo el día.', price:4.60, originalPrice:5.20, img:'banners/cmb-banner-02.jpg', featured:true, featuredTag:'COMBO DEL MARTES', accent:'#D8A24A', order:1, days:[2] },
-  { id:'banana-bread-latte', cat:'Bebida del Mes', name:'Banana Bread Latte', desc:'Banano real, espresso y sirope casero de mantequilla avellanada, bien frío. Como una tarde de pan recién hecho, pero con sorbete.', price:3.75, img:'assets/image-b4e517cc3df03e47.jpg', featured:true, featuredTag:'Bebida del mes', promoNote:'El precio de lanzamiento ($2.75) ya terminó. Mantente atento a la Bebida del Mes: cada lanzamiento sale con descuento.' },
+  { id:'pumpkin-spice-caliente', cat:'Bebida del Mes', name:'Pumpkin Spice Latte · Caliente', desc:'Jarabe pumpkin spice hecho artesanalmente en Clowder.', price:3.00, milk:true, img:'assets/pumpkin-spice-latte.jpg', featured:true, groupFeatured:true, featuredTag:'Bebida del mes', group:'pumpkin-spice-latte', flavor:'Caliente · $3.00', order:0 },
+  { id:'pumpkin-spice-frio', cat:'Bebida del Mes', name:'Pumpkin Spice Latte · Frío', desc:'Jarabe pumpkin spice hecho artesanalmente en Clowder.', price:3.75, milk:true, img:'assets/pumpkin-spice-latte.jpg', featured:true, groupFeatured:true, featuredTag:'Bebida del mes', group:'pumpkin-spice-latte', flavor:'Frío · $3.75', order:0 },
 
   // ---- Bebidas Calientes ----
   { id:'strawberry-catpuccino', cat:'Bebidas Calientes', name:'Strawberry Catpuccino', classic:'Cappuccino de fresa', desc:'Espresso, fresa y leche espumada.', price:3.00, availableFrom:'2026-09-19T00:00:00-05:00', availableUntil:'2026-09-28T00:00:00-05:00', promoNote:'Disponible del 19 al 27 de septiembre, hasta las 23:59.', img:'banners/bc-strawberry-catpuccino.jpeg' },
@@ -43,6 +44,7 @@ const MENU = [
   { id:'milkishaki-salted-caramel', cat:'Bebidas Frías', name:'MilkiShaki - Salted Caramel', classic:'Milkshake', classicTheme:'fresh', order:4, desc:'Leche, helado premium y caramelo con un toque de sal.', price:4.9, milk:true, groupFeatured:true, featured:true, featuredTag:'Disponible', img:'assets/image-861d6d271de84321.jpg', group:'milkishaki', flavor:'Salted Caramel'  },
 
   // ---- Snacks ----
+  { id:'clowder-pizza', cat:'Snack Sal', name:'Clowder Pizza', desc:'Slice gordo de masa artesanal sin gluten, hecha por nosotros, con pomodoro artesanal, tomate fresco, queso mozzarella y un plus de parmesano.', price:2.50, img:'assets/clowder-pizza.png', featured:true, featuredTag:'NUEVO', featuredIcon:'🆕', order:0 },
   { id:'tocipapa', cat:'Snack Sal', name:'Tocipapa', desc:'Papas corte recto con tocineta crocante y salsa de la casa. 120 g (20–25 g de tocineta).', price:2.5, soldOut:true, img:'assets/image-9fa7a5da9f5e3cb0.jpg' },
   { id:'wachipapa', cat:'Snack Sal', name:'Wachipapa', desc:'Papas corte recto con chorizo argentino y salsa mayochurri de la casa. 120 g (35–40 g de chorizo).', price:3.0, img:'banners/snack-papas.jpg' },
   { id:'empanada-queso', cat:'Snack Sal', name:'Empanada de Hojaldre', desc:'Hojaldre horneado y crocante, relleno de queso.', price:1.5, order:0, img:'assets/image-b46285ee20adcc24.jpg', group:'empanada', flavor:'Queso' },
@@ -83,8 +85,8 @@ if (miniCake) {
   miniCake.featured = true;
   miniCake.featuredTag = 'MINICAKE DE LA SEMANA';
 }
-// El minicake y el brownie siguen ocultos; Snack Dulce incluye galleta, Funbite y Cupcake Banana.
-const HIDDEN_ITEM_IDS = ['mini-cake-del-dia', 'brownie'];
+// Productos pausados en el menú; se pueden reactivar quitando su ID de esta lista.
+const HIDDEN_ITEM_IDS = ['mini-cake-del-dia', 'brownie', 'tocipapa'];
 // Información de preparación visible en cada tarjeta.
 ['wachipapa','tocipapa'].forEach(id => {
   const item = MENU.find(product => product.id === id);
@@ -124,6 +126,7 @@ const CAT_BANNERS = {
     { productId:'funbite', img:'assets/funbite.jpeg', alt:'Funbite — cupcake con cobertura cremosa y chips de colores' },
   ],
   'Snack Sal': [
+    { productId:'clowder-pizza', img:'assets/clowder-pizza-banner.png', alt:'Clowder Pizza de queso mozzarella' },
     { img:'banners/snack-papas.jpg', alt:'Papas y carne grillada en un vaso Clowder' },
     { hidden:true, video:'banners/snack-papas.mp4', poster:'banners/snack-papas-poster.jpg', alt:'Papas Clowder, recién preparadas' },
     { img:'banners/ss-banner-01.jpg', alt:'Empanada de pollo — vegetales frescos picaditos y pechuga de pollo mechada' },
@@ -133,7 +136,7 @@ const CAT_BANNERS = {
     { img:'banners/bf-banner-02.jpg', alt:'Berry Bloom — limonada con salsa de fresa, refrescante y sin café' },
   ],
   'Bebida del Mes': [
-    { img:'banners/bm-banner-01.jpg', alt:'Banana Bread Latte — bebida del mes' },
+    { img:'assets/pumpkin-spice-latte.jpg', alt:'Pumpkin Spice Latte de Clowder, frío y caliente' },
   ],
   'Combos': [
     { day:1, img:'banners/cmb-banner-01.jpg', alt:'Combo del lunes — café más empanada de queso' },
@@ -142,7 +145,7 @@ const CAT_BANNERS = {
 };
 // Categorías ocultas temporalmente: sus productos siguen en MENU (por si se reactivan),
 // pero no aparecen como pestaña hasta sacarlas de esta lista.
-const HIDDEN_CATS = ['Merch Clowder', 'Congelados y Más', 'Bebida del Mes', 'Combos']; // categorías ocultas temporalmente
+const HIDDEN_CATS = ['Merch Clowder', 'Congelados y Más', 'Combos']; // categorías ocultas temporalmente
 const CATS = [...new Set(MENU.map(i=>i.cat))].filter(c => !HIDDEN_CATS.includes(c));
 function visibleCats(){
   return CATS;
@@ -150,15 +153,15 @@ function visibleCats(){
 
 /* Colores secundarios de marca — uno por categoría de sabor */
 const CAT_COLORS = {
-  'Bebidas Calientes': '#442C19',
-  'Bebidas Frías':     '#B6DAEA',
-  'Matcha':            '#3F854A',
-  'Snack Dulce':        '#CC835A',
-  'Snack Sal':          '#FAEF9A',
-  'Congelados y Más':   '#D5C8DF',
-  'Merch Clowder':     '#8C7B6B',
-  'Bebida del Mes':     '#D5528C',
-  'Combos':             '#D8A24A',
+  'Bebidas Calientes': '#8A4B2A',
+  'Bebidas Frías':     '#82708B',
+  'Matcha':            '#69734A',
+  'Snack Dulce':        '#A86545',
+  'Snack Sal':          '#B28A3E',
+  'Congelados y Más':   '#81758C',
+  'Merch Clowder':     '#76665A',
+  'Bebida del Mes':     '#B76535',
+  'Combos':             '#B07835',
 };
 function catColor(c){ return CAT_COLORS[c] || 'transparent'; }
 function lighten(hex, amt){
@@ -169,8 +172,19 @@ function lighten(hex, amt){
 }
 function pastelBg(c){ const hex = catColor(c); return hex==='transparent' ? 'transparent' : lighten(hex, 0.45); }
 
-// Bebidas Frías es la portada del menú al abrir la app.
-let activeCat = CATS.includes('Bebidas Frías') ? 'Bebidas Frías' : CATS[0];
+// La portada inicial muestra categorías; Bebida del Mes permanece como sección destacada.
+let activeCat = CATS.includes('Bebida del Mes') ? 'Bebida del Mes' : (CATS.includes('Bebidas Frías') ? 'Bebidas Frías' : CATS[0]);
+let categoryHome = true;
+let themeManuallySelected = false;
+function applyMenuTheme(){
+  const halloweenFeature = !categoryHome && activeCat === 'Bebida del Mes';
+  document.body.classList.toggle('halloween-feature', halloweenFeature);
+  document.body.classList.add('halloween-season');
+  if(themeManuallySelected) return;
+  const hour = new Date().getHours();
+  document.body.classList.toggle('light-theme', !halloweenFeature && hour >= 7 && hour < 19);
+}
+applyMenuTheme();
 let cart = {}; // id -> {qty, note}
 let pendingOptions = {}; // product id -> currently selected milk/scoop/syrup options
 let mode = '';
@@ -316,10 +330,10 @@ function persistOrderDraft(){
   } catch(e) {}
 }
 
-let catsCollapsed = true; // arranca enfocada en la categoría de entrada, sin la lista completa
+let catsCollapsed = false; // al inicio se muestra la portada con todas las categorías
 function renderCats(){
   const el = document.getElementById('cats');
-  if(catsCollapsed){
+  if(catsCollapsed || categoryHome){
     // La pastilla activa funciona como acceso para volver a la lista completa.
     el.innerHTML = '';
     return;
@@ -340,6 +354,7 @@ function renderCats(){
 function syncHeaderCompact(){
   const stickyTop = document.querySelector('.sticky-top');
   if(!stickyTop) return;
+  document.body.classList.toggle('category-home', categoryHome);
   stickyTop.classList.toggle('compact', catsCollapsed);
   const titleEl = document.getElementById('compactCatTitle');
   if(titleEl){
@@ -353,7 +368,7 @@ function syncHeaderCompact(){
       titleEl.onclick = expandCats;
       titleEl.setAttribute('role','button');
       titleEl.setAttribute('tabindex','0');
-      titleEl.setAttribute('aria-label','Ver todas las categorías');
+      titleEl.setAttribute('aria-label','Volver a las categorías');
     } else {
       titleEl.style.background = '';
       titleEl.style.borderColor = '';
@@ -367,23 +382,18 @@ function syncHeaderCompact(){
   }
 }
 function expandCats(){
+  categoryHome = true;
   catsCollapsed = false;
+  applyMenuTheme();
   renderCats();
   renderMenu();
   syncHeaderCompact();
-  // Al volver a la vista general, enfoca la categoría que estaba activa.
-  const catsRow = document.getElementById('cats');
-  const activeBtn = catsRow && catsRow.querySelector('.cat-btn.active');
-  if(catsRow && activeBtn){
-    requestAnimationFrame(() => {
-      const target = activeBtn.offsetLeft - (catsRow.clientWidth - activeBtn.offsetWidth) / 2;
-      const maxScroll = Math.max(0, catsRow.scrollWidth - catsRow.clientWidth);
-      catsRow.scrollTo({ left: Math.max(0, Math.min(target, maxScroll)), behavior:'smooth' });
-    });
-  }
+  window.scrollTo({top:0, behavior:'smooth'});
 }
 function selectCat(c){
   activeCat = c;
+  categoryHome = false;
+  applyMenuTheme();
   catsCollapsed = true;
   renderCats();
   renderMenu();
@@ -391,6 +401,8 @@ function selectCat(c){
 }
 
 const FLAVOR_COLORS = {
+  'Frío · $3.75': '#B76535',
+  'Caliente · $3.00': '#6B3D4A',
   'Salted Caramel': '#C68642',
   'Hazelnut + Brownie Bites': '#4A2C17',
   'Fresa': '#E8536B',
@@ -431,8 +443,9 @@ const GROUP_NAMES = {
   'empanada': 'Empanada de Hojaldre',
   'cake-grande': 'Cake Grande',
   'long-tail-intensity': 'Long Tail',
+  'pumpkin-spice-latte': 'Pumpkin Spice Latte',
 };
-let groupView = {milkishaki:'milkishaki-fresa'}; // group -> currently displayed variant id
+let groupView = {milkishaki:'milkishaki-fresa', 'pumpkin-spice-latte':'pumpkin-spice-frio'}; // group -> currently displayed variant id
 
 function selectVariant(group, id){
   const card = document.getElementById(`menu-group-${group}`);
@@ -466,7 +479,40 @@ document.addEventListener('error', event => {
   else if(img.classList.contains('item-thumb')) img.hidden = true;
 }, true);
 
+function categoryThumbnail(category){
+  const banners = CAT_BANNERS[category] || [];
+  // La portada de Matcha debe usar su banner; para estas categorías elegimos
+  // una imagen de producto concreta para evitar fotos estacionales o repetidas.
+  if(category === 'Matcha'){
+    const matchaBanner = banners.find(banner => !banner.hidden && banner.img);
+    if(matchaBanner) return matchaBanner.img;
+  }
+  if(category === 'Bebidas Calientes') return 'miniaturas/bf-affocato.jpg';
+  if(category === 'Snack Dulce') return 'assets/galleta.jpeg';
+  const productBanner = banners.find(banner => !banner.hidden && banner.img && banner.productId
+    && MENU.some(product => product.id === banner.productId && !HIDDEN_ITEM_IDS.includes(product.id) && isWithinAvailability(product)));
+  if(productBanner) return productBanner.img;
+  const product = MENU.find(item => item.cat === category && !HIDDEN_ITEM_IDS.includes(item.id) && item.img && isWithinAvailability(item));
+  if(product) return product.img;
+  const banner = banners.find(item => !item.hidden && item.img && !item.productId);
+  return banner?.img || 'assets/image-b30d7df6a35a7973.png';
+}
+function renderCategoryHome(){
+  const tiles = visibleCats().map(category => {
+    const image = categoryThumbnail(category);
+    const color = catColor(category);
+    const imageScale = category === 'Bebidas Calientes' ? '1.4' : '1';
+    const imagePosition = category === 'Snack Dulce' ? '50% 0%' : '50% 50%';
+    return `<button type="button" class="category-tile" style="--tile-accent:${color};--tile-pill-text:${textColorFor(color)};--tile-image-scale:${imageScale};--tile-image-position:${imagePosition}" onclick="selectCat('${escapeHtml(category)}')" aria-label="Abrir categoría ${escapeHtml(category)}"><img src="${escapeHtml(image)}" alt="" loading="eager" decoding="async"><span class="category-tile-shade"></span><span class="category-tile-name">${escapeHtml(category)}</span></button>`;
+  }).join('');
+  return `<section class="category-home-view" aria-label="Categorías del menú"><div class="category-home-grid">${tiles}</div></section>`;
+}
 function renderMenu(){
+  const el = document.getElementById('menu');
+  if(categoryHome){
+    el.innerHTML = renderCategoryHome();
+    return;
+  }
   const today = businessTime().day;
   const items = MENU.filter(i=>i.cat===activeCat && !HIDDEN_ITEM_IDS.includes(i.id) && isWithinAvailability(i));
   const seenGroups = new Set();
@@ -497,7 +543,6 @@ function renderMenu(){
     return aPrice - bPrice;
   });
 
-  const el = document.getElementById('menu');
   const categoryBanners = (CAT_BANNERS[activeCat] || []).filter(b => !b.hidden && (!b.productId || MENU.some(item => item.id === b.productId && isWithinAvailability(item))));
   const dailyBanner = activeCat === 'Combos' && categoryBanners.find(b=>b.day===today);
   const banners = dailyBanner ? [dailyBanner] : categoryBanners;
@@ -515,8 +560,9 @@ function renderMenu(){
     const controls = banners.length > 1 ? `<div class="cat-banner-controls"><button type="button" class="cat-banner-arrow" data-step="-1" aria-label="Promoción anterior">‹</button>${dots}<button type="button" class="cat-banner-arrow" data-step="1" aria-label="Promoción siguiente">›</button></div>` : '';
     bannerHtml = `<div class="cat-banner"><div class="cat-banner-track" id="catBannerTrack" ${banners.length > 1 ? 'tabindex="0" role="region" aria-label="Promociones: usa las flechas para navegar"' : ''}>${slides}</div>${controls}</div>`;
   }
+  const seasonalHtml = '';
   const sectionLabelHtml = catsCollapsed ? '' : `<div class="section-label"><span class="cat-dot" style="background:${catColor(activeCat)}"></span>${activeCat}</div>`;
-  el.innerHTML = sectionLabelHtml + bannerHtml + display.map(i=>{
+  el.innerHTML = sectionLabelHtml + seasonalHtml + bannerHtml + display.map(i=>{
     const options = productOptions(i.id);
     const lineId = cartLineId(i.id, options);
     const inCart = cart[lineId];
@@ -543,7 +589,7 @@ function renderMenu(){
     </div>` : '';
     return `
     <div id="menu-group-${i.__group || i.id}" class="item ${i.featured?'item-featured':''} ${i.cat==='Combos'?'item-combo':''}" style="background:${i.accent ? lighten(i.accent, 0.82) : (isStoreCat(i.cat) ? '#F2EEE6' : pastelBg(i.cat))}; border-left-color:${i.accent || (catColor(i.cat)==='transparent' ? 'var(--line)' : catColor(i.cat))};">
-      ${i.featured ? `<div class="item-heading"><div class="featured-ribbon">\u{1F43E} ${i.featuredTag||'Destacado'}</div>${priceHtml}</div>` : ''}
+      ${i.featured ? `<div class="item-heading"><div class="featured-ribbon">${i.featuredIcon || (i.cat==='Bebida del Mes'?'🎃':'\u{1F43E}')} ${i.featuredTag||'Destacado'}</div>${priceHtml}</div>` : ''}
       ${i.comingSoon ? `<div class="coming-soon-status">✦ ${badgeText}</div>` : ''}
       <div class="item-top">
         ${(() => { const currentImg = (i.imgScoop && scoop === 'si') ? i.imgScoop : i.img; if (!currentImg) return ''; const image = `<img class="item-thumb" id="thumb-${i.id}" src="${currentImg}" alt="${i.name}" loading="lazy" decoding="async">`; return i.id === 'funbite' ? `<span class="funbite-photo">${image}</span>` : image; })()}
@@ -1261,6 +1307,8 @@ function showUnavailableNotice(id){
 function closeHours(){ document.getElementById('hoursOverlay').classList.remove('open'); }
 
 function toggleTheme(){
+  themeManuallySelected = true;
+  document.body.classList.add('theme-manual');
   document.body.classList.toggle('light-theme');
 }
 
@@ -1539,6 +1587,24 @@ document.addEventListener('visibilitychange', refreshAvailability);
 enableMouseDrag(document.getElementById('cats'));
 renderCats();
 renderMenu();
+
+// Reproduce la intro de temporada una vez al cargar y revela el menú al terminar.
+(function playIntroSplash(){
+  const splash = document.getElementById('introSplash');
+  const video = document.getElementById('introVideo');
+  if(!splash || !video) return;
+  let dismissed = false;
+  const dismiss = () => {
+    if(dismissed) return;
+    dismissed = true;
+    splash.classList.add('is-done');
+    window.setTimeout(() => splash.remove(), 850);
+  };
+  video.addEventListener('ended', dismiss, { once:true });
+  video.addEventListener('error', dismiss, { once:true });
+  window.setTimeout(dismiss, 15000);
+  video.play().catch(dismiss);
+})();
 updateBars();
 syncHeaderCompact();
 
