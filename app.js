@@ -38,9 +38,9 @@ const MENU = [
   { id:'mini-cake-del-dia', cat:'Snack Dulce', name:'Apple Crumble Cake', desc:'Harina de almendra, harina de coco, ghee y manzana natural, cobertura de chocolate blanco.', price:2.6, scoop:true, accent:'#C8433B', img:'miniaturas/apple-crumble.jpg', imgScoop:'miniaturas/apple-crumble-helado.jpg' },
 
   { id:'brownie', cat:'Snack Dulce', name:'Brownie', desc:'Brownie intenso y húmedo, con cacao orgánico, endulzado con alulosa y panela.', price:3.0, scoop:true, img:'assets/image-6d3c530cc30feadd.jpg' },
-  { id:'milkishaki-nutella', cat:'Bebidas Frías', name:'MilkiShaki - Hazelnut + Brownie Bites', classic:'Milkshake', classicTheme:'fresh', order:4, desc:'Sirope de hazelnut, leche, helado premium y bocados de brownie.', price:4.9, milk:true, comingSoon:true, comingSoonLabel:'Vuelve pronto', comingSoonNote:'El sirope de hazelnut se terminó.', img:'assets/image-2b43f2fe510398fb.jpg', group:'milkishaki', flavor:'Hazelnut + Brownie Bites'  },
-  { id:'milkishaki-fresa', cat:'Bebidas Frías', name:'MilkiShaki - Fresa', classic:'Milkshake', classicTheme:'fresh', order:4, desc:'Fresa, leche y helado premium.', price:4.9, milk:true, featured:true, featuredTag:'Disponible', img:'assets/image-299c9fd9ebdf031a.jpg', group:'milkishaki', flavor:'Fresa'  },
-  { id:'milkishaki-salted-caramel', cat:'Bebidas Frías', name:'MilkiShaki - Salted Caramel', classic:'Milkshake', classicTheme:'fresh', order:4, desc:'Leche, helado premium y caramelo con un toque de sal.', price:4.9, milk:true, img:'assets/image-861d6d271de84321.jpg', group:'milkishaki', flavor:'Salted Caramel'  },
+  { id:'milkishaki-nutella', cat:'Bebidas Frías', name:'MilkiShaki - Hazelnut + Brownie Bites', classic:'Milkshake', classicTheme:'fresh', order:4, desc:'Sirope de hazelnut, leche, helado premium y bocados de brownie.', price:4.9, milk:true, groupFeatured:true, comingSoon:true, comingSoonLabel:'Vuelve pronto', comingSoonNote:'El sirope de hazelnut se terminó.', img:'assets/image-2b43f2fe510398fb.jpg', group:'milkishaki', flavor:'Hazelnut + Brownie Bites'  },
+  { id:'milkishaki-fresa', cat:'Bebidas Frías', name:'MilkiShaki - Fresa', classic:'Milkshake', classicTheme:'fresh', order:4, desc:'Fresa, leche y helado premium.', price:4.9, milk:true, groupFeatured:true, featured:true, featuredTag:'Disponible', img:'assets/image-299c9fd9ebdf031a.jpg', group:'milkishaki', flavor:'Fresa'  },
+  { id:'milkishaki-salted-caramel', cat:'Bebidas Frías', name:'MilkiShaki - Salted Caramel', classic:'Milkshake', classicTheme:'fresh', order:4, desc:'Leche, helado premium y caramelo con un toque de sal.', price:4.9, milk:true, groupFeatured:true, featured:true, featuredTag:'Disponible', img:'assets/image-861d6d271de84321.jpg', group:'milkishaki', flavor:'Salted Caramel'  },
 
   // ---- Snacks ----
   { id:'tocipapa', cat:'Snack Sal', name:'Tocipapa', desc:'Papas corte recto con tocineta crocante y salsa de la casa. 120 g (20–25 g de tocineta).', price:2.5, soldOut:true, img:'assets/image-9fa7a5da9f5e3cb0.jpg' },
@@ -435,8 +435,17 @@ const GROUP_NAMES = {
 let groupView = {milkishaki:'milkishaki-fresa'}; // group -> currently displayed variant id
 
 function selectVariant(group, id){
+  const card = document.getElementById(`menu-group-${group}`);
+  const previousTop = card?.getBoundingClientRect().top;
   groupView[group] = id;
   renderMenu();
+  if(previousTop !== undefined){
+    const nextCard = document.getElementById(`menu-group-${group}`);
+    if(nextCard){
+      const offset = nextCard.getBoundingClientRect().top - previousTop;
+      if(Math.abs(offset) > 1) window.scrollBy(0, offset);
+    }
+  }
 }
 
 // Un recurso ausente no debe dejar un ícono roto ni un banner vacío.
@@ -476,8 +485,8 @@ function renderMenu(){
   });
 
   display.sort((a,b)=>{
-    const aFeatured = a.featured ? 0 : 1;
-    const bFeatured = b.featured ? 0 : 1;
+    const aFeatured = a.featured || a.groupFeatured ? 0 : 1;
+    const bFeatured = b.featured || b.groupFeatured ? 0 : 1;
     if(aFeatured !== bFeatured) return aFeatured - bFeatured;
     // Orden manual explícito (menor primero); si un producto no lo define, se ordena por precio
     const aOrder = a.order !== undefined ? a.order : 999;
@@ -533,7 +542,7 @@ function renderMenu(){
       <div class="item-price ${badgeClass}">${badgeText ? badgeText : '$'+i.price.toFixed(2)}</div>
     </div>` : '';
     return `
-    <div class="item ${i.featured?'item-featured':''} ${i.cat==='Combos'?'item-combo':''}" style="background:${i.accent ? lighten(i.accent, 0.82) : (isStoreCat(i.cat) ? '#F2EEE6' : pastelBg(i.cat))}; border-left-color:${i.accent || (catColor(i.cat)==='transparent' ? 'var(--line)' : catColor(i.cat))};">
+    <div id="menu-group-${i.__group || i.id}" class="item ${i.featured?'item-featured':''} ${i.cat==='Combos'?'item-combo':''}" style="background:${i.accent ? lighten(i.accent, 0.82) : (isStoreCat(i.cat) ? '#F2EEE6' : pastelBg(i.cat))}; border-left-color:${i.accent || (catColor(i.cat)==='transparent' ? 'var(--line)' : catColor(i.cat))};">
       ${i.featured ? `<div class="item-heading"><div class="featured-ribbon">\u{1F43E} ${i.featuredTag||'Destacado'}</div>${priceHtml}</div>` : ''}
       ${i.comingSoon ? `<div class="coming-soon-status">✦ ${badgeText}</div>` : ''}
       <div class="item-top">
