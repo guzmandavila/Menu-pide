@@ -1002,22 +1002,21 @@ function estimatedPrepTime(){
 }
 
 function packagingReasons(){
-  if(mode!=='llevar') return [];
+  if(!['llevar','delivery'].includes(mode)) return [];
   const reasons = [];
-  const hasOtherSnack = Object.keys(cart).some(id=>{
+  const sauceQty = Object.entries(cart).reduce((sum,[id,c])=>{
     const item = productForCartLine(id);
-    return item && SNACK_CATS.includes(item.cat) && item.group !== 'empanada';
-  });
-  const empanadaQty = Object.entries(cart).reduce((sum,[id,c])=>{
-    const item = productForCartLine(id);
-    return sum + (item && item.group === 'empanada' ? c.qty : 0);
+    const hasSauceCup = item && (item.group === 'empanada' || /papas?/i.test(`${item.id} ${item.name}`));
+    return sum + (hasSauceCup ? c.qty : 0);
   },0);
-  if(hasOtherSnack || empanadaQty >= 3) reasons.push({label:'empaque', fee:0.5});
+  if(sauceQty) reasons.push({label:`envases para salsas (${sauceQty})`, fee:Math.round(sauceQty * 10) / 100});
   const drinkQty = Object.entries(cart).reduce((sum,[id,c])=>{
     const item = productForCartLine(id);
     return sum + (item && DRINK_CATS.includes(item.cat) ? c.qty : 0);
   },0);
-  if(drinkQty > 1) reasons.push({label:'portavasos', fee:0.25});
+  const carrierQty = Math.ceil(drinkQty / 2);
+  if(carrierQty) reasons.push({label:`portavasos (${carrierQty}, hasta 2 bebidas c/u)`, fee:Math.round(carrierQty * 25) / 100});
+  if(cartCount()) reasons.push({label:'bolsa grande', fee:0.15});
   return reasons;
 }
 function packagingFee(){ return packagingReasons().reduce((s,r)=>s+r.fee,0); }
