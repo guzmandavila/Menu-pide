@@ -334,7 +334,7 @@ function persistOrderDraft(){
 let catsCollapsed = false; // al inicio se muestra la portada con todas las categorías
 function renderCats(){
   const el = document.getElementById('cats');
-  if(catsCollapsed || categoryHome){
+  if(categoryHome || (catsCollapsed && !window.matchMedia('(min-width:1024px)').matches)){
     // La pastilla activa funciona como acceso para volver a la lista completa.
     el.innerHTML = '';
     return;
@@ -352,6 +352,7 @@ function renderCats(){
     return `<button class="cat-btn ${active?'active':''} ${isPromo?'cat-btn-promo':''}" ${style} onclick="selectCat('${c}')"><span class="cat-dot" style="background:${active?textColorFor(color):color}"></span>${c}</button>`;
   }).join('');
 }
+window.matchMedia('(min-width:1024px)').addEventListener('change', () => renderCats());
 function syncHeaderCompact(){
   const stickyTop = document.querySelector('.sticky-top');
   if(!stickyTop) return;
@@ -563,7 +564,7 @@ function renderMenu(){
   }
   const seasonalHtml = '';
   const sectionLabelHtml = catsCollapsed ? '' : `<div class="section-label"><span class="cat-dot" style="background:${catColor(activeCat)}"></span>${activeCat}</div>`;
-  el.innerHTML = sectionLabelHtml + seasonalHtml + bannerHtml + display.map(i=>{
+  el.innerHTML = sectionLabelHtml + seasonalHtml + bannerHtml + '<div class="menu-products">' + display.map(i=>{
     const options = productOptions(i.id);
     const lineId = cartLineId(i.id, options);
     const inCart = cart[lineId];
@@ -633,7 +634,7 @@ function renderMenu(){
       </select>` : ''}
       <textarea class="note-input" id="note-${i.id}" rows="2" placeholder="Ej: sin cebolla, para llevar aparte..." maxlength="500" oninput="saveNote('${i.id}', this.value)">${escapeHtml(note)}</textarea>`}
     </div>`;
-  }).join('');
+  }).join('') + '</div>';
   initBannerSlider();
   initBannerVideos();
 }
@@ -1265,15 +1266,7 @@ function closePayments(){ document.getElementById('paymentsOverlay').classList.r
 function openGuide(){ document.getElementById('guideOverlay').classList.add('open'); }
 function closeGuide(){
   document.getElementById('guideOverlay').classList.remove('open');
-  try { localStorage.setItem('clowder_seen_guide', '1'); } catch(e) {}
 }
-(function(){
-  try {
-    if(!localStorage.getItem('clowder_seen_guide')){
-      setTimeout(openGuide, 500);
-    }
-  } catch(e) {}
-})();
 
 const DEFAULT_HOURS_TITLE = 'Horarios de atención';
 const DEFAULT_HOURS_NOTICE = 'Ahora estamos fuera del horario del menú completo. Puedes revisar los horarios y volver a pedir cuando esté disponible.';

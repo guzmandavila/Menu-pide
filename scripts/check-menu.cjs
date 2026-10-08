@@ -470,6 +470,27 @@ test('Delivery exige manzana y villa enteras y permite direcciones válidas', ()
   assert.equal(await page.locator('#sendBtn').isDisabled(), false);
 }));
 
+test('Computadora: dos columnas, categorías accesibles y sin desbordamiento', () => useFixture(async ({ page }) => {
+  await page.setViewportSize({ width: 1440, height: 1000 });
+  await page.evaluate(() => selectCat('Bebidas Calientes'));
+  assert.ok(await page.locator('#cats .cat-btn').count() > 1);
+  assert.equal(await page.locator('.cats-wrap').isVisible(), true);
+  const layout = await page.evaluate(() => {
+    const cards = [...document.querySelectorAll('.menu-products > .item')];
+    return { columns: getComputedStyle(document.querySelector('.menu-products')).gridTemplateColumns.split(' ').length,
+      overflow: document.documentElement.scrollWidth > innerWidth,
+      width: cards[0].getBoundingClientRect().width,
+      emojiFont: getComputedStyle(document.body).fontFamily };
+  });
+  assert.equal(layout.columns, 2);
+  assert.equal(layout.overflow, false);
+  assert.ok(layout.width > 350);
+  assert.match(layout.emojiFont, /Apple Color Emoji/);
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.waitForFunction(() => document.querySelector('#cats').children.length === 0);
+  assert.equal(await page.locator('.cats-wrap').isVisible(), false);
+}));
+
 async function main() {
   if (process.env.MENU_TEST_BASE_URL) baseURL = process.env.MENU_TEST_BASE_URL;
   else {

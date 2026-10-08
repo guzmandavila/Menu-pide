@@ -25,7 +25,7 @@
 <link rel="icon" type="image/png" href="assets/image-37567444807043c1.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,600;1,9..144,500&family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@500;600&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="./styles.css?v=20261004-category-thumbnails-9">
+<link rel="stylesheet" href="./styles.css?v=20261008-wide-14">
 </head>
 <body>
 <div class="intro-splash" id="introSplash" aria-hidden="true">
@@ -109,23 +109,33 @@
 </section>
 <main id="menu"></main>
 
-<div class="footer-mascot">
-  <img src="assets/image-1241ecc6e22c2542.png" loading="lazy" decoding="async" width="900" height="891" alt="Clowder — Powered by coffee &amp; cat energy">
-  <div class="footer-mascot-tag">Powered by coffee &amp; cat energy</div>
-  <div class="footer-ig-cta">Ayúdanos a crecer: síguenos y comparte tu compra favorita</div>
+<footer id="preview-footer" class="footer-mascot footer-compact">
+  <div class="footer-brand">
+    <img src="assets/image-1241ecc6e22c2542.png" loading="lazy" decoding="async" width="900" height="891" alt="Clowder Coffee House">
+  </div>
+  <div class="footer-details">
+    <h2 class="footer-heading">Sigamos en contacto</h2><p class="footer-ig-cta">Descubre nuestras novedades o comparte una idea.</p>
+    <nav class="footer-links" aria-label="Comunidad Clowder">
   <a class="footer-mascot-ig" href="https://www.instagram.com/clowdercoffeehouse/" target="_blank" rel="noopener" aria-label="Instagram de Clowder">
     <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><defs><linearGradient id="igGradient" x1="2" y1="22" x2="22" y2="2"><stop stop-color="#feda75"/><stop offset=".35" stop-color="#fa7e1e"/><stop offset=".7" stop-color="#d62976"/><stop offset="1" stop-color="#4f5bd5"/></linearGradient></defs><rect x="3" y="3" width="18" height="18" rx="5" stroke="url(#igGradient)" stroke-width="2.2"/><circle cx="12" cy="12" r="4.2" stroke="url(#igGradient)" stroke-width="2.2"/><circle cx="17.4" cy="6.7" r="1.1" fill="#d62976"/></svg>
-    @clowdercoffeehouse
+    <span>Instagram<small>@clowdercoffeehouse</small></span><span class="footer-link-arrow" aria-hidden="true">↗︎</span>
   </a>
-  <a class="footer-suggestion-link" href="https://share.forms.app/form/6a9ef996fdd4755e6a546004" target="_blank" rel="noopener noreferrer"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 11.5a8.4 8.4 0 0 1-9 8.5 9.3 9.3 0 0 1-4.2-1L3 20l1.5-4.4A8.1 8.1 0 0 1 3 11.5 8.4 8.4 0 0 1 12 3a8.4 8.4 0 0 1 9 8.5Z"/><path d="M8 11.5h8M12 7.5v8"/></svg><span>Buzón de sugerencias<span class="suggestion-caption">Tu idea puede hacer más bonita la experiencia</span></span></a>
+  <a class="footer-suggestion-link" href="https://share.forms.app/form/6a9ef996fdd4755e6a546004" target="_blank" rel="noopener noreferrer"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 11.5a8.4 8.4 0 0 1-9 8.5 9.3 9.3 0 0 1-4.2-1L3 20l1.5-4.4A8.1 8.1 0 0 1 3 11.5 8.4 8.4 0 0 1 12 3a8.4 8.4 0 0 1 9 8.5Z"/><path d="M8 11.5h8M12 7.5v8"/></svg><span>Buzón de sugerencias<small>Nos encantará leerte</small></span><span class="footer-link-arrow" aria-hidden="true">↗︎</span></a>
+    </nav>
+  </div>
+  <div class="footer-credit"><span>Clowder Coffee House <span aria-hidden="true">·</span> Café &amp; comunidad</span><span>Hecho por Rnnld (Ronald Guzmán Dávila) <button type="button" onclick="document.getElementById('aboutApp').showModal()">Acerca de esta app <span aria-hidden="true">↗︎</span></button></span></div>
+</footer>
+<dialog id="aboutApp" class="about-dialog" aria-labelledby="aboutAppTitle">
+  <div class="drawer-head"><h2 id="aboutAppTitle">Acerca de esta app</h2><button type="button" aria-label="Cerrar" onclick="document.getElementById('aboutApp').close()">✕</button></div>
+  <p class="about-intro">Creada para que elegir tu café y armar tu pedido sea más fácil.</p>
   <div class="dev-card">
     <div class="dev-hook">¿Te gusta esta app?</div>
     <div class="dev-hook-sub">¿Tienes algo en mente? Cuéntame.</div>
     <a class="dev-btn dev-btn-wa dev-btn-full" href="#" data-whatsapp target="_blank" rel="noopener">Hablemos por WhatsApp</a>
     <div class="dev-sign">Ronald Guzmán Dávila</div>
   </div>
-  <div class="footer-version">v6 &middot; <span id="emojiCheck"></span></div>
-</div>
+  <div class="footer-version">Clowder · v6</div>
+</dialog>
 
 <div class="cartbar" id="cartbar" role="button" tabindex="0" aria-label="Ver mi pedido">
   <div class="left"><span class="count" id="cartCount">0</span> Ver mi pedido</div>
@@ -332,6 +342,6 @@
 </div>
 
 <script src="./contact-config.js"></script>
-<script src="./app.js?v=20261007-blueberry-matcha-1"></script>
+<script src="./app.js?v=20261008-wide-3"></script>
 </body>
 </html>
