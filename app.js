@@ -3,7 +3,7 @@
    "cat" agrupa los productos por categoría.
    ============================================================ */
 const MENU = [
-  { id:'combo-cafe-empanada-queso', cat:'Combos', name:'Café + Empanada de queso', desc:'Un café de la casa y una empanada de queso. Disponible únicamente los lunes, todo el día.', price:3.25, originalPrice:3.75, img:'miniaturas/combo-cafe-empanada.jpg', featured:true, featuredTag:'COMBO DEL LUNES', accent:'#D8A24A', order:0, days:[1] },
+  { id:'combo-cafe-empanada-queso', soldOut:true, cat:'Combos', name:'Café + Empanada de queso', desc:'Un café de la casa y una empanada de queso. Disponible únicamente los lunes, todo el día.', price:3.25, originalPrice:3.75, img:'miniaturas/combo-cafe-empanada.jpg', featured:true, featuredTag:'COMBO DEL LUNES', accent:'#D8A24A', order:0, days:[1] },
   { id:'combo-bananacake-catpuccino', cat:'Combos', name:'Bananacake + Catpuccino', desc:'Bananacake con harina de almendras, panela y drizzle de vainilla, acompañado de un Catpuccino. Disponible solo los martes, todo el día.', price:4.60, originalPrice:5.20, img:'banners/cmb-banner-02.jpg', featured:true, featuredTag:'COMBO DEL MARTES', accent:'#D8A24A', order:1, days:[2] },
   { id:'pumpkin-spice-caliente', cat:'Bebida del Mes', name:'Pumpkin Spice Latte · Caliente', desc:'Jarabe pumpkin spice hecho artesanalmente en Clowder.', price:3.00, milk:true, img:'assets/pumpkin-spice-latte.jpg', featured:true, groupFeatured:true, featuredTag:'Bebida del mes', group:'pumpkin-spice-latte', flavor:'Caliente · $3.00', order:0 },
   { id:'pumpkin-spice-frio', cat:'Bebida del Mes', name:'Pumpkin Spice Latte · Frío', desc:'Jarabe pumpkin spice hecho artesanalmente en Clowder.', price:3.75, milk:true, img:'assets/pumpkin-spice-latte.jpg', featured:true, groupFeatured:true, featuredTag:'Bebida del mes', group:'pumpkin-spice-latte', flavor:'Frío · $3.75', order:0 },
@@ -35,7 +35,7 @@ const MENU = [
 
   // ---- Panadería ----
   { id:'galleta', cat:'Snack Dulce', name:'Galleta', desc:'Gordita, hecha con mix de harinas sin gluten y trozos de chocolate sin leche.', price:2.0, soldOut:true, img:'assets/galleta.jpeg' },
-  { id:'funbite', cat:'Snack Dulce', name:'Funbite', desc:'Cupcake de mix de harinas sin gluten con chips de colores.', price:1.50, img:'assets/funbite.jpeg' },
+  { id:'funbite', soldOut:true, cat:'Snack Dulce', name:'Funbite', desc:'Cupcake de mix de harinas sin gluten con chips de colores.', price:1.50, img:'assets/funbite.jpeg' },
   { id:'cupcake-banana', cat:'Snack Dulce', name:'Cupcake Banana', desc:'Cupcake con banana real y chispas de chocolate, sin chips de colores.', price:1.75, img:'assets/cupcake-banana.jpeg' },
   { id:'mini-cake-del-dia', cat:'Snack Dulce', name:'Apple Crumble Cake', desc:'Harina de almendra, harina de coco, ghee y manzana natural, cobertura de chocolate blanco.', price:2.6, scoop:true, accent:'#C8433B', img:'miniaturas/apple-crumble.jpg', imgScoop:'miniaturas/apple-crumble-helado.jpg' },
 
@@ -48,7 +48,7 @@ const MENU = [
   { id:'clowder-pizza', cat:'Snack Sal', name:'Clowder Pizza', desc:'Slice de masa artesanal delgada, sin gluten, hecha por nosotros, con pomodoro artesanal, tomate fresco, queso mozzarella y un plus de parmesano.', price:2.50, img:'assets/clowder-pizza.png', featured:true, featuredTag:'NUEVO', featuredIcon:'🆕', order:0 },
   { id:'tocipapa', cat:'Snack Sal', name:'Tocipapa', desc:'Papas corte recto con tocineta crocante y salsa de la casa. 120 g (20–25 g de tocineta).', price:2.5, soldOut:true, img:'assets/image-9fa7a5da9f5e3cb0.jpg' },
   { id:'wachipapa', cat:'Snack Sal', name:'Wachipapa', desc:'Papas corte recto con chorizo argentino y salsa mayochurri de la casa. 120 g (35–40 g de chorizo).', price:3.0, img:'banners/snack-papas.jpg' },
-  { id:'empanada-queso', cat:'Snack Sal', name:'Empanada de Hojaldre', desc:'Hojaldre horneado y crocante, relleno de queso.', price:1.5, order:0, img:'assets/image-b46285ee20adcc24.jpg', group:'empanada', flavor:'Queso' },
+  { id:'empanada-queso', soldOut:true, cat:'Snack Sal', name:'Empanada de Hojaldre', desc:'Hojaldre horneado y crocante, relleno de queso.', price:1.5, order:0, img:'assets/image-b46285ee20adcc24.jpg', group:'empanada', flavor:'Queso' },
   { id:'empanada-pollo', cat:'Snack Sal', name:'Empanada de Hojaldre', desc:'Pechuga de pollo con nuestra salsa de vegetales. No te pierdas nuestro aderezo de mayonesa de la casa.', price:2.4, order:0, img:'assets/image-b46285ee20adcc24.jpg', group:'empanada', flavor:'Pollo' },
   { id:'empanada-pizza', cat:'Snack Sal', name:'Empanada de Hojaldre', desc:'Hojaldre horneado y crocante, relleno de queso mozzarella y tocineta.', price:0, img:'assets/image-b46285ee20adcc24.jpg', group:'empanada', flavor:'Pizza', comingSoon:true },
   { id:'virginia-melt', cat:'Snack Sal', name:'Virginia Melt', desc:'Pan de masa madre tostado con ghee, jamón Virginia, mozzarella de búfala y salsa panini, con chips de papa.', price:3.5, soldOut:true, img:'assets/image-96afa6196cb83296.jpg' },
