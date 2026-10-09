@@ -104,6 +104,14 @@ MENU.forEach(item => {
   if (ICE_CREAM_DRINK_IDS.includes(item.id)) item.soldOut = !ICE_CREAM_AVAILABLE;
   if (!ICE_CREAM_AVAILABLE && item.scoop) item.scoop = false;
 });
+// Bebidas temporalmente agotadas; se mantienen visibles en el menú.
+const SOLD_OUT_DRINK_IDS = ['cozy-claws', 'moccatto', 'nimbus', 'milkishaki-nutella', 'banana-caramel-latte'];
+MENU.forEach(item => {
+  if (SOLD_OUT_DRINK_IDS.includes(item.id)) {
+    item.soldOut = true;
+    delete item.comingSoon;
+  }
+});
 ['brownie'].forEach(id => {
   const item = MENU.find(product => product.id === id);
   if (item) {
