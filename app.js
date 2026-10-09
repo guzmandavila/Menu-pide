@@ -602,7 +602,7 @@ function renderMenu(){
       ${i.featured ? `<div class="item-heading"><div class="featured-ribbon">${i.featuredIcon || (i.cat==='Bebida del Mes'?'🎃':'\u{1F43E}')} ${i.featuredTag||'Destacado'}</div>${priceHtml}</div>` : ''}
       ${i.comingSoon ? `<div class="coming-soon-status">✦ ${badgeText}</div>` : ''}
       <div class="item-top">
-        ${(() => { const currentImg = (i.imgScoop && scoop === 'si') ? i.imgScoop : i.img; if (!currentImg) return ''; const image = `<img class="item-thumb" id="thumb-${i.id}" src="${currentImg}" alt="${i.name}" loading="lazy" decoding="async">`; return i.id === 'funbite' ? `<span class="funbite-photo">${image}</span>` : image; })()}
+        ${(() => { const currentImg = (i.imgScoop && scoop === 'si') ? i.imgScoop : i.img; if (!currentImg) return ''; const image = `<img class="item-thumb" role="button" tabindex="0" aria-label="Ampliar foto de ${escapeHtml(i.name)}" id="thumb-${i.id}" src="${escapeHtml(currentImg)}" alt="${escapeHtml(i.name)}" loading="lazy" decoding="async">`; return i.id === 'funbite' ? `<span class="funbite-photo">${image}</span>` : image; })()}
         <div class="item-info">
           <div class="item-title-row">
             <div class="item-name-badge">${i.__isGroup ? GROUP_NAMES[i.__group] : i.name}</div>
@@ -1208,6 +1208,26 @@ function renderCartList(){
     </div>`;
   }).join('');
 }
+
+// Foto ampliada: el diálogo conserva el foco y permite cerrar con Escape.
+const productPhotoDialog = document.createElement('dialog');
+productPhotoDialog.className = 'product-photo-dialog';
+productPhotoDialog.setAttribute('aria-label', 'Foto del producto');
+productPhotoDialog.innerHTML = '<button type="button" class="product-photo-close" aria-label="Cerrar foto">×</button><img alt=""><p></p>';
+document.body.append(productPhotoDialog);
+productPhotoDialog.querySelector('button').addEventListener('click', () => productPhotoDialog.close());
+productPhotoDialog.addEventListener('click', event => {
+  if (event.target === productPhotoDialog) productPhotoDialog.close();
+});
+document.getElementById('menu').addEventListener('click', event => {
+  const thumb = event.target.closest('.item-thumb');
+  if (!thumb) return;
+  const photo = productPhotoDialog.querySelector('img');
+  photo.src = thumb.currentSrc || thumb.src;
+  photo.alt = thumb.alt;
+  productPhotoDialog.querySelector('p').textContent = thumb.alt;
+  productPhotoDialog.showModal();
+});
 
 document.getElementById('cartbar').addEventListener('click', openCart);
 document.addEventListener('keydown', event => {

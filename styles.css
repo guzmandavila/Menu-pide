@@ -1064,3 +1064,12 @@
  .footer-credit{display:flex; flex-direction:column; gap:5px; padding:16px 0;}
  .footer-credit button{margin-left:10px;}
 }
+
+/* Ampliación de las fotos del catálogo. */
+.item-thumb[role="button"]{cursor:zoom-in;}
+.item-thumb[role="button"]:focus-visible{outline:3px solid var(--coffee,#60432f);outline-offset:4px;}
+.product-photo-dialog{position:fixed;inset:0;margin:auto;padding:48px 16px 16px;border:0;border-radius:16px;background:#1a1310;color:#fff;max-width:min(94vw,900px);max-height:92dvh;box-sizing:border-box;}
+.product-photo-dialog::backdrop{background:rgba(0,0,0,.8);}
+.product-photo-dialog img{display:block;max-width:100%;width:auto;height:auto;max-height:calc(92dvh - 110px);object-fit:contain;margin:auto;}
+.product-photo-dialog p{text-align:center;margin:12px 0 0;}
+.product-photo-close{position:absolute;top:6px;right:8px;width:40px;height:40px;border:0;border-radius:50%;background:#fff;color:#1a1310;font-size:30px;cursor:pointer;}
