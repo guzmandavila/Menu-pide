@@ -25,7 +25,7 @@
 <link rel="icon" type="image/png" href="assets/image-37567444807043c1.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,600;1,9..144,500&family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@500;600&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="./styles.css?v=20261008-wide-14">
+<link rel="stylesheet" href="./styles.css?v=20261010-scroll-header">
 </head>
 <body>
 <div class="intro-splash" id="introSplash" aria-hidden="true">
@@ -77,10 +77,6 @@
     <img class="theme-cat-logo theme-cat-logo-dark-mode" width="2250" height="2250" decoding="async" src="assets/clowder-mark-dark-mode.png" alt="">
     <img class="theme-cat-logo theme-cat-logo-light-mode" width="2250" height="2250" decoding="async" src="assets/clowder-mark-light-mode.png" alt="">
   </button>
-  <button class="install-toggle" id="installToggle" onclick="installApp()" aria-label="Instalar Clowder">
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12"/><path d="m7 10 5 5 5-5"/><path d="M5 21h14"/></svg>
-    Instalar Clowder
-  </button>
   </div>
   </div>
   <img class="logo" width="1374" height="1149" decoding="async" src="assets/image-b30d7df6a35a7973.png" alt="Clowder">
@@ -112,6 +108,10 @@
 <footer id="preview-footer" class="footer-mascot footer-compact">
   <div class="footer-brand">
     <img src="assets/image-1241ecc6e22c2542.png" loading="lazy" decoding="async" width="900" height="891" alt="Clowder Coffee House">
+    <button class="install-toggle" id="installToggle" onclick="installApp()" aria-label="Instalar Clowder">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12"/><path d="m7 10 5 5 5-5"/><path d="M5 21h14"/></svg>
+      Instalar Clowder
+    </button>
   </div>
   <div class="footer-details">
     <h2 class="footer-heading">Sigamos en contacto</h2><p class="footer-ig-cta">Descubre nuestras novedades o comparte una idea.</p>
@@ -342,6 +342,6 @@
 </div>
 
 <script src="./contact-config.js"></script>
-<script src="./app.js?v=20261008-wide-3"></script>
+<script src="./app.js?v=20261010-scroll-header"></script>
 </body>
 </html>
