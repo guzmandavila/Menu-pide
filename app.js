@@ -375,11 +375,11 @@ function syncHeaderCompact(){
       titleEl.style.background = color;
       titleEl.style.borderColor = color;
       titleEl.style.color = textColor;
-      titleEl.innerHTML = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="15 18 9 12 15 6"/></svg><span class="cat-dot" style="background:${textColor}"></span><span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${activeCat}</span>`;
+      titleEl.innerHTML = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="15 18 9 12 15 6"/></svg><span class="compact-cat-copy"><span class="compact-cat-name">${escapeHtml(activeCat)}</span><span class="compact-cat-hint">Ver menú</span></span>`;
       titleEl.onclick = expandCats;
       titleEl.setAttribute('role','button');
       titleEl.setAttribute('tabindex','0');
-      titleEl.setAttribute('aria-label','Volver a las categorías');
+      titleEl.setAttribute('aria-label','Volver al menú principal');
     } else {
       titleEl.style.background = '';
       titleEl.style.borderColor = '';
@@ -412,9 +412,26 @@ window.addEventListener('scroll', () => {
   headerScrollFrame = requestAnimationFrame(() => {
     headerScrollFrame = 0;
     syncScrolledHeader();
+    syncBannerScroll();
   });
 }, {passive:true});
-window.addEventListener('resize', () => syncScrolledHeader(true));
+window.addEventListener('resize', () => { syncScrolledHeader(true); syncBannerScroll(); });
+function syncBannerScroll(){
+  const banner = document.querySelector('#menu .cat-banner');
+  const products = document.querySelector('#menu .menu-products');
+  if(!banner || !products) return;
+  if(window.matchMedia('(min-width:1024px)').matches){
+    banner.style.removeProperty('opacity');
+    banner.style.removeProperty('pointer-events');
+    return;
+  }
+  const top = document.querySelector('.sticky-top')?.offsetHeight || 0;
+  banner.style.setProperty('--banner-sticky-top', `${top}px`);
+  const distance = products.getBoundingClientRect().top - top;
+  const progress = Math.max(0, Math.min(1, 1 - distance / Math.max(1, banner.offsetHeight)));
+  banner.style.opacity = String(1 - progress);
+  banner.style.pointerEvents = progress > .85 ? 'none' : '';
+}
 function expandCats(){
   categoryHome = true;
   catsCollapsed = false;
@@ -669,6 +686,7 @@ function renderMenu(){
   }).join('') + '</div>';
   initBannerSlider();
   initBannerVideos();
+  requestAnimationFrame(syncBannerScroll);
 }
 // El tacto conserva el scroll nativo; el mouse permite agarrar la pista.
 function enableMouseDrag(track, onRelease){
@@ -758,7 +776,8 @@ function initBannerSlider(){
   const arrows = track.parentElement.querySelectorAll('.cat-banner-arrow');
   const step = () => track.children[1].offsetLeft - track.children[0].offsetLeft;
   const index = () => Math.round(track.scrollLeft / step());
-  const goTo = i => track.scrollTo({left:Math.max(0, Math.min(dots.length-1, i)) * step(), behavior:matchMedia('(prefers-reduced-motion: reduce)').matches ? 'instant' : 'smooth'});
+  const lastIndex = () => Math.ceil((track.scrollWidth - track.clientWidth) / step());
+  const goTo = i => track.scrollTo({left:Math.max(0, Math.min(lastIndex(), i)) * step(), behavior:matchMedia('(prefers-reduced-motion: reduce)').matches ? 'instant' : 'smooth'});
   enableMouseDrag(track, left => goTo(Math.round(left / step())));
   dots.forEach((dot, i) => dot.addEventListener('click', () => goTo(i)));
   arrows.forEach(button => button.addEventListener('click', () => goTo(index() + Number(button.dataset.step))));
@@ -774,7 +793,7 @@ function initBannerSlider(){
       dot.setAttribute('aria-current', String(i === idx));
     });
     arrows[0].disabled = idx === 0;
-    arrows[1].disabled = idx === dots.length-1;
+    arrows[1].disabled = track.scrollLeft >= track.scrollWidth - track.clientWidth - 2;
   }
   track.addEventListener('scroll', sync, {passive:true});
   sync();

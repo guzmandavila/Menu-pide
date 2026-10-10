@@ -119,6 +119,9 @@
   }
   .compact-cat-title svg{ width:17px; height:17px; margin-right:6px; flex:0 0 auto; }
   .compact-cat-title .cat-dot{ width:9px; height:9px; margin-right:7px; flex:0 0 auto; }
+  .compact-cat-copy{display:flex; flex-direction:column; min-width:0; gap:3px;}
+  .compact-cat-name{overflow:hidden; text-overflow:ellipsis; white-space:nowrap; line-height:1.1;}
+  .compact-cat-hint{font-family:'Inter',sans-serif; font-size:10px; font-weight:600; line-height:1.2;}
   .sticky-top.compact .compact-cat-title{ display:flex; }
   .sticky-top.compact .cats{
     padding:0; border-bottom:none;
@@ -1083,3 +1086,16 @@
 .sticky-top.scrolled .compact-cat-title,
 .sticky-top.scrolled .cats-wrap{display:none;}
 .sticky-top.scrolled .header-actions{justify-content:center; margin:0; flex-wrap:wrap;}
+
+@media(max-width:1023px){
+  #menu .cat-banner{position:sticky; top:var(--banner-sticky-top,70px); z-index:0;}
+  .cat-banner-track{gap:12px; border-radius:0;}
+  .cat-banner-slide{flex:0 0 calc((100% - 12px)/2); min-width:0; border-radius:16px; background:var(--bg-alt);}
+  .cat-banner-slide:only-child{flex-basis:min(60%,220px); margin-inline:auto;}
+  .cat-banner-slide img,
+  .cat-banner-slide video,
+  .cat-banner-slide .banner-video-poster{width:100%; height:auto; aspect-ratio:3/4; object-fit:contain; object-position:center;}
+  .cat-banner:not(:has(.cat-banner-slide:nth-child(3))) .cat-banner-controls{display:none;}
+  .cat-banner-slide img[src="assets/funbite.jpeg"]{transform:none;}
+  .menu-products{position:relative; z-index:1; background:var(--bg); padding-top:8px;}
+}
