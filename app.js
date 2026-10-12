@@ -700,7 +700,7 @@ function renderMenu(){
         <option value="" ${syrup===''?'selected':''}>Personaliza tu bebida con un toque de sabor (opcional)</option>
         ${i.syrupOption.map(flavorKey => { const color = SYRUP_COLORS[flavorKey] || SYRUP_COLORS['']; return `<option value="${flavorKey}" style="background-color:${color};color:${textColorFor(color)}" ${syrup===flavorKey?'selected':''}>Toque de ${SYRUP_LABELS[flavorKey]} (+$0.50)</option>`; }).join('')}
       </select>` : ''}
-      <textarea class="note-input" id="note-${i.id}" rows="2" placeholder="Ej: sin cebolla, para llevar aparte..." maxlength="500" oninput="saveNote('${i.id}', this.value)">${escapeHtml(note)}</textarea>`}
+      <textarea class="note-input" id="note-${i.id}" rows="2" placeholder="Ej.: sin azúcar, con poco hielo, para llevar…" maxlength="500" oninput="saveNote('${i.id}', this.value)">${escapeHtml(note)}</textarea>`}
     </div>`;
   }).join('') + '</div>';
   initBannerSlider();
