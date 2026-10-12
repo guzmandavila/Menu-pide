@@ -367,17 +367,17 @@ function syncHeaderCompact(){
   document.body.classList.toggle('category-home', categoryHome);
   const backButton = document.getElementById('menuBack');
   if(backButton) { backButton.disabled = categoryHome; backButton.innerHTML = categoryHome ? 'Menú principal' : '<span aria-hidden="true">←</span> Volver al menú'; }
-  stickyTop.classList.toggle('compact', catsCollapsed);
+  stickyTop.classList.add('compact');
   syncScrolledHeader(true);
   const titleEl = document.getElementById('compactCatTitle');
   if(titleEl){
-    if(catsCollapsed){
-      const color = catColor(activeCat);
+    if(catsCollapsed || categoryHome){
+      const color = categoryHome ? '#40323d' : catColor(activeCat);
       const textColor = textColorFor(color);
       titleEl.style.background = color;
       titleEl.style.borderColor = color;
       titleEl.style.color = textColor;
-      titleEl.innerHTML = `<span class="compact-cat-copy"><span class="compact-cat-name">${escapeHtml(activeCat)}</span></span>`;
+      titleEl.innerHTML = `<span class="compact-cat-copy"><span class="compact-cat-name">${escapeHtml(categoryHome ? 'Menú principal' : activeCat)}</span></span>`;
       titleEl.onclick = null;
       titleEl.removeAttribute('role');
       titleEl.removeAttribute('tabindex');

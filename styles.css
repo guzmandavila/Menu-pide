@@ -1143,3 +1143,6 @@ body{padding-bottom:calc(110px + env(safe-area-inset-bottom, 0px));}
 /* La línea inferior permanece a la misma distancia durante el scroll. */
 .sticky-top.compact,.sticky-top.compact.scrolled{height:64px; box-sizing:border-box; grid-template-rows:44px; padding-top:9px; padding-bottom:10px; align-items:center;}
 .sticky-top.compact .tag-row,.sticky-top.compact .cats-wrap{display:none;}
+
+.home-brand{display:none;}
+body.category-home .home-brand{display:block; position:relative; padding:16px 16px 14px;}
