@@ -1,8 +1,8 @@
 // Cache names include the scope: another menu on this origin keeps its own data.
 const SCOPE_URL = new URL(self.registration.scope);
 const CACHE_PREFIX = `clowder-menu:${SCOPE_URL.pathname}:`;
-const SHELL_CACHE = `${CACHE_PREFIX}shell-v54`;
-const ASSET_CACHE = `${CACHE_PREFIX}assets-v54`;
+const SHELL_CACHE = `${CACHE_PREFIX}shell-v55`;
+const ASSET_CACHE = `${CACHE_PREFIX}assets-v55`;
 const INDEX_URL = new URL('index.html', SCOPE_URL).href;
 const CONFIG_URL = new URL('menu-config.json', SCOPE_URL).href;
 const MAX_RUNTIME_ASSETS = 80;
