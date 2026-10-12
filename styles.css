@@ -1150,3 +1150,19 @@ body.category-home .home-brand{display:block; position:relative; padding:16px 16
 /* La portada ya es el menú principal; el regreso solo aparece en categorías. */
 body.category-home .menu-back{display:none;}
 body.category-home .bottom-navigation:not(:has(.cartbar.show)){display:none;}
+
+/* Confirmación compacta con preguntas y selecciones fáciles de leer. */
+#overlay .fields{gap:14px;}
+#overlay .fields label{display:block; font:600 14px 'Inter',sans-serif; letter-spacing:0; text-transform:none; color:var(--cream); margin-bottom:6px;}
+#overlay .name-label{font:600 14px 'Inter',sans-serif !important; color:var(--cream) !important;}
+#overlay .name-input{width:100%; box-sizing:border-box; border:1px solid var(--line) !important;}
+#overlay .toggle-row button{font:600 14px 'Inter',sans-serif; min-height:44px; padding:10px 8px;}
+#overlay .field-missing,#overlay .option-missing{animation:none;}
+#overlay .name-input.field-missing{border-color:#C94C3C !important;}
+#overlay .new-order-btn{font-size:12px; border:0; margin:8px auto 0;}
+#overlay .total-row{margin-top:16px; padding-top:14px;}
+#overlay #sendHint{font-size:12px; line-height:1.4;}
+#overlay #sendBtn{font:700 16px 'Inter',sans-serif; padding:15px 10px;}
+
+#overlay #sendHint{text-align:center;}
+#overlay .new-order-btn{word-spacing:normal; letter-spacing:normal;}

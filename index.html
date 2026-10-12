@@ -281,7 +281,7 @@
 <div class="overlay" id="overlay">
   <div class="drawer">
     <div class="drawer-head">
-      <h2>Tu pedido</h2>
+      <h2>Confirma tu pedido</h2>
       <button aria-label="Cerrar" onclick="closeCart()">✕</button>
     </div>
     <div id="cartList"></div>
@@ -289,13 +289,13 @@
 
     <div class="fields">
       <div>
-        <label class="name-label" for="customerName">✎ Tu nombre <span class="name-required">*</span></label>
-        <div class="name-hint">Lo necesitamos para identificar tu pedido</div>
-        <input type="text" id="customerName" maxlength="80" autocomplete="given-name" placeholder="¿Cómo te llamas?" class="name-input" oninput="updateBars()">
+        <label class="name-label" for="customerName">¿Cómo te llamas?</label>
+        <input type="text" id="customerName" maxlength="80" autocomplete="given-name" placeholder="Tu nombre" class="name-input" oninput="updateBars()">
       </div>
       <div id="modeFieldWrap">
+        <label>¿Dónde lo disfrutas?</label>
         <div class="toggle-row" id="modeToggleRow">
-          <button id="btnMesa" onclick="setMode('mesa')">Para servir</button>
+          <button id="btnMesa" onclick="setMode('mesa')">Aquí</button>
           <button id="btnLlevar" onclick="setMode('llevar')">Para llevar</button>
           <button id="btnDelivery" onclick="setMode('delivery')">Delivery</button>
         </div>
@@ -309,7 +309,7 @@
         </div>
       </div>
       <div>
-        <label>¿Cómo vas a pagar?</label>
+        <label>¿Cómo prefieres pagar?</label>
         <div class="toggle-row">
           <button id="btnEfectivo" onclick="setPay('efectivo')">Efectivo</button>
           <button id="btnTransfer" onclick="setPay('transferencia')">Transferencia</button>
@@ -343,7 +343,7 @@
     <p id="sendHint" class="modal-hint" role="status" aria-live="polite"></p>
     <p id="whatsappRecovery" class="modal-hint" hidden>Tu pedido quedó registrado. Si WhatsApp no se abrió, <a id="whatsappRecoveryLink">abre WhatsApp aquí</a> y envía el mensaje. No necesitas crear otro pedido.</p>
     <p id="contactError" class="modal-hint" role="alert" hidden></p>
-    <button class="send-btn" id="sendBtn" onclick="sendOrder()">Enviar pedido por WhatsApp</button>
+    <button class="send-btn" id="sendBtn" onclick="sendOrder()">Continuar en WhatsApp</button>
     <button class="new-order-btn" type="button" onclick="startNewOrder()">Empezar un pedido nuevo</button>
   </div>
 </div>

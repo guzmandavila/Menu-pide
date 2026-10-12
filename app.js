@@ -1094,6 +1094,8 @@ function packagingReasons(){
 function packagingFee(){ return packagingReasons().reduce((s,r)=>s+r.fee,0); }
 function grandTotal(){ return Math.round((cartTotal() + packagingFee()) * 100) / 100; }
 
+let checkoutAttempted = false;
+let checkoutReady = false;
 function updateBars(){
   if(mode === 'delivery' && !isDeliveryAvailableNow()) mode = '';
   [['btnMesa',mode === 'mesa'],['btnLlevar',mode === 'llevar'],['btnDelivery',mode === 'delivery'],
@@ -1150,11 +1152,11 @@ function updateBars(){
   const deliveryValidation = document.getElementById('deliveryValidation');
   const manzanaOk = validAddressField(manzanaEl);
   const villaOk = validAddressField(villaEl);
-  if(manzanaEl) manzanaEl.classList.toggle('field-missing', deliveryActive && !manzanaOk);
-  if(villaEl) villaEl.classList.toggle('field-missing', deliveryActive && !villaOk);
-  if(manzanaEl) manzanaEl.setAttribute('aria-invalid', deliveryActive && !manzanaOk ? 'true' : 'false');
-  if(villaEl) villaEl.setAttribute('aria-invalid', deliveryActive && !villaOk ? 'true' : 'false');
-  if(deliveryValidation) deliveryValidation.classList.toggle('open', deliveryActive && (!manzanaOk || !villaOk));
+  if(manzanaEl) manzanaEl.classList.toggle('field-missing', checkoutAttempted && deliveryActive && !manzanaOk);
+  if(villaEl) villaEl.classList.toggle('field-missing', checkoutAttempted && deliveryActive && !villaOk);
+  if(manzanaEl) manzanaEl.setAttribute('aria-invalid', checkoutAttempted && deliveryActive && !manzanaOk ? 'true' : 'false');
+  if(villaEl) villaEl.setAttribute('aria-invalid', checkoutAttempted && deliveryActive && !villaOk ? 'true' : 'false');
+  if(deliveryValidation) deliveryValidation.classList.toggle('open', checkoutAttempted && deliveryActive && (!manzanaOk || !villaOk));
 
   const cashAmountEl = document.getElementById('cashAmount');
   const cashActive = payMethod === 'efectivo';
@@ -1164,7 +1166,7 @@ function updateBars(){
   const cashOk = !cashActive || validCash(total);
   const cashChange = document.getElementById('cashChange');
   if(cashChange) cashChange.classList.toggle('open', cashActive);
-  if(cashAmountEl) cashAmountEl.classList.toggle('field-missing', cashActive && !cashOk);
+  if(cashAmountEl) cashAmountEl.classList.toggle('field-missing', checkoutAttempted && cashActive && !cashOk);
   const cashChangeText = document.getElementById('cashChangeText');
   if(cashChangeText){
     const amount = Number(cashAmountEl?.value || 0);
@@ -1175,20 +1177,24 @@ function updateBars(){
 
   const nameOk = (document.getElementById('customerName')?.value || '').trim().length > 0;
   const nameField = document.getElementById('customerName');
-  if(nameField) nameField.classList.toggle('field-missing', !nameOk && count > 0);
+  if(nameField) nameField.classList.toggle('field-missing', checkoutAttempted && !nameOk && count > 0);
   const modeOk = storeOnly || mode !== '';
   const addressOk = mode !== 'delivery' || deliveryAddressOk();
   const deliveryOk = mode !== 'delivery' || isDeliveryAvailableNow();
   const listo = count > 0 && nameOk && modeOk && addressOk && deliveryOk && payMethod !== '' && cashOk && bankOk;
   ['btnMesa','btnLlevar'].forEach(id => {
     const el = document.getElementById(id);
-    if(el) el.classList.toggle('option-missing', count > 0 && !storeOnly && !modeOk);
+    if(el) el.classList.toggle('option-missing', checkoutAttempted && count > 0 && !storeOnly && !modeOk);
   });
   ['btnEfectivo','btnTransfer'].forEach(id => {
     const el = document.getElementById(id);
-    if(el) el.classList.toggle('option-missing', count > 0 && payMethod === '');
+    if(el) el.classList.toggle('option-missing', checkoutAttempted && count > 0 && payMethod === '');
   });
-  document.getElementById('sendBtn').disabled = !listo || birthdayState().closed || sendingOrder;
+  checkoutReady = listo;
+  const continueButton = document.getElementById('sendBtn');
+  continueButton.disabled = count === 0 || birthdayState().closed || sendingOrder;
+  if(!sendingOrder) continueButton.textContent = `Continuar en WhatsApp · $${total.toFixed(2)}`;
+  document.getElementById('paymentBank').classList.toggle('field-missing', checkoutAttempted && !bankOk);
   const hint = document.getElementById('sendHint');
   if(hint){
     const faltan = [];
@@ -1200,15 +1206,15 @@ function updateBars(){
     if(payMethod === '') faltan.push('cómo pagas');
     if(!bankOk) faltan.push('el banco al que transfieres');
     if(cashActive && !cashOk) faltan.push('con cuánto pagas');
-    if(faltan.length){
+    if(checkoutAttempted && faltan.length){
       const lista = faltan.length === 1
         ? faltan[0]
         : faltan.slice(0,-1).join(', ') + ' y ' + faltan[faltan.length-1];
       hint.textContent = 'Para continuar, completa ' + lista + '.';
       hint.style.display = 'block';
     } else {
-      hint.innerHTML = '';
-      hint.style.display = 'none';
+      hint.textContent = 'Tu pedido irá listo; solo tendrás que enviar el mensaje.';
+      hint.style.display = 'block';
     }
   }
 
@@ -1466,8 +1472,14 @@ async function sendOrder(){
     renderMenu();
     return;
   }
+  checkoutAttempted = true;
   updateBars();
-  if(document.getElementById('sendBtn').disabled) return;
+  if(!checkoutReady || document.getElementById('sendBtn').disabled){
+    const missing = document.querySelector('#overlay .field-missing, #overlay .option-missing');
+    missing?.focus();
+    missing?.scrollIntoView({block:'center', behavior:'smooth'});
+    return;
+  }
   const name = document.getElementById('customerName').value.trim() || 'Sin nombre';
   const entries = Object.entries(cart);
   if(entries.length===0) return;
@@ -1583,12 +1595,13 @@ async function sendOrder(){
     message.hidden = false;
   } finally {
     sendingOrder = false;
-    document.getElementById('sendBtn').textContent = 'Enviar pedido por WhatsApp';
+    document.getElementById('sendBtn').textContent = `Continuar en WhatsApp · $${grandTotal().toFixed(2)}`;
     updateBars();
   }
 }
 
 function startNewOrder(){
+  checkoutAttempted = false;
   if(sendingOrder) return;
   if(cartCount() && !confirm('¿Empezar un pedido nuevo? Se borrará el pedido guardado en este dispositivo.')) return;
   completeOrder();

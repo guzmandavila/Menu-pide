@@ -180,14 +180,14 @@ test('Pago exacto funciona con 3 × $4.90 y rechaza efectivo insuficiente o frac
   await prepare(page, { items: { 'test-centavos': 3 }, pay: 'efectivo' });
   assert.equal(await page.locator('#drawerTotal').textContent(), '$14.70');
   assert.equal(await page.locator('#cashAmount').inputValue(), '14.70');
-  assert.equal(await page.locator('#sendBtn').isDisabled(), false);
+  assert.equal(await page.evaluate(() => !checkoutReady), false);
   await page.evaluate(() => sendOrder());
   const state = await orderState(page);
   assert.match(decodeURIComponent(state.destinations.at(-1).url), /14\.70/);
   for (const value of ['14.69', '20.001']) {
     await page.locator('#cashAmount').fill(value);
     await page.evaluate(() => updateBars());
-    assert.equal(await page.locator('#sendBtn').isDisabled(), true, `Efectivo inválido aceptado: ${value}`);
+    assert.equal(await page.evaluate(() => !checkoutReady), true, `Efectivo inválido aceptado: ${value}`);
   }
 }));
 
@@ -368,7 +368,7 @@ test('El envío lento mantiene el menú visible y abre WhatsApp en la misma pest
     assert.equal(context.pages().length,1);
     assert.deepEqual(await page.evaluate(()=>window.__openAttempts),[],'No debe abrir about:blank');
     assert.equal(await page.locator('#sendBtn').textContent(),'Conectando con WhatsApp…');
-    assert.equal(await page.locator('#sendBtn').isDisabled(),true);
+    assert.equal(await page.evaluate(() => !checkoutReady),true);
     assert.equal((await orderState(page)).draft.cart.catpuccino.qty,1);
   } finally { release(); }
   await page.waitForURL('https://wa.me/**');
@@ -484,15 +484,15 @@ test('Notas restauradas se muestran como texto y cantidades inválidas se descar
 
 test('Delivery exige manzana y villa enteras y permite direcciones válidas', () => useFixture(async ({ page }) => {
   await prepare(page, { mode: 'delivery' });
-  assert.equal(await page.locator('#sendBtn').isDisabled(), false);
+  assert.equal(await page.evaluate(() => !checkoutReady), false);
   for (const value of ['', '-1', '1.5']) {
     await page.locator('#deliveryManzana').fill(value);
     await page.evaluate(() => updateBars());
-    assert.equal(await page.locator('#sendBtn').isDisabled(), true, `Dirección inválida: ${value}`);
+    assert.equal(await page.evaluate(() => !checkoutReady), true, `Dirección inválida: ${value}`);
   }
   await page.locator('#deliveryManzana').fill('12');
   await page.evaluate(() => updateBars());
-  assert.equal(await page.locator('#sendBtn').isDisabled(), false);
+  assert.equal(await page.evaluate(() => !checkoutReady), false);
 }));
 
 test('Computadora: dos columnas, categorías accesibles y sin desbordamiento', () => useFixture(async ({ page }) => {
@@ -539,6 +539,23 @@ test('Navegación inferior y Atrás conservan el carrito', () => useFixture(asyn
     assert.ok(boxes.every(b => b.left >= 0 && b.right <= width && b.bottom <= 844));
   }
   await page.setViewportSize({width:390,height:844});
+}));
+
+test('Confirmación pide datos solo al continuar y conserva validaciones', () => useFixture(async ({page}) => {
+ await page.evaluate(()=>{selectCat('Bebidas Calientes');changeQty('catpuccino',1);openCart();});
+ assert.equal(await page.locator('#overlay .field-missing, #overlay .option-missing').count(),0);
+ await page.locator('#sendBtn').click();
+ assert.ok(await page.locator('#overlay .field-missing').count()>0);
+ assert.equal((await orderState(page)).destinations.length,0);
+ await page.evaluate(()=>{document.getElementById('customerName').value='Prueba';setMode('mesa');setPay('efectivo');setExactCash();});
+ assert.equal(await page.locator('#overlay .field-missing, #overlay .option-missing').count(),0);
+ await page.locator('#cashAmount').fill('0.01');await page.evaluate(()=>updateBars());
+ await page.locator('#sendBtn').click();assert.equal((await orderState(page)).destinations.length,0);
+ await page.evaluate(()=>setExactCash());await page.locator('#sendBtn').click();
+ await page.waitForFunction(()=>window.__whatsappAttempts.length===1);
+ assert.equal((await orderState(page)).destinations.length,1);
+ await page.evaluate(()=>{startNewOrder();selectCat('Bebidas Calientes');changeQty('catpuccino',1);openCart();});
+ assert.equal(await page.locator('#overlay .field-missing, #overlay .option-missing').count(),0);
 }));
 
 async function main() {
