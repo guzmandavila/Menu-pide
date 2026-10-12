@@ -516,6 +516,31 @@ test('Computadora: dos columnas, categorías accesibles y sin desbordamiento', (
   assert.equal(await page.locator('.cats-wrap').isVisible(), false);
 }));
 
+test('Navegación inferior y Atrás conservan el carrito', () => useFixture(async ({ page }) => {
+  await page.evaluate(() => selectCat('Bebidas Calientes'));
+  await page.evaluate(() => changeQty('catpuccino', 1));
+  await page.locator('#menuBack').click();
+  await page.waitForFunction(() => categoryHome);
+  assert.equal((await orderState(page)).cart.catpuccino.qty, 1);
+  await page.evaluate(() => selectCat('Bebidas Frías'));
+  await page.goBack();
+  await page.waitForFunction(() => categoryHome);
+  assert.equal((await orderState(page)).cart.catpuccino.qty, 1);
+  await page.goForward();
+  await page.waitForFunction(() => !categoryHome && activeCat === 'Bebidas Frías');
+  await page.locator('#cartbar').click();
+  assert.equal(await page.locator('#overlay').evaluate(el => el.classList.contains('open')), true);
+  await page.evaluate(() => closeCart());
+  for(const width of [320,390,1440]) {
+    await page.setViewportSize({width,height:844});
+    assert.ok(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth + 1));
+    const boxes = await page.evaluate(() => ['menuBack','cartbar'].map(id => {const r=document.getElementById(id).getBoundingClientRect();return {left:r.left,right:r.right,top:r.top,bottom:r.bottom};}));
+    assert.ok(boxes[0].right <= boxes[1].left);
+    assert.ok(boxes.every(b => b.left >= 0 && b.right <= width && b.bottom <= 844));
+  }
+  await page.setViewportSize({width:390,height:844});
+}));
+
 async function main() {
   if (process.env.MENU_TEST_BASE_URL) baseURL = process.env.MENU_TEST_BASE_URL;
   else {

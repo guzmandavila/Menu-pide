@@ -365,6 +365,8 @@ function syncHeaderCompact(){
   const stickyTop = document.querySelector('.sticky-top');
   if(!stickyTop) return;
   document.body.classList.toggle('category-home', categoryHome);
+  const backButton = document.getElementById('menuBack');
+  if(backButton) { backButton.disabled = categoryHome; backButton.innerHTML = categoryHome ? 'Menú principal' : '<span aria-hidden="true">←</span> Volver al menú'; }
   stickyTop.classList.toggle('compact', catsCollapsed);
   syncScrolledHeader(true);
   const titleEl = document.getElementById('compactCatTitle');
@@ -375,11 +377,11 @@ function syncHeaderCompact(){
       titleEl.style.background = color;
       titleEl.style.borderColor = color;
       titleEl.style.color = textColor;
-      titleEl.innerHTML = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="15 18 9 12 15 6"/></svg><span class="compact-cat-copy"><span class="compact-cat-name">${escapeHtml(activeCat)}</span><span class="compact-cat-hint">Ver menú</span></span>`;
-      titleEl.onclick = expandCats;
-      titleEl.setAttribute('role','button');
-      titleEl.setAttribute('tabindex','0');
-      titleEl.setAttribute('aria-label','Volver al menú principal');
+      titleEl.innerHTML = `<span class="compact-cat-copy"><span class="compact-cat-name">${escapeHtml(activeCat)}</span></span>`;
+      titleEl.onclick = null;
+      titleEl.removeAttribute('role');
+      titleEl.removeAttribute('tabindex');
+      titleEl.removeAttribute('aria-label');
     } else {
       titleEl.style.background = '';
       titleEl.style.borderColor = '';
@@ -432,7 +434,19 @@ function syncBannerScroll(){
   banner.style.opacity = String(1 - progress);
   banner.style.pointerEvents = progress > .85 ? 'none' : '';
 }
-function expandCats(){
+// Cada categoría es una pantalla real del historial; el carrito vive aparte.
+history.replaceState({...history.state, clowderMenu:true, category:null}, '', location.href);
+window.addEventListener('popstate', event => {
+  document.querySelectorAll('.overlay.open').forEach(el => el.classList.remove('open'));
+  const category = event.state?.clowderMenu && event.state.category;
+  if(category && visibleCats().includes(category)) selectCat(category, false);
+  else expandCats(false);
+});
+function expandCats(updateHistory = true){
+  if(updateHistory && !categoryHome && history.state?.clowderMenu && history.state.category){
+    history.back();
+    return;
+  }
   categoryHome = true;
   catsCollapsed = false;
   applyMenuTheme();
@@ -441,7 +455,12 @@ function expandCats(){
   syncHeaderCompact();
   window.scrollTo({top:0, behavior:'smooth'});
 }
-function selectCat(c){
+function selectCat(c, updateHistory = true){
+  if(!visibleCats().includes(c)) return;
+  if(updateHistory && (categoryHome || activeCat !== c)) {
+    if(categoryHome) history.pushState({clowderMenu:true, category:c}, '', location.href);
+    else history.replaceState({clowderMenu:true, category:c}, '', location.href);
+  }
   activeCat = c;
   categoryHome = false;
   applyMenuTheme();

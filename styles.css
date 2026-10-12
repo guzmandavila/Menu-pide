@@ -1099,3 +1099,21 @@
   .cat-banner-slide img[src="assets/funbite.jpeg"]{transform:none;}
   .menu-products{position:relative; z-index:1; background:var(--bg); padding-top:8px;}
 }
+
+/* Navegación al alcance del pulgar, con espacio para el área segura del móvil. */
+body{padding-bottom:calc(110px + env(safe-area-inset-bottom, 0px));}
+.bottom-navigation{position:fixed; z-index:30; bottom:0; left:0; right:0; display:flex; align-items:stretch; gap:10px; max-width:720px; margin:0 auto; padding:12px 16px calc(12px + env(safe-area-inset-bottom, 0px)); background:var(--bg); border-top:1px solid var(--line); box-sizing:border-box;}
+.menu-back{flex:1; min-height:52px; border:1px solid var(--line); border-radius:14px; background:var(--bg-alt); color:var(--cream); font:700 15px 'Inter',sans-serif; cursor:pointer; padding:10px 12px;}
+.menu-back:disabled{opacity:.65; cursor:default;}
+.bottom-navigation .cartbar{position:static; flex:1.4; min-width:0; width:auto; margin:0; padding:12px; transform:none; border-radius:14px; box-shadow:none; gap:8px;}
+.bottom-navigation .cartbar:not(.show){display:none;}
+.bottom-navigation .cartbar .left,.bottom-navigation .cartbar .right{font-size:14px;}
+.bottom-navigation .cartbar .left{gap:6px;}
+.bottom-navigation button:focus-visible,.bottom-navigation .cartbar:focus-visible{outline:3px solid var(--gold); outline-offset:3px;}
+.sticky-top.compact .compact-cat-title{cursor:default;}
+
+.bottom-navigation .cartbar{flex:1; flex-direction:column; justify-content:center; gap:3px; padding:8px;}
+.bottom-navigation .cartbar .left{white-space:nowrap;}
+.bottom-navigation .cartbar .count{font-size:11px; padding:2px 6px;}
+.bottom-navigation .cartbar .right{font-size:12px;}
+.bottom-navigation .cartbar-arrow{display:none;}

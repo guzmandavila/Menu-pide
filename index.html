@@ -137,12 +137,15 @@
   <div class="footer-version">Clowder · v6</div>
 </dialog>
 
+<nav class="bottom-navigation" aria-label="Navegación del menú">
+  <button type="button" id="menuBack" class="menu-back" onclick="expandCats()" disabled><span aria-hidden="true">←</span> Volver al menú</button>
 <div class="cartbar" id="cartbar" role="button" tabindex="0" aria-label="Ver mi pedido">
-  <div class="left"><span class="count" id="cartCount">0</span> Ver mi pedido</div>
+  <div class="left"><span class="count" id="cartCount">0</span> Mi pedido</div>
   <div class="right"><span id="cartTotal">$0.00</span>
     <svg class="cartbar-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
   </div>
 </div>
+</nav>
 <div class="order-complete" id="orderComplete" role="status" aria-live="polite">Continúa en WhatsApp<br><small>Envía allí el mensaje para completar tu pedido. Tu pedido queda guardado aquí por si necesitas reintentarlo.</small></div>
 
 <div class="overlay" id="paymentsOverlay">
