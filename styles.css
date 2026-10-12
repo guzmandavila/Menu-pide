@@ -1166,3 +1166,19 @@ body.category-home .bottom-navigation:not(:has(.cartbar.show)){display:none;}
 
 #overlay #sendHint{text-align:center;}
 #overlay .new-order-btn{word-spacing:normal; letter-spacing:normal;}
+
+#overlay .rm{display:inline-flex; align-items:center; justify-content:center; width:44px; height:44px; min-width:44px; padding:0; border:1px solid var(--line); border-radius:10px; background:var(--bg-alt); color:var(--cream); text-decoration:none; cursor:pointer;}
+#overlay .rm:hover{background:var(--line);}
+#overlay .transfer-accounts{font:13px/1.5 'Inter',sans-serif; text-align:left; margin:10px 0 0;}
+#overlay .transfer-accounts a{color:var(--cream); text-decoration:underline; text-underline-offset:3px;}
+
+#overlay .milk-chip-deslactosada{background:#B6DAEA; border-color:#B6DAEA; color:#233B48;}
+#overlay .milk-chip-almendra{background:#D9BF96; border-color:#D9BF96; color:#49331F;}
+#overlay .milk-chip-avena{background:#E9DBAF; border-color:#E9DBAF; color:#493F23;}
+#overlay .milk-chip strong,#overlay .milk-chip button{color:inherit;}
+
+.cart-line-actions{display:flex; align-items:center; gap:12px; margin-top:10px;}
+.cart-line-quantity{display:flex; align-items:center; border:1px solid var(--line); border-radius:10px; overflow:hidden;}
+.cart-line-quantity button{width:44px; height:44px; border:0; background:var(--bg-alt); color:var(--cream); font-size:24px; cursor:pointer;}
+.cart-line-quantity span{min-width:30px; text-align:center; font:700 14px 'Inter',sans-serif;}
+.cart-other-version{margin-top:8px; padding:8px 0; background:none; border:0; color:var(--cream-dim); text-decoration:underline; font:12px 'Inter',sans-serif; cursor:pointer;}

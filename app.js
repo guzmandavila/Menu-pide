@@ -1161,8 +1161,6 @@ function updateBars(){
   const cashAmountEl = document.getElementById('cashAmount');
   const cashActive = payMethod === 'efectivo';
   document.getElementById('bankField').hidden = payMethod !== 'transferencia';
-  document.getElementById('paymentBank').value = paymentBank;
-  const bankOk = payMethod !== 'transferencia' || PAYMENT_BANKS.includes(paymentBank);
   const cashOk = !cashActive || validCash(total);
   const cashChange = document.getElementById('cashChange');
   if(cashChange) cashChange.classList.toggle('open', cashActive);
@@ -1181,7 +1179,7 @@ function updateBars(){
   const modeOk = storeOnly || mode !== '';
   const addressOk = mode !== 'delivery' || deliveryAddressOk();
   const deliveryOk = mode !== 'delivery' || isDeliveryAvailableNow();
-  const listo = count > 0 && nameOk && modeOk && addressOk && deliveryOk && payMethod !== '' && cashOk && bankOk;
+  const listo = count > 0 && nameOk && modeOk && addressOk && deliveryOk && payMethod !== '' && cashOk;
   ['btnMesa','btnLlevar'].forEach(id => {
     const el = document.getElementById(id);
     if(el) el.classList.toggle('option-missing', checkoutAttempted && count > 0 && !storeOnly && !modeOk);
@@ -1194,7 +1192,6 @@ function updateBars(){
   const continueButton = document.getElementById('sendBtn');
   continueButton.disabled = count === 0 || birthdayState().closed || sendingOrder;
   if(!sendingOrder) continueButton.textContent = `Continuar en WhatsApp · $${total.toFixed(2)}`;
-  document.getElementById('paymentBank').classList.toggle('field-missing', checkoutAttempted && !bankOk);
   const hint = document.getElementById('sendHint');
   if(hint){
     const faltan = [];
@@ -1204,7 +1201,6 @@ function updateBars(){
     if(mode === 'delivery' && !deliveryOk) faltan.push('delivery disponible');
     if(mode === 'delivery' && deliveryOk && !addressOk) faltan.push('manzana y villa');
     if(payMethod === '') faltan.push('cómo pagas');
-    if(!bankOk) faltan.push('el banco al que transfieres');
     if(cashActive && !cashOk) faltan.push('con cuánto pagas');
     if(checkoutAttempted && faltan.length){
       const lista = faltan.length === 1
@@ -1256,8 +1252,8 @@ function renderCartList(){
     const extrasTotal = (unitPrice(id) - item.price) * c.qty;
     const modifierChips = [];
     if(item.milk) modifierChips.push(c.milk
-      ? `<span class="modifier-chip">Leche vegetal (${c.milk === 'almendra' ? 'almendra' : 'avena'}) <strong>+$0.50</strong><button aria-label="Quitar leche vegetal" onclick="removeExtra('${id}','milk')">×</button></span>`
-      : `<span class="modifier-chip">Leche deslactosada</span>`);
+      ? `<span class="modifier-chip milk-chip milk-chip-${c.milk}">Leche vegetal (${c.milk === 'almendra' ? 'almendra' : 'avena'}) <strong>+$0.50</strong><button aria-label="Quitar leche vegetal" onclick="removeExtra('${id}','milk')">×</button></span>`
+      : `<span class="modifier-chip milk-chip milk-chip-deslactosada">Leche deslactosada</span>`);
     if(c.scoop) modifierChips.push(`<span class="modifier-chip">Bola de helado <strong>+$0.75</strong><button aria-label="Quitar bola de helado" onclick="removeExtra('${id}','scoop')">×</button></span>`);
     if(c.syrup) modifierChips.push(`<span class="modifier-chip">Toque de ${SYRUP_LABELS[c.syrup]} <strong>+$0.50</strong><button aria-label="Quitar toque de sabor" onclick="removeExtra('${id}','syrup')">×</button></span>`);
     if(item.strengthLevel) modifierChips.push(`<span class="modifier-chip">${STRENGTH_LABELS[item.strengthLevel]}</span>`);
@@ -1270,7 +1266,9 @@ function renderCartList(){
         <div class="n">${c.qty}x ${escapeHtml(productLabel(item))}</div>
         ${modifierChips.length ? `<div class="cart-modifiers">${modifierChips.join('')}</div>` : ''}
         ${c.note ? `<div class="note">nota: ${escapeHtml(c.note)}</div>` : ''}
-        <button class="rm" onclick="changeQty('${id}', -${c.qty}, true)">Quitar producto</button>
+        <div class="cart-line-actions"><div class="cart-line-quantity" role="group" aria-label="Cantidad de ${escapeHtml(productLabel(item))}"><button type="button" aria-label="Restar una unidad" onclick="changeQty('${id}', -1, true)">−</button><span aria-live="polite">${c.qty}</span><button type="button" aria-label="Agregar una unidad con las mismas modificaciones" onclick="changeQty('${id}', 1, true)">+</button></div>
+        <button type="button" class="rm" aria-label="Quitar ${escapeHtml(productLabel(item))} del pedido" title="Quitar producto" onclick="changeQty('${id}', -${c.qty}, true)"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 6h18M9 6V3h6v3M5 6l1 15h12l1-15M10 10v7M14 10v7"/></svg></button></div>
+        <button type="button" class="cart-other-version" onclick="closeCart(); selectCat('${item.cat}');">Añadir con otra modificación</button>
       </div>
       <div class="price">${priceHtml}</div>
     </div>`;
@@ -1534,7 +1532,7 @@ async function sendOrder(){
   }
   if(payMethod) msg += (payMethod === 'efectivo'
     ? `💵 *Efectivo: paga con $${cashAmount.toFixed(2)}*\n`
-    : `🏦 *Pago: transferencia a ${paymentBank}*\n`);
+    : `🏦 *Pago: transferencia*\n`);
   msg += `\n*PRODUCTOS*\n`;
   entries.forEach(([id,c])=>{
     const item = productForCartLine(id);
@@ -1561,7 +1559,7 @@ async function sendOrder(){
   if(hasFrozenOrder) msg += `📦 Producto bajo stock: coordinamos contigo la entrega o retiro.\n`;
   msg += `\n☕ *¡Gracias! Te esperamos en Clowder.*\n`;
   const transfer = payMethod === 'transferencia';
-  const sharedOrder = {code:orderCode, receiptKey:orderReceiptKey, name, method:payMethod, bank:transfer ? paymentBank : '', totalCents:Math.round(grandTotal()*100), details:msg};
+  const sharedOrder = {code:orderCode, receiptKey:orderReceiptKey, name, method:payMethod, bank:'', totalCents:Math.round(grandTotal()*100), details:msg};
   // Build the complete order before the asynchronous contact check.
   const target = MenuContact.reserveWindow();
   sendingOrder = true;

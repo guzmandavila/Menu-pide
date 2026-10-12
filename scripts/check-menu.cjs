@@ -558,6 +558,22 @@ test('Confirmación pide datos solo al continuar y conserva validaciones', () =>
  assert.equal(await page.locator('#overlay .field-missing, #overlay .option-missing').count(),0);
 }));
 
+test('Transferencia sin banco, papelera y colores de leche', () => useFixture(async ({page}) => {
+ await page.evaluate(()=>{selectCat('Bebidas Calientes');changeQty('catpuccino',1);document.getElementById('milk-moccatto').value='almendra';setMilk('moccatto','almendra');changeQty('moccatto',1);openCart();document.getElementById('customerName').value='Prueba';setMode('mesa');paymentBank='';setPay('transferencia');});
+ assert.equal(await page.locator('#paymentBank').count(),0);
+ assert.equal(await page.locator('#bankField a').getAttribute('href'),'https://clowder.cafe/pagos/');
+ assert.equal(await page.evaluate(()=>checkoutReady),true);
+ assert.equal(await page.locator('.milk-chip-deslactosada').count(),1);
+ assert.equal(await page.locator('.milk-chip-almendra').count(),1);
+ const colors=await page.locator('.milk-chip').evaluateAll(es=>es.map(e=>getComputedStyle(e).backgroundColor));assert.notEqual(colors[0],colors[1]);
+ await page.locator('#cartList .cart-row').nth(1).getByRole('button',{name:'Agregar una unidad con las mismas modificaciones'}).click();
+ const almond=await page.evaluate(()=>Object.values(cart).find(x=>x.milk==='almendra'));assert.equal(almond.qty,2);
+ const rm=page.locator('#cartList .rm').first();const box=await rm.boundingBox();assert.ok(box.width>=44 && box.height>=44);
+ await rm.click();assert.equal(await page.locator('#cartList .cart-row').count(),1);
+ await page.locator('#sendBtn').click();await page.waitForFunction(()=>window.__whatsappAttempts.length===1);
+ const msg=decodeURIComponent((await orderState(page)).destinations[0].url);assert.match(msg,/Pago: transferencia/);assert.doesNotMatch(msg,/transferencia a /);
+}));
+
 async function main() {
   if (process.env.MENU_TEST_BASE_URL) baseURL = process.env.MENU_TEST_BASE_URL;
   else {
