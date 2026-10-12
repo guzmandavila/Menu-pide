@@ -1128,3 +1128,14 @@ body{padding-bottom:calc(110px + env(safe-area-inset-bottom, 0px));}
  .sticky-top.compact:not(.scrolled){padding-left:12px; padding-right:12px; gap:6px;}
  .sticky-top.compact:not(.scrolled) .compact-cat-title{font-size:15px; padding:7px 6px;}
 }
+
+/* Al recorrer una categoría se conserva su título y el logo. */
+.sticky-top.compact.scrolled{display:grid; grid-template-columns:minmax(106px,1fr) minmax(0,auto) minmax(106px,1fr); gap:8px; padding:10px 20px;}
+.sticky-top.compact.scrolled header,.sticky-top.compact.scrolled .header-actions{display:contents;}
+.sticky-top.compact.scrolled .header-primary-actions{display:none;}
+.sticky-top.compact.scrolled .header-secondary-actions{grid-column:3; grid-row:1; justify-self:end; margin:0; padding:0; border:0;}
+.sticky-top.compact.scrolled .compact-cat-title{display:flex; grid-column:2; grid-row:1; justify-self:center; justify-content:center; text-align:center; margin:0; max-width:100%; box-sizing:border-box;}
+@media(max-width:420px){
+ .sticky-top.compact.scrolled{padding-left:12px; padding-right:12px; gap:6px;}
+ .sticky-top.compact.scrolled .compact-cat-title{font-size:15px; padding:7px 6px;}
+}
