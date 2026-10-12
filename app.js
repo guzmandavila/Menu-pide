@@ -10,13 +10,13 @@ const MENU = [
 
   // ---- Bebidas Calientes ----
   { id:'strawberry-catpuccino', cat:'Bebidas Calientes', name:'Strawberry Catpuccino', classic:'Cappuccino de fresa', desc:'Espresso, fresa y leche espumada.', price:3.00, availableFrom:'2026-09-19T00:00:00-05:00', availableUntil:'2026-09-28T00:00:00-05:00', promoNote:'Disponible del 19 al 27 de septiembre, hasta las 23:59.', img:'banners/bc-strawberry-catpuccino.jpeg' },
-  { id:'catpuccino', cat:'Bebidas Calientes', name:'Catpuccino', classic:'Cappuccino', syrupOption:['vainilla-francesa','avellana','caramelo-salado'], desc:'Espresso con leche y espuma suave.', price:2.50, milk:true, img:'miniaturas/bc-catpuccino.jpg' },
-  { id:'cozy-claws', cat:'Bebidas Calientes', name:'Cozy Claws', classic:'Chocolate caliente', syrupOption:['vainilla-francesa','avellana','caramelo-salado'], desc:'Cacao con leche caliente.', price:2.75, milk:true, img:'miniaturas/bc-cozy-claws.jpg' },
-  { id:'doble-sippi', cat:'Bebidas Calientes', name:'Doble Sippi', classic:'Espresso doble', syrupOption:['vainilla-francesa','avellana','caramelo-salado'], desc:'Doble shot, doble felicidad.', price:1.50, img:'miniaturas/bc-doble-sippi.jpg' },
-  { id:'long-tail', cat:'Bebidas Calientes', name:'Long Tail', classic:'Americano', syrupOption:['vainilla-francesa','avellana','caramelo-salado'], group:'long-tail-intensity', flavor:'Intensidad: Estándar', strengthLevel:'estandar', desc:'Espresso + agua caliente, perfecto para charlas largas.', price:1.80, img:'miniaturas/bc-long-tail.jpg' },
-  { id:'long-tail-suave', cat:'Bebidas Calientes', name:'Long Tail', classic:'Americano', syrupOption:['vainilla-francesa','avellana','caramelo-salado'], group:'long-tail-intensity', flavor:'Intensidad: Suave', strengthLevel:'suave', desc:'Espresso + agua caliente, perfecto para charlas largas.', price:1.80, img:'miniaturas/bc-long-tail.jpg' },
-  { id:'long-tail-muy-suave', cat:'Bebidas Calientes', name:'Long Tail', classic:'Americano', syrupOption:['vainilla-francesa','avellana','caramelo-salado'], group:'long-tail-intensity', flavor:'Intensidad: Muy Suave', strengthLevel:'muy-suave', desc:'Espresso + agua caliente, perfecto para charlas largas.', price:1.80, img:'miniaturas/bc-long-tail.jpg' },
-  { id:'moccatto', cat:'Bebidas Calientes', name:'Moccatto', classic:'Mocaccino', syrupOption:['vainilla-francesa','avellana','caramelo-salado'], desc:'Espresso, cacao y leche caliente.', price:3.0, milk:true, img:'miniaturas/bc-moccatto.jpg' },
+  { id:'catpuccino', cat:'Bebidas Calientes', name:'Catpuccino', classic:'Cappuccino', syrupOption:['vainilla-francesa','caramelo-salado'], desc:'Espresso con leche y espuma suave.', price:2.50, milk:true, img:'miniaturas/bc-catpuccino.jpg' },
+  { id:'cozy-claws', cat:'Bebidas Calientes', name:'Cozy Claws', classic:'Chocolate caliente', syrupOption:['vainilla-francesa','caramelo-salado'], desc:'Cacao con leche caliente.', price:2.75, milk:true, img:'miniaturas/bc-cozy-claws.jpg' },
+  { id:'doble-sippi', cat:'Bebidas Calientes', name:'Doble Sippi', classic:'Espresso doble', syrupOption:['vainilla-francesa','caramelo-salado'], desc:'Doble shot, doble felicidad.', price:1.50, img:'miniaturas/bc-doble-sippi.jpg' },
+  { id:'long-tail', cat:'Bebidas Calientes', name:'Long Tail', classic:'Americano', syrupOption:['vainilla-francesa','caramelo-salado'], group:'long-tail-intensity', flavor:'Intensidad: Estándar', strengthLevel:'estandar', desc:'Espresso + agua caliente, perfecto para charlas largas.', price:1.80, img:'miniaturas/bc-long-tail.jpg' },
+  { id:'long-tail-suave', cat:'Bebidas Calientes', name:'Long Tail', classic:'Americano', syrupOption:['vainilla-francesa','caramelo-salado'], group:'long-tail-intensity', flavor:'Intensidad: Suave', strengthLevel:'suave', desc:'Espresso + agua caliente, perfecto para charlas largas.', price:1.80, img:'miniaturas/bc-long-tail.jpg' },
+  { id:'long-tail-muy-suave', cat:'Bebidas Calientes', name:'Long Tail', classic:'Americano', syrupOption:['vainilla-francesa','caramelo-salado'], group:'long-tail-intensity', flavor:'Intensidad: Muy Suave', strengthLevel:'muy-suave', desc:'Espresso + agua caliente, perfecto para charlas largas.', price:1.80, img:'miniaturas/bc-long-tail.jpg' },
+  { id:'moccatto', cat:'Bebidas Calientes', name:'Moccatto', classic:'Mocaccino', syrupOption:['vainilla-francesa','caramelo-salado'], desc:'Espresso, cacao y leche caliente.', price:3.0, milk:true, img:'miniaturas/bc-moccatto.jpg' },
 
   // ---- Bebidas Frías ----
   { id:'affocato', cat:'Bebidas Calientes', name:'AffoCato', desc:'Helado de vainilla Madagascar con espresso doble.', price:3.00, img:'miniaturas/bf-affocato.jpg' },
@@ -24,7 +24,7 @@ const MENU = [
   { id:'ice-koffin', cat:'Bebidas Frías', name:'Ice Koffin', classic:'Americano helado', classicTheme:'fresh', order:1, desc:'Espresso, agua y hielo.', price:2.00, img:'assets/image-cc920e9b95fa9297.jpg' },
   { id:'nara-sunset', cat:'Bebidas Frías', name:'Nara Sunset', classic:'Naranja y café', classicTheme:'fresh', order:5, desc:'Naranja y café sobre hielo.', price:3.5, img:'assets/image-564f15ba92421bf9.jpg' },
   { id:'nimbus', cat:'Bebidas Frías', name:'Ice Moccatto', classic:'Mocaccino helado', classicTheme:'fresh', order:3, desc:'Espresso, leche y chocolate, bien fríos.', price:3.25, milk:true, img:'assets/image-de2fc99b743f1564.jpg' },
-  { id:'vanilatte', cat:'Bebidas Frías', name:'Ice Latte', classic:'Latte helado', classicTheme:'fresh', order:2, syrupOption:['vainilla-francesa','avellana','caramelo-salado'], desc:'Espresso, leche y hielo.', price:2.75, milk:true, img:'assets/image-c2358fbf75d9fa28.jpg' },
+  { id:'vanilatte', cat:'Bebidas Frías', name:'Ice Latte', classic:'Latte helado', classicTheme:'fresh', order:2, syrupOption:['vainilla-francesa','caramelo-salado'], desc:'Espresso, leche y hielo.', price:2.75, milk:true, img:'assets/image-c2358fbf75d9fa28.jpg' },
 
   { id:'banana-caramel-latte', cat:'Bebidas Frías', name:'Banana Caramel Latte', classic:'Latte helado de banana y caramelo', classicTheme:'fresh', order:2.5, desc:'Banana caramelizada, espresso y leche fría, con cold foam de vainilla y canela.', featured:true, featuredTag:'Bebida especial', promoNote:'Disponible hasta el 15 de octubre.', price:3.50, img:'banners/bf-banana-caramel-latte.jpeg' },
 
@@ -40,7 +40,7 @@ const MENU = [
   { id:'mini-cake-del-dia', cat:'Snack Dulce', name:'Apple Crumble Cake', desc:'Harina de almendra, harina de coco, ghee y manzana natural, cobertura de chocolate blanco.', price:2.6, scoop:true, accent:'#C8433B', img:'miniaturas/apple-crumble.jpg', imgScoop:'miniaturas/apple-crumble-helado.jpg' },
 
   { id:'brownie', cat:'Snack Dulce', name:'Brownie', desc:'Brownie intenso y húmedo, con cacao orgánico, endulzado con alulosa y panela.', price:3.0, scoop:true, img:'assets/image-6d3c530cc30feadd.jpg' },
-  { id:'milkishaki-nutella', cat:'Bebidas Frías', name:'MilkiShaki - Hazelnut + Brownie Bites', classic:'Milkshake', classicTheme:'fresh', order:4, desc:'Sirope de hazelnut, leche, helado premium y bocados de brownie.', price:4.9, milk:true, groupFeatured:true, comingSoon:true, comingSoonLabel:'Vuelve pronto', comingSoonNote:'El sirope de hazelnut se terminó.', img:'assets/image-2b43f2fe510398fb.jpg', group:'milkishaki', flavor:'Hazelnut + Brownie Bites'  },
+  { id:'milkishaki-nutella', cat:'Bebidas Frías', name:'MilkiShaki - Brownie Bites', classic:'Milkshake', classicTheme:'fresh', order:4, desc:'Leche, helado premium y bocados de brownie.', price:4.9, milk:true, groupFeatured:true, img:'assets/image-2b43f2fe510398fb.jpg', group:'milkishaki', flavor:'Brownie Bites'  },
   { id:'milkishaki-fresa', cat:'Bebidas Frías', name:'MilkiShaki - Fresa', classic:'Milkshake', classicTheme:'fresh', order:4, desc:'Fresa, leche y helado premium.', price:4.9, milk:true, groupFeatured:true, featured:true, featuredTag:'Disponible', img:'assets/image-299c9fd9ebdf031a.jpg', group:'milkishaki', flavor:'Fresa'  },
   { id:'milkishaki-salted-caramel', cat:'Bebidas Frías', name:'MilkiShaki - Salted Caramel', classic:'Milkshake', classicTheme:'fresh', order:4, desc:'Leche, helado premium y caramelo con un toque de sal.', price:4.9, milk:true, groupFeatured:true, featured:true, featuredTag:'Disponible', img:'assets/image-861d6d271de84321.jpg', group:'milkishaki', flavor:'Salted Caramel'  },
 
@@ -105,7 +105,7 @@ MENU.forEach(item => {
   if (!ICE_CREAM_AVAILABLE && item.scoop) item.scoop = false;
 });
 // Bebidas temporalmente agotadas; se mantienen visibles en el menú.
-const SOLD_OUT_DRINK_IDS = ['cozy-claws', 'moccatto', 'nimbus', 'milkishaki-nutella', 'banana-caramel-latte'];
+const SOLD_OUT_DRINK_IDS = ['banana-caramel-latte'];
 MENU.forEach(item => {
   if (SOLD_OUT_DRINK_IDS.includes(item.id)) {
     item.soldOut = true;
@@ -455,7 +455,7 @@ const FLAVOR_COLORS = {
   'Frío · $3.75': '#B76535',
   'Caliente · $3.00': '#6B3D4A',
   'Salted Caramel': '#C68642',
-  'Hazelnut + Brownie Bites': '#4A2C17',
+  'Brownie Bites': '#4A2C17',
   'Fresa': '#E8536B',
   'Regular': '#D8C9A3',
   'Grande': '#B5542C',

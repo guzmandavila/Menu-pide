@@ -149,6 +149,31 @@ test('Stock actual: helados, queso y wachipapas disponibles; pollo y tocipapas a
   assert.equal(await page.locator('#menu .cat-banner-slide img[src="banners/ss-banner-01.jpg"]').count(), 1);
 }));
 
+test('Chocolate disponible y opciones de avellana retiradas', () => useFixture(async ({ page }) => {
+  const result = await page.evaluate(() => {
+    const ids = ['cozy-claws', 'moccatto', 'nimbus', 'milkishaki-nutella'];
+    const shake = MENU.find(item => item.id === 'milkishaki-nutella');
+    setSyrup('catpuccino', 'avellana');
+    return {
+      available: ids.map(id => isItemOrderable(MENU.find(item => item.id === id))),
+      shake: [shake.name, shake.desc, shake.flavor],
+      options: MENU.flatMap(item => item.syrupOption || []),
+      restored: sanitizeCart({catpuccino: {qty: 1, syrup: 'avellana'}}),
+      selected: cart.catpuccino?.syrup || '',
+    };
+  });
+  assert.deepEqual(result.available, [true, true, true, true]);
+  assert.match(result.shake[0], /Brownie Bites/);
+  assert.doesNotMatch(result.shake.join(' '), /avellana|hazelnut|nutella/i);
+  assert.ok(!result.options.some(option => /avellana|hazelnut/i.test(option)));
+  assert.equal(result.restored.catpuccino.syrup, '');
+  assert.equal(result.selected, '');
+  for (const category of ['Bebidas Calientes', 'Bebidas Frías']) {
+    await page.evaluate(category => selectCat(category), category);
+    assert.doesNotMatch(await page.locator('#menu').textContent(), /avellana|hazelnut/i);
+  }
+}));
+
 test('Pago exacto funciona con 3 × $4.90 y rechaza efectivo insuficiente o fracciones de centavo', () => useFixture(async ({ page }) => {
   // Producto sintético para verificar centavos sin depender del stock del catálogo.
   await page.evaluate(() => MENU.push({ id:'test-centavos', cat:'Bebidas Frías', name:'Prueba centavos', price:4.9 }));
@@ -301,13 +326,13 @@ test('Un botón renderizado antes de abrir cocina permite pedir al llegar la hor
 
 test('Abrir WhatsApp y recargar conserva todos los datos y el mismo código', () => useFixture(async ({ page, ready }) => {
   await prepare(page, { mode: 'delivery' });
-  await page.evaluate(() => { setMilk('catpuccino', 'almendra'); setSyrup('catpuccino', 'avellana'); saveNote('catpuccino', 'Poca espuma'); });
+  await page.evaluate(() => { setMilk('catpuccino', 'almendra'); setSyrup('catpuccino', 'vainilla-francesa'); saveNote('catpuccino', 'Poca espuma'); });
   await page.evaluate(() => sendOrder());
   const before = await orderState(page);
   assert.ok(before.currentOrderCode);
   assert.equal(before.cart.catpuccino.qty, 1);
   assert.equal(before.cart.catpuccino.milk, 'almendra');
-  assert.equal(before.cart.catpuccino.syrup, 'avellana');
+  assert.equal(before.cart.catpuccino.syrup, 'vainilla-francesa');
   assert.equal(before.cart.catpuccino.note, 'Poca espuma');
   assert.equal(before.draft.orderCode, before.currentOrderCode);
   await page.reload({ waitUntil: 'domcontentloaded' });
