@@ -40,7 +40,7 @@ const MENU = [
   { id:'mini-cake-del-dia', cat:'Snack Dulce', name:'Apple Crumble Cake', desc:'Harina de almendra, harina de coco, ghee y manzana natural, cobertura de chocolate blanco.', price:2.6, scoop:true, accent:'#C8433B', img:'miniaturas/apple-crumble.jpg', imgScoop:'miniaturas/apple-crumble-helado.jpg' },
 
   { id:'brownie', cat:'Snack Dulce', name:'Brownie', desc:'Brownie intenso y húmedo, con cacao orgánico, endulzado con alulosa y panela.', price:3.0, scoop:true, img:'assets/image-6d3c530cc30feadd.jpg' },
-  { id:'milkishaki-nutella', cat:'Bebidas Frías', name:'MilkiShaki - Brownie Bites', classic:'Milkshake', classicTheme:'fresh', order:4, desc:'Chocolate de Clowder, leche, helado premium y bocados de brownie.', price:4.9, milk:true, groupFeatured:true, img:'assets/image-2b43f2fe510398fb.jpg', group:'milkishaki', flavor:'Brownie Bites'  },
+  { id:'milkishaki-nutella', cat:'Bebidas Frías', name:'MilkiShaki - Chocolate de Clowder + Brownie Bites', classic:'Milkshake', classicTheme:'fresh', order:4, desc:'Chocolate de Clowder, leche, helado premium y bocados de brownie.', price:4.9, milk:true, groupFeatured:true, img:'assets/image-2b43f2fe510398fb.jpg', group:'milkishaki', flavor:'Chocolate de Clowder + Brownie Bites'  },
   { id:'milkishaki-fresa', cat:'Bebidas Frías', name:'MilkiShaki - Fresa', classic:'Milkshake', classicTheme:'fresh', order:4, desc:'Fresa, leche y helado premium.', price:4.9, milk:true, groupFeatured:true, featured:true, featuredTag:'Disponible', img:'assets/image-299c9fd9ebdf031a.jpg', group:'milkishaki', flavor:'Fresa'  },
   { id:'milkishaki-salted-caramel', cat:'Bebidas Frías', name:'MilkiShaki - Salted Caramel', classic:'Milkshake', classicTheme:'fresh', order:4, desc:'Leche, helado premium y caramelo con un toque de sal.', price:4.9, milk:true, groupFeatured:true, featured:true, featuredTag:'Disponible', img:'assets/image-861d6d271de84321.jpg', group:'milkishaki', flavor:'Salted Caramel'  },
 
@@ -455,7 +455,7 @@ const FLAVOR_COLORS = {
   'Frío · $3.75': '#B76535',
   'Caliente · $3.00': '#6B3D4A',
   'Salted Caramel': '#C68642',
-  'Brownie Bites': '#4A2C17',
+  'Chocolate de Clowder + Brownie Bites': '#4A2C17',
   'Fresa': '#E8536B',
   'Regular': '#D8C9A3',
   'Grande': '#B5542C',
