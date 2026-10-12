@@ -40,6 +40,8 @@ Esto funciona en páginas que ya cargaron este código. Una página antigua que 
 
 ## Banners de video
 
+La intro de temporada permite entrar directamente con «Ir al menú». No reproduce el video con movimiento reducido o ahorro de datos; si falla, revela el menú automáticamente. Sin JavaScript, la intro queda oculta.
+
 En `CAT_BANNERS` de `app.js`, un banner puede usar `video` (ruta a un MP4), `poster` (foto mientras carga y alternativa si falla) y `alt` (descripción). Las fotos siguen usando `img`. Usa `hidden:true` para conservar un banner sin mostrarlo ni cargar su video.
 
 El clip se reproduce en silencio y en bucle cuando está visible. Se pausa al salir de pantalla o al ocultar la pestaña; los controles permiten pausarlo manualmente. Con movimiento reducido o ahorro de datos no arranca automáticamente. Los videos conservan el marco 3:4 del banner; ajusta `object-position` en CSS si cambia el encuadre. Conviene exportar H.264, sin audio, a 720 píxeles de ancho con `faststart`.

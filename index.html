@@ -3,6 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<script>if('scrollRestoration' in history) history.scrollRestoration='manual';</script>
 <title>Clowder Coffee House - Pedidos</title>
 <meta name="description" content="Pide desde aquí y te llega directo a nuestro WhatsApp. Café, snacks y la bebida del mes.">
 <meta name="theme-color" content="#1b151b">
@@ -25,13 +26,15 @@
 <link rel="icon" type="image/png" href="assets/image-37567444807043c1.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,600;1,9..144,500&family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@500;600&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="./styles.css?v=20261010-vertical-banners">
+<link rel="stylesheet" href="./styles.css?v=20261012-cleanup">
 </head>
 <body>
-<div class="intro-splash" id="introSplash" aria-hidden="true">
-  <video id="introVideo" autoplay muted playsinline preload="auto">
+<noscript><style>.intro-splash{display:none}</style></noscript>
+<div class="intro-splash" id="introSplash">
+  <video id="introVideo" muted playsinline preload="metadata" aria-hidden="true">
     <source src="assets/pumpkin-intro.mp4" type="video/mp4">
   </video>
+  <button type="button" class="intro-skip" id="introSkip">Ir al menú</button>
 </div>
 <script>
   // Tema automático: claro durante el día y oscuro por la noche.
@@ -342,6 +345,6 @@
 </div>
 
 <script src="./contact-config.js"></script>
-<script src="./app.js?v=20261010-vertical-banners"></script>
+<script src="./app.js?v=20261012-cleanup"></script>
 </body>
 </html>

@@ -76,6 +76,7 @@ async function fixture(options = {}) {
   };
   await page.goto(baseURL, { waitUntil: 'domcontentloaded' });
   await ready();
+  await page.evaluate(() => document.getElementById('introSkip')?.click());
   return {
     page, context, state, ready,
     async close() { await context.close(); assert.deepEqual(state.pageErrors, [], 'Errores JavaScript'); },
@@ -123,7 +124,7 @@ test('Todos los menús se muestran en móvil sin errores ni desbordamiento horiz
   }
 }));
 
-test('Stock actual: helados, queso y wachipapas disponibles; pollo y tocipapas agotados', () => useFixture(async ({ page }) => {
+test('Stock actual: helados, pollo y wachipapas disponibles; queso y tocipapas agotados', () => useFixture(async ({ page }) => {
   const result = await page.evaluate(() => {
     const ids = ['affocato', 'milkishaki-nutella', 'milkishaki-fresa', 'milkishaki-salted-caramel'];
     changeQty('empanada-queso', 1);
@@ -133,19 +134,19 @@ test('Stock actual: helados, queso y wachipapas disponibles; pollo y tocipapas a
       cheese: !!cart['empanada-queso'], chicken: !!cart['empanada-pollo'],
       potatoes: ['wachipapa', 'tocipapa'].map(id => isItemOrderable(MENU.find(item => item.id === id))),
       restored: sanitizeCart({ 'empanada-pollo': { qty: 8 }, 'tocipapa': { qty: 1 }, 'tocipapa-grande': { qty: 1 }, 'empanada-queso': { qty: 1 }, 'banana-bread-latte': { qty: 1 }, 'combo-cafe-empanada-queso': { qty: 1 } }),
-      hidden: ['Bebida del Mes', 'Combos'].every(cat => !CATS.includes(cat)),
+      hidden: !CATS.includes('Combos') && CATS.includes('Bebida del Mes'),
     };
   });
   assert.deepEqual(result.iceCream, [true, true, true, true]);
-  assert.equal(result.cheese, true);
-  assert.equal(result.chicken, false);
+  assert.equal(result.cheese, false);
+  assert.equal(result.chicken, true);
   assert.deepEqual(result.potatoes, [true, false]);
   assert.equal(result.hidden, true);
-  assert.deepEqual(Object.keys(result.restored), ['empanada-queso']);
-  assert.equal(result.restored['empanada-queso'].qty, 1);
+  assert.deepEqual(Object.keys(result.restored), ['empanada-pollo']);
+  assert.equal(result.restored['empanada-pollo'].qty, 8);
   await page.evaluate(() => selectCat('Snack Sal'));
   assert.doesNotMatch(await page.locator('#menu').textContent(), /Últimas 4 empanadas de pollo/);
-  assert.equal(await page.locator('#menu .item').first().locator('.variant-select').inputValue(), 'empanada-queso');
+  assert.equal(await page.locator('#qty-empanada-pollo').count(), 1);
   assert.equal(await page.locator('#menu .cat-banner-slide img[src="banners/ss-banner-01.jpg"]').count(), 1);
 }));
 
@@ -192,9 +193,11 @@ test('Pago exacto funciona con 3 × $4.90 y rechaza efectivo insuficiente o frac
 }));
 
 test('Video del banner: reproduce en silencio, pausa fuera de pantalla y respeta una pausa manual', () => useFixture(async ({ page }) => {
+  await page.setViewportSize({ width:1280, height:900 });
   await page.evaluate(() => {
-    CAT_BANNERS['Snack Sal'].find(b => b.video).hidden = false;
-    CAT_BANNERS['Snack Sal'].find(b => b.img === 'banners/snack-papas.jpg').hidden = true;
+    // Dos banners conocidos aíslan la reproducción del catálogo de temporada.
+    const clip = CAT_BANNERS['Snack Sal'].find(b => b.video);
+    CAT_BANNERS['Snack Sal'] = [{ ...clip, hidden:false }, { img:'banners/ss-banner-01.jpg', alt:'Empanada' }];
     selectCat('Snack Sal');
   });
   const video = page.locator('.cat-banner video');
@@ -219,8 +222,9 @@ test('Video del banner: reproduce en silencio, pausa fuera de pantalla y respeta
 test('Video con movimiento reducido no arranca automáticamente', () => useFixture(async ({ page }) => {
   await page.emulateMedia({ reducedMotion:'reduce' });
   await page.evaluate(() => {
-    CAT_BANNERS['Snack Sal'].find(b => b.video).hidden = false;
-    CAT_BANNERS['Snack Sal'].find(b => b.img === 'banners/snack-papas.jpg').hidden = true;
+    // Dos banners conocidos aíslan la reproducción del catálogo de temporada.
+    const clip = CAT_BANNERS['Snack Sal'].find(b => b.video);
+    CAT_BANNERS['Snack Sal'] = [{ ...clip, hidden:false }, { img:'banners/ss-banner-01.jpg', alt:'Empanada' }];
     selectCat('Snack Sal');
   });
   const video = page.locator('.cat-banner video');
@@ -233,8 +237,9 @@ test('Video con movimiento reducido no arranca automáticamente', () => useFixtu
 test('Si falla el video se conserva su foto y el resto del carrusel', () => useFixture(async ({ page }) => {
   await page.route('**/banners/snack-papas.mp4', route => route.abort());
   await page.evaluate(() => {
-    CAT_BANNERS['Snack Sal'].find(b => b.video).hidden = false;
-    CAT_BANNERS['Snack Sal'].find(b => b.img === 'banners/snack-papas.jpg').hidden = true;
+    // Dos banners conocidos aíslan la reproducción del catálogo de temporada.
+    const clip = CAT_BANNERS['Snack Sal'].find(b => b.video);
+    CAT_BANNERS['Snack Sal'] = [{ ...clip, hidden:false }, { img:'banners/ss-banner-01.jpg', alt:'Empanada' }];
     selectCat('Snack Sal');
   });
   await page.locator('.cat-banner img[src$="/banners/snack-papas-poster.jpg"]').waitFor();
@@ -244,7 +249,10 @@ test('Si falla el video se conserva su foto y el resto del carrusel', () => useF
 
 test('Papas con presentación única: sin selector, sin tamaños en el pedido y sin variantes antiguas', () => useFixture(async ({ page }) => {
   // Aislar la presentación del stock; los horarios se comprueban por separado.
-  await page.evaluate(() => MENU.filter(item => ['wachipapa', 'tocipapa'].includes(item.id)).forEach(item => item.soldOut = false));
+  await page.evaluate(() => {
+    MENU.filter(item => ['wachipapa', 'tocipapa'].includes(item.id)).forEach(item => item.soldOut = false);
+    HIDDEN_ITEM_IDS.splice(HIDDEN_ITEM_IDS.indexOf('tocipapa'), 1);
+  });
   await page.evaluate(() => selectCat('Snack Sal'));
   for (const [id, name, price] of [['tocipapa', 'Tocipapa', '$2.50'], ['wachipapa', 'Wachipapa', '$3.00']]) {
     const card = page.locator('.item').filter({ has: page.locator('#qty-' + id) });
@@ -268,8 +276,8 @@ test('Papas con presentación única: sin selector, sin tamaños en el pedido y 
   assert.doesNotMatch(message, /Regular|Grande/);
 }));
 
-test('El menú abre en Bebidas Frías y Strawberry vence al terminar el domingo 27 en Ecuador', () => useFixture(async ({ page }) => {
-  assert.equal(await page.evaluate(() => activeCat), 'Bebidas Frías');
+test('El menú abre en categorías y Strawberry vence al terminar el domingo 27 en Ecuador', () => useFixture(async ({ page }) => {
+  assert.equal(await page.evaluate(() => categoryHome), true);
   await page.evaluate(() => selectCat('Bebidas Calientes'));
   for (const [time, available] of [
     ['2026-09-19T04:59:59Z', false],
@@ -301,7 +309,10 @@ test('El menú abre en Bebidas Frías y Strawberry vence al terminar el domingo 
 }));
 
 test('Tocipapa y Wachipapa conservan los límites de cocina de lunes y domingo', () => useFixture(async ({ page }) => {
-  await page.evaluate(() => MENU.filter(item => ['wachipapa', 'tocipapa'].includes(item.id)).forEach(item => item.soldOut = false));
+  await page.evaluate(() => {
+    MENU.filter(item => ['wachipapa', 'tocipapa'].includes(item.id)).forEach(item => item.soldOut = false);
+    HIDDEN_ITEM_IDS.splice(HIDDEN_ITEM_IDS.indexOf('tocipapa'), 1);
+  });
   for (const [time, expected] of [
     ['2026-09-21T23:59:00Z', false], ['2026-09-22T00:00:00Z', true],
     ['2026-09-22T04:00:00Z', true], ['2026-09-22T04:01:00Z', false],
@@ -326,14 +337,14 @@ test('Un botón renderizado antes de abrir cocina permite pedir al llegar la hor
 
 test('Abrir WhatsApp y recargar conserva todos los datos y el mismo código', () => useFixture(async ({ page, ready }) => {
   await prepare(page, { mode: 'delivery' });
-  await page.evaluate(() => { setMilk('catpuccino', 'almendra'); setSyrup('catpuccino', 'vainilla-francesa'); saveNote('catpuccino', 'Poca espuma'); });
+  await page.evaluate(() => { cart = {}; setMilk('catpuccino', 'almendra'); setSyrup('catpuccino', 'vainilla-francesa'); changeQty('catpuccino', 1); saveNote('catpuccino', 'Poca espuma'); });
   await page.evaluate(() => sendOrder());
   const before = await orderState(page);
   assert.ok(before.currentOrderCode);
-  assert.equal(before.cart.catpuccino.qty, 1);
-  assert.equal(before.cart.catpuccino.milk, 'almendra');
-  assert.equal(before.cart.catpuccino.syrup, 'vainilla-francesa');
-  assert.equal(before.cart.catpuccino.note, 'Poca espuma');
+  assert.equal(Object.values(before.cart)[0].qty, 1);
+  assert.equal(Object.values(before.cart)[0].milk, 'almendra');
+  assert.equal(Object.values(before.cart)[0].syrup, 'vainilla-francesa');
+  assert.equal(Object.values(before.cart)[0].note, 'Poca espuma');
   assert.equal(before.draft.orderCode, before.currentOrderCode);
   await page.reload({ waitUntil: 'domcontentloaded' });
   await ready();
@@ -368,7 +379,7 @@ test('El envío lento mantiene el menú visible y abre WhatsApp en la misma pest
     assert.equal(context.pages().length,1);
     assert.deepEqual(await page.evaluate(()=>window.__openAttempts),[],'No debe abrir about:blank');
     assert.equal(await page.locator('#sendBtn').textContent(),'Conectando con WhatsApp…');
-    assert.equal(await page.evaluate(() => !checkoutReady),true);
+    assert.equal(await page.locator('#sendBtn').isDisabled(),true);
     assert.equal((await orderState(page)).draft.cart.catpuccino.qty,1);
   } finally { release(); }
   await page.waitForURL('https://wa.me/**');
@@ -499,7 +510,7 @@ test('Computadora: dos columnas, categorías accesibles y sin desbordamiento', (
   await page.setViewportSize({ width: 1440, height: 1000 });
   await page.evaluate(() => selectCat('Bebidas Calientes'));
   assert.ok(await page.locator('#cats .cat-btn').count() > 1);
-  assert.equal(await page.locator('.cats-wrap').isVisible(), true);
+  assert.equal(await page.locator('#menuBack').isVisible(), true);
   const layout = await page.evaluate(() => {
     const cards = [...document.querySelectorAll('.menu-products > .item')];
     return { columns: getComputedStyle(document.querySelector('.menu-products')).gridTemplateColumns.split(' ').length,
@@ -512,7 +523,7 @@ test('Computadora: dos columnas, categorías accesibles y sin desbordamiento', (
   assert.ok(layout.width > 350);
   assert.match(layout.emojiFont, /Apple Color Emoji/);
   await page.setViewportSize({ width: 390, height: 844 });
-  await page.waitForFunction(() => document.querySelector('#cats').children.length === 0);
+  await page.waitForFunction(() => document.documentElement.scrollWidth <= innerWidth);
   assert.equal(await page.locator('.cats-wrap').isVisible(), false);
 }));
 

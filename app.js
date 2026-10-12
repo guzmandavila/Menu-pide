@@ -45,7 +45,7 @@ const MENU = [
   { id:'milkishaki-salted-caramel', cat:'Bebidas Frías', name:'MilkiShaki - Salted Caramel', classic:'Milkshake', classicTheme:'fresh', order:4, desc:'Leche, helado premium y caramelo con un toque de sal.', price:4.9, milk:true, groupFeatured:true, featured:true, featuredTag:'Disponible', img:'assets/image-861d6d271de84321.jpg', group:'milkishaki', flavor:'Salted Caramel'  },
 
   // ---- Snacks ----
-  { id:'clowder-pizza', cat:'Snack Sal', name:'Clowder Pizza', desc:'Slice mediano de masa artesanal delgada, sin gluten, hecha por nosotros, con pomodoro artesanal, tomate fresco, queso mozzarella y un plus de parmesano.', price:2.50, img:'assets/clowder-pizza.png', featured:true, featuredTag:'NUEVO', featuredIcon:'🆕', order:0 },
+  { id:'clowder-pizza', cat:'Snack Sal', name:'Clowder Pizza', desc:'Slice mediano de masa artesanal delgada sin gluten, hecha por nosotros con aceite de oliva y sin huevo. Lleva pomodoro artesanal, tomate fresco, queso mozzarella y un plus de parmesano.', price:2.50, img:'assets/clowder-pizza.png', featured:true, featuredTag:'NUEVO', featuredIcon:'🆕', order:0 },
   { id:'tocipapa', cat:'Snack Sal', name:'Tocipapa', desc:'Papas corte recto con tocineta crocante y salsa de la casa. 120 g (20–25 g de tocineta).', price:2.5, soldOut:true, img:'assets/image-9fa7a5da9f5e3cb0.jpg' },
   { id:'wachipapa', cat:'Snack Sal', name:'Wachipapa', desc:'Papas corte recto con chorizo argentino y salsa mayochurri de la casa. 120 g (35–40 g de chorizo).', price:3.0, img:'banners/snack-papas.jpg' },
   { id:'empanada-pollo', cat:'Snack Sal', name:'Empanada de Hojaldre', desc:'Pechuga de pollo con nuestra salsa de vegetales. No te pierdas nuestro aderezo de mayonesa de la casa.', price:2.4, order:0, img:'assets/image-b46285ee20adcc24.jpg', group:'empanada', flavor:'Pollo' },
@@ -1687,16 +1687,39 @@ renderMenu();
   const splash = document.getElementById('introSplash');
   const video = document.getElementById('introVideo');
   if(!splash || !video) return;
+  const pinMenuToTop = () => {
+    window.scrollTo(0, 0);
+    document.documentElement.scrollTop = 0;
+    document.body.scrollTop = 0;
+    requestAnimationFrame(() => window.scrollTo(0, 0));
+  };
+  pinMenuToTop();
   let dismissed = false;
+  let fallbackTimer;
   const dismiss = () => {
     if(dismissed) return;
     dismissed = true;
+    clearTimeout(fallbackTimer);
+    video.pause();
+    pinMenuToTop();
+    const skipHadFocus = document.activeElement === document.getElementById('introSkip');
+    splash.inert = true;
     splash.classList.add('is-done');
+    if(skipHadFocus){
+      const menu = document.getElementById('menu');
+      menu.setAttribute('tabindex', '-1');
+      menu.focus({ preventScroll:true });
+    }
     window.setTimeout(() => splash.remove(), 850);
   };
+  document.getElementById('introSkip').addEventListener('click', dismiss);
+  if(window.matchMedia('(prefers-reduced-motion: reduce)').matches || navigator.connection?.saveData){
+    dismiss();
+    return;
+  }
   video.addEventListener('ended', dismiss, { once:true });
   video.addEventListener('error', dismiss, { once:true });
-  window.setTimeout(dismiss, 15000);
+  fallbackTimer = window.setTimeout(dismiss, 15000);
   video.play().catch(dismiss);
 })();
 updateBars();
