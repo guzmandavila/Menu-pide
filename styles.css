@@ -1117,3 +1117,14 @@ body{padding-bottom:calc(110px + env(safe-area-inset-bottom, 0px));}
 .bottom-navigation .cartbar .count{font-size:11px; padding:2px 6px;}
 .bottom-navigation .cartbar .right{font-size:12px;}
 .bottom-navigation .cartbar-arrow{display:none;}
+
+/* Columnas laterales iguales mantienen la categoría en el centro del encabezado. */
+.sticky-top.compact:not(.scrolled){display:grid; grid-template-columns:minmax(106px,1fr) minmax(0,auto) minmax(106px,1fr); gap:8px;}
+.sticky-top.compact:not(.scrolled) header,.sticky-top.compact:not(.scrolled) .header-actions{display:contents;}
+.sticky-top.compact:not(.scrolled) .header-primary-actions{grid-column:1; grid-row:1; justify-self:start;}
+.sticky-top.compact:not(.scrolled) .header-secondary-actions{grid-column:3; grid-row:1; justify-self:end; margin:0; padding:0; border:0;}
+.sticky-top.compact:not(.scrolled) .compact-cat-title{grid-column:2; grid-row:1; justify-self:center; justify-content:center; text-align:center; margin:0; max-width:100%; box-sizing:border-box;}
+@media(max-width:420px){
+ .sticky-top.compact:not(.scrolled){padding-left:12px; padding-right:12px; gap:6px;}
+ .sticky-top.compact:not(.scrolled) .compact-cat-title{font-size:15px; padding:7px 6px;}
+}
