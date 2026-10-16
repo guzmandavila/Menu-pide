@@ -118,6 +118,12 @@ async function orderState(page) {
 test('Todos los menús se muestran en móvil sin errores ni desbordamiento horizontal', () => useFixture(async ({ page }) => {
   const categories = await page.evaluate(() => [...CATS]);
   for (const category of categories) {
+    if (category === 'Bebida del Mes') {
+      assert.equal(await page.locator('.category-tile:disabled').count(), 1);
+      await page.evaluate(category => selectCat(category), category);
+      assert.equal(await page.locator('.category-home-view').count(), 1);
+      continue;
+    }
     await page.evaluate(category => selectCat(category), category);
     assert.ok(await page.locator('#menu .item').count(), `Categoría vacía: ${category}`);
     assert.ok(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth + 1), `Desborde: ${category}`);
@@ -146,6 +152,9 @@ test('Stock actual: helados, pollo y wachipapas disponibles; queso y tocipapas a
   assert.equal(result.restored['empanada-pollo'].qty, 8);
   await page.evaluate(() => selectCat('Snack Sal'));
   assert.doesNotMatch(await page.locator('#menu').textContent(), /Últimas 4 empanadas de pollo/);
+  assert.equal(await page.locator('#qty-empanada-capresse').count(), 1);
+  assert.equal(await page.evaluate(() => MENU.find(item => item.id === 'empanada-capresse').price === MENU.find(item => item.id === 'empanada-pollo').price), true);
+  await page.evaluate(() => { groupView.empanada = 'empanada-pollo'; renderMenu(); });
   assert.equal(await page.locator('#qty-empanada-pollo').count(), 1);
   assert.equal(await page.locator('#menu .cat-banner-slide img[src="banners/ss-banner-01.jpg"]').count(), 1);
 }));

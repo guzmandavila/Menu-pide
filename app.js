@@ -26,12 +26,11 @@ const MENU = [
   { id:'nimbus', cat:'Bebidas Frías', name:'Ice Moccatto', classic:'Mocaccino helado', classicTheme:'fresh', order:3, desc:'Espresso, leche y chocolate, bien fríos.', price:3.25, milk:true, img:'assets/image-de2fc99b743f1564.jpg' },
   { id:'vanilatte', cat:'Bebidas Frías', name:'Ice Latte', classic:'Latte helado', classicTheme:'fresh', order:2, syrupOption:['vainilla-francesa','caramelo-salado'], desc:'Espresso, leche y hielo.', price:2.75, milk:true, img:'assets/image-c2358fbf75d9fa28.jpg' },
 
-  { id:'banana-caramel-latte', cat:'Bebidas Frías', name:'Banana Caramel Latte', classic:'Latte helado de banana y caramelo', classicTheme:'fresh', order:2.5, desc:'Banana caramelizada, espresso y leche fría, con cold foam de vainilla y canela.', featured:true, featuredTag:'Bebida especial', promoNote:'Disponible hasta el 15 de octubre.', price:3.50, img:'banners/bf-banana-caramel-latte.jpeg' },
 
   // ---- Matcha ----
   { id:'nekomatchalatte', cat:'Matcha', name:'NekoMatchaLatte', syrupOption:['caramelo','vainilla'], desc:'Matcha y leche bien fría. Verde, suave y cremoso. Se bebe despacio, si te acuerdas.', price:3.5, milk:true, img:'assets/image-a21806fe3017f9d8.jpg' },
-  { id:'sakuramatcha-latte', cat:'Matcha', name:'SakuraMatcha Latte', desc:'Matcha, leche y puré real de fresa sobre hielo.', price:4.15, milk:true, img:'assets/image-73038c7da3c63e99.jpg' },
-  { id:'blueberry-matcha', cat:'Matcha', name:'Blueberry Matcha', desc:'Matcha, leche y puré real de arándano sobre hielo.', price:4.45, milk:true, img:'assets/blueberry-matcha.jpeg' },
+  { id:'sakuramatcha-latte', soldOut:true, cat:'Matcha', name:'SakuraMatcha Latte', desc:'Matcha, leche y puré real de fresa sobre hielo.', price:4.15, milk:true, img:'assets/image-73038c7da3c63e99.jpg' },
+  { id:'blueberry-matcha', order:0, cat:'Matcha', name:'Blueberry Matcha', desc:'Matcha, leche y puré real de arándano sobre hielo.', price:4.45, milk:true, img:'assets/blueberry-matcha.jpeg' },
 
   // ---- Panadería ----
   { id:'galleta', cat:'Snack Dulce', name:'Galleta', desc:'Gordita, hecha con mix de harinas sin gluten y trozos de chocolate sin leche.', price:2.0, soldOut:true, img:'assets/galleta.jpeg' },
@@ -45,9 +44,10 @@ const MENU = [
   { id:'milkishaki-salted-caramel', cat:'Bebidas Frías', name:'MilkiShaki - Salted Caramel', classic:'Milkshake', classicTheme:'fresh', order:4, desc:'Leche, helado premium y caramelo con un toque de sal.', price:4.9, milk:true, groupFeatured:true, featured:true, featuredTag:'Disponible', img:'assets/image-861d6d271de84321.jpg', group:'milkishaki', flavor:'Salted Caramel'  },
 
   // ---- Snacks ----
-  { id:'clowder-pizza', cat:'Snack Sal', name:'Clowder Pizza', desc:'Slice mediano de masa artesanal delgada sin gluten, hecha por nosotros con aceite de oliva y sin huevo. Lleva pomodoro artesanal, tomate fresco, queso mozzarella y un plus de parmesano.', price:2.50, img:'assets/clowder-pizza.png', featured:true, featuredTag:'NUEVO', featuredIcon:'🆕', order:0 },
+  { id:'clowder-pizza', cat:'Snack Sal', name:'Clowder Pizza', desc:'Pizza redonda personal de masa artesanal delgada sin gluten, hecha por nosotros con aceite de oliva y sin huevo. Lleva pomodoro artesanal, tomate fresco, queso mozzarella, un plus de parmesano y jamón Virginia de pura carne de cerdo, sin embutidos.', price:5.50, img:'assets/clowder-pizza-virginia.png', featured:true, featuredTag:'NUEVO', featuredIcon:'🆕', order:0 },
   { id:'tocipapa', cat:'Snack Sal', name:'Tocipapa', desc:'Papas corte recto con tocineta crocante y salsa de la casa. 120 g (20–25 g de tocineta).', price:2.5, soldOut:true, img:'assets/image-9fa7a5da9f5e3cb0.jpg' },
   { id:'wachipapa', cat:'Snack Sal', name:'Wachipapa', desc:'Papas corte recto con chorizo argentino y salsa mayochurri de la casa. 120 g (35–40 g de chorizo).', price:3.0, img:'banners/snack-papas.jpg' },
+  { id:'empanada-capresse', cat:'Snack Sal', name:'Empanada de Hojaldre', desc:'Pomodoro Clowder, queso mozzarella de búfala, tomates frescos y albahaca cuidadosamente trabajada, en hojaldre horneado y crocante. Acompañada de nuestra salsa pesto.', price:2.4, order:0, img:'assets/empanada-capresse.jpeg', group:'empanada', flavor:'Capresse' },
   { id:'empanada-pollo', cat:'Snack Sal', name:'Empanada de Hojaldre', desc:'Pechuga de pollo con nuestra salsa de vegetales. No te pierdas nuestro aderezo de mayonesa de la casa.', price:2.4, order:0, img:'assets/image-b46285ee20adcc24.jpg', group:'empanada', flavor:'Pollo' },
   { id:'empanada-queso', soldOut:true, cat:'Snack Sal', name:'Empanada de Hojaldre', desc:'Hojaldre horneado y crocante, relleno de queso.', price:1.5, order:0, img:'assets/image-b46285ee20adcc24.jpg', group:'empanada', flavor:'Queso' },
   { id:'empanada-pizza', cat:'Snack Sal', name:'Empanada de Hojaldre', desc:'Hojaldre horneado y crocante, relleno de queso mozzarella y tocineta.', price:0, img:'assets/image-b46285ee20adcc24.jpg', group:'empanada', flavor:'Pizza', comingSoon:true },
@@ -105,10 +105,11 @@ MENU.forEach(item => {
   if (!ICE_CREAM_AVAILABLE && item.scoop) item.scoop = false;
 });
 // Bebidas temporalmente agotadas; se mantienen visibles en el menú.
-const SOLD_OUT_DRINK_IDS = ['banana-caramel-latte'];
+const SOLD_OUT_DRINK_IDS = ['pumpkin-spice-caliente', 'pumpkin-spice-frio'];
 MENU.forEach(item => {
   if (SOLD_OUT_DRINK_IDS.includes(item.id)) {
     item.soldOut = true;
+    item.soldOutNote = 'Esta bebida del mes se agotó. ¡Pronto tendremos una nueva!';
     delete item.comingSoon;
   }
 });
@@ -123,6 +124,7 @@ MENU.forEach(item => {
 /* Banners por categoría: usa img para fotos o video + poster para clips. */
 const CAT_BANNERS = {
   'Matcha': [
+    { productId:'blueberry-matcha', img:'banners/blueberry-matcha.jpeg', alt:'Blueberry Matcha de Clowder' },
     { img:'banners/mt-banner-01.jpg', alt:'Matcha Clowder' },
   ],
   'Bebidas Calientes': [
@@ -135,13 +137,12 @@ const CAT_BANNERS = {
     { productId:'funbite', img:'assets/funbite.jpeg', alt:'Funbite — cupcake con cobertura cremosa y chips de colores' },
   ],
   'Snack Sal': [
-    { productId:'clowder-pizza', img:'assets/clowder-pizza-banner-octubre.jpeg', alt:'Clowder Pizza de queso mozzarella' },
+    { productId:'clowder-pizza', img:'assets/clowder-pizza-banner-octubre.jpeg', alt:'Clowder Pizza redonda personal con queso mozzarella y jamón Virginia de pura carne de cerdo' },
     { img:'banners/snack-papas.jpg', alt:'Papas y carne grillada en un vaso Clowder' },
     { hidden:true, video:'banners/snack-papas.mp4', poster:'banners/snack-papas-poster.jpg', alt:'Papas Clowder, recién preparadas' },
     { img:'banners/ss-banner-01.jpg', alt:'Empanada de pollo — vegetales frescos picaditos y pechuga de pollo mechada' },
   ],
   'Bebidas Frías': [
-    { productId:'banana-caramel-latte', img:'banners/bf-banana-caramel-latte.jpeg', alt:'Banana Caramel Latte — banana caramelizada, espresso y leche bien fría' },
     { img:'banners/bf-banner-02.jpg', alt:'Berry Bloom — limonada con salsa de fresa, refrescante y sin café' },
   ],
   'Bebida del Mes': [
@@ -456,7 +457,7 @@ function expandCats(updateHistory = true){
   window.scrollTo({top:0, behavior:'smooth'});
 }
 function selectCat(c, updateHistory = true){
-  if(!visibleCats().includes(c)) return;
+  if(c === 'Bebida del Mes' || !visibleCats().includes(c)) return;
   if(updateHistory && (categoryHome || activeCat !== c)) {
     if(categoryHome) history.pushState({clowderMenu:true, category:c}, '', location.href);
     else history.replaceState({clowderMenu:true, category:c}, '', location.href);
@@ -481,6 +482,7 @@ const FLAVOR_COLORS = {
   'Búfala': '#E8D9B0',
   'Queso': '#F2E5A1',
   'Pollo': '#C9A876',
+  'Capresse': '#7B9B59',
   'Pizza': '#C0392B',
   'Zanahoria': '#D2691E',
   'Banana': '#F0D264',
@@ -554,7 +556,9 @@ function categoryThumbnail(category){
   // La portada de Matcha debe usar su banner; para estas categorías elegimos
   // una imagen de producto concreta para evitar fotos estacionales o repetidas.
   if(category === 'Matcha'){
-    const matchaBanner = banners.find(banner => !banner.hidden && banner.img);
+    const blueberry = MENU.find(item => item.id === 'blueberry-matcha');
+    if(blueberry?.img) return blueberry.img;
+    const matchaBanner = banners.find(banner => !banner.hidden && banner.img && !banner.productId);
     if(matchaBanner) return matchaBanner.img;
   }
   if(category === 'Bebidas Calientes') return 'miniaturas/bf-affocato.jpg';
@@ -573,7 +577,7 @@ function renderCategoryHome(){
     const color = catColor(category);
     const imageScale = category === 'Bebidas Calientes' ? '1.4' : '1';
     const imagePosition = category === 'Snack Dulce' ? '50% 0%' : '50% 50%';
-    return `<button type="button" class="category-tile" style="--tile-accent:${color};--tile-pill-text:${textColorFor(color)};--tile-image-scale:${imageScale};--tile-image-position:${imagePosition}" onclick="selectCat('${escapeHtml(category)}')" aria-label="Abrir categoría ${escapeHtml(category)}"><img src="${escapeHtml(image)}" alt="" loading="eager" decoding="async"><span class="category-tile-shade"></span><span class="category-tile-name">${escapeHtml(category)}</span></button>`;
+    return `<button type="button" class="category-tile" ${category === 'Bebida del Mes' ? 'disabled aria-disabled="true"' : ''} style="--tile-accent:${color};--tile-pill-text:${textColorFor(color)};--tile-image-scale:${imageScale};--tile-image-position:${imagePosition}" onclick="selectCat('${escapeHtml(category)}')" aria-label="Abrir categoría ${escapeHtml(category)}"><img src="${escapeHtml(image)}" alt="" loading="eager" decoding="async"><span class="category-tile-shade"></span><span class="category-tile-name">${escapeHtml(category)}${category === 'Bebida del Mes' ? ' · Próximamente' : ''}</span></button>`;
   }).join('');
   return `<section class="category-home-view" aria-label="Categorías del menú"><div class="category-home-grid">${tiles}</div></section>`;
 }
@@ -648,7 +652,7 @@ function renderMenu(){
     // Así la tarjeta no se llena con el estado "Cerrado" repetido.
     const badgeText = i.comingSoon ? (i.comingSoonLabel || 'Próximamente') : (i.soldOut ? 'Agotado' : null);
     const badgeClass = i.comingSoon ? 'coming-soon-price' : (i.soldOut ? 'sold-out-price' : '');
-    const unavailableNote = i.comingSoon ? (i.comingSoonNote || 'Todavía no está disponible para pedir.') : (i.soldOut ? 'Se agotó por hoy — vuelve pronto.' : '');
+    const unavailableNote = i.comingSoon ? (i.comingSoonNote || 'Todavía no está disponible para pedir.') : (i.soldOut ? (i.soldOutNote || 'Se agotó por hoy — vuelve pronto.') : '');
     const variantSelect = i.__isGroup ? `
       <select class="variant-select" style="background-color:${flavorColor}; color:${flavorText}; background-image:${arrowSvg(flavorText)};" onchange="selectVariant('${i.__group}', this.value)">
         ${i.__variants.map(v=>`<option value="${v.id}" ${v.id===i.id?'selected':''}>${v.flavor}${v.comingSoon ? ' — Vuelve pronto' : ''}</option>`).join('')}
