@@ -130,7 +130,7 @@ test('Todos los menús se muestran en móvil sin errores ni desbordamiento horiz
   }
 }));
 
-test('Stock actual: helados, pollo y wachipapas disponibles; queso y tocipapas agotados', () => useFixture(async ({ page }) => {
+test('Stock actual: helados y pollo disponibles; queso, wachipapas y tocipapas agotados', () => useFixture(async ({ page }) => {
   const result = await page.evaluate(() => {
     const ids = ['affocato', 'milkishaki-nutella', 'milkishaki-fresa', 'milkishaki-salted-caramel'];
     changeQty('empanada-queso', 1);
@@ -138,7 +138,7 @@ test('Stock actual: helados, pollo y wachipapas disponibles; queso y tocipapas a
     return {
       iceCream: ids.map(id => isItemOrderable(MENU.find(item => item.id === id))),
       cheese: !!cart['empanada-queso'], chicken: !!cart['empanada-pollo'],
-      potatoes: ['wachipapa', 'tocipapa'].map(id => isItemOrderable(MENU.find(item => item.id === id))),
+      potatoes: ['wachipapa', 'tocipapa', 'papas-fritas'].map(id => isItemOrderable(MENU.find(item => item.id === id))),
       restored: sanitizeCart({ 'empanada-pollo': { qty: 8 }, 'tocipapa': { qty: 1 }, 'tocipapa-grande': { qty: 1 }, 'empanada-queso': { qty: 1 }, 'banana-bread-latte': { qty: 1 }, 'combo-cafe-empanada-queso': { qty: 1 } }),
       hidden: !CATS.includes('Combos') && CATS.includes('Bebida del Mes'),
     };
@@ -146,7 +146,7 @@ test('Stock actual: helados, pollo y wachipapas disponibles; queso y tocipapas a
   assert.deepEqual(result.iceCream, [true, true, true, true]);
   assert.equal(result.cheese, false);
   assert.equal(result.chicken, true);
-  assert.deepEqual(result.potatoes, [true, false]);
+  assert.deepEqual(result.potatoes, [false, false, true]);
   assert.equal(result.hidden, true);
   assert.deepEqual(Object.keys(result.restored), ['empanada-pollo']);
   assert.equal(result.restored['empanada-pollo'].qty, 8);
@@ -341,10 +341,10 @@ test('Tocipapa y Wachipapa conservan los límites de cocina de lunes y domingo',
 
 test('Un botón renderizado antes de abrir cocina permite pedir al llegar la hora', () => useFixture(async ({ page }) => {
   await page.evaluate(() => { window.__setTestTime('2026-09-21T23:59:00Z'); selectCat('Snack Sal'); });
-  const plus = page.locator('#qty-wachipapa').locator('..').locator('button').last();
+  const plus = page.locator('#qty-papas-fritas').locator('..').locator('button').last();
   await page.evaluate(() => window.__setTestTime('2026-09-22T00:00:00Z'));
   await plus.click();
-  assert.equal((await orderState(page)).cart.wachipapa?.qty, 1);
+  assert.equal((await orderState(page)).cart['papas-fritas']?.qty, 1);
 }));
 
 test('Abrir WhatsApp y recargar conserva todos los datos y el mismo código', () => useFixture(async ({ page, ready }) => {

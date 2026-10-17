@@ -47,7 +47,8 @@ const MENU = [
   // ---- Snacks ----
   { id:'clowder-pizza', cat:'Snack Sal', name:'Clowder Pizza', desc:'Pizza redonda personal de masa artesanal delgada sin gluten, hecha por nosotros con aceite de oliva y sin huevo. Lleva pomodoro artesanal, tomate fresco, queso mozzarella, un plus de parmesano y jamón Virginia de pura carne de cerdo, sin embutidos.', price:5.50, img:'assets/clowder-pizza-virginia.png', featured:true, featuredTag:'NUEVO', featuredIcon:'🆕', order:0 },
   { id:'tocipapa', cat:'Snack Sal', name:'Tocipapa', desc:'Papas corte recto con tocineta crocante y salsa de la casa. 120 g (20–25 g de tocineta).', price:2.5, soldOut:true, img:'assets/image-9fa7a5da9f5e3cb0.jpg' },
-  { id:'wachipapa', cat:'Snack Sal', name:'Wachipapa', desc:'Papas corte recto con chorizo argentino y salsa mayochurri de la casa. 120 g (35–40 g de chorizo).', price:3.0, img:'banners/snack-papas.jpg' },
+  { id:'papas-fritas', cat:'Snack Sal', name:'Papas fritas', desc:'Papas fritas solas, acompañadas de mayonesa de la casa.', price:2.00, img:'assets/papas-fritas-stock.jpeg', processTag:'♨️ Freidora de aire', order:0 },
+  { id:'wachipapa', soldOut:true, cat:'Snack Sal', name:'Wachipapa', desc:'Papas corte recto con chorizo argentino y salsa mayochurri de la casa. 120 g (35–40 g de chorizo).', price:3.0, img:'banners/snack-papas.jpg' },
   { id:'empanada-capresse', cat:'Snack Sal', name:'Empanada de Hojaldre', desc:'Pomodoro Clowder, queso mozzarella de búfala, tomates frescos y albahaca cuidadosamente trabajada, en hojaldre horneado y crocante. Acompañada de nuestra salsa pesto.', price:1.8, order:0, img:'assets/empanada-capresse.jpeg', group:'empanada', flavor:'Capresse' },
   { id:'empanada-pollo', cat:'Snack Sal', name:'Empanada de Hojaldre', desc:'Pechuga de pollo con nuestra salsa de vegetales. No te pierdas nuestro aderezo de mayonesa de la casa.', price:2.4, order:0, img:'assets/image-b46285ee20adcc24.jpg', group:'empanada', flavor:'Pollo' },
   { id:'empanada-queso', soldOut:true, cat:'Snack Sal', name:'Empanada de Hojaldre', desc:'Hojaldre horneado y crocante, relleno de queso.', price:1.5, order:0, img:'assets/image-b46285ee20adcc24.jpg', group:'empanada', flavor:'Queso' },
@@ -987,7 +988,7 @@ const STORE_CATS = ['Congelados y Más','Merch Clowder'];
 function isStoreCat(c){ return STORE_CATS.includes(c); }
 
 // Wachi y Toci requieren el horario de cocina; el resto conserva su disponibilidad.
-const KITCHEN_HOURS_ITEM_IDS = ['wachipapa', 'tocipapa'];
+const KITCHEN_HOURS_ITEM_IDS = ['wachipapa', 'tocipapa', 'papas-fritas'];
 const FULL_MENU_ORDERING_ENABLED = true; // Permite pedidos fuera del horario habitual.
 const ALWAYS_OPEN_CATS = ['Bebidas Calientes', 'Congelados y Más', 'Combos'];
 const ALWAYS_OPEN_GROUPS = ['empanada']; // se puede pedir a cualquier hora, sin importar su categoría
@@ -1392,7 +1393,7 @@ function showUnavailableNotice(id){
     return;
   }
   if(item && KITCHEN_HOURS_ITEM_IDS.includes(item.id)){
-    openHours('Horario de papas', 'Wachipapas y Tocipapas: lunes a sábado de 19:00 a 23:00; domingos de 18:30 a 22:30.');
+    openHours('Horario de papas', 'Papas fritas, Wachipapas y Tocipapas: lunes a sábado de 19:00 a 23:00; domingos de 18:30 a 22:30.');
     return;
   }
   showClosedNotice();
