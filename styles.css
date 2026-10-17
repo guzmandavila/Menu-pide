@@ -1200,12 +1200,5 @@ body.category-home .bottom-navigation:not(:has(.cartbar.show)){display:none;}
  .bottom-navigation .cartbar .right{font-size:14px; white-space:nowrap;}
 }
 
-/* Bebida del mes agotada: presentación en blanco y negro. */
-#menu:has(#menu-group-pumpkin-spice-latte) .cat-banner,
-#menu-group-pumpkin-spice-latte,
-.category-tile:has(img[src="assets/pumpkin-spice-latte.jpg"]) {
-  filter: grayscale(1);
-}
-
 .category-tile:disabled { cursor: default; }
 .category-tile:disabled:hover img { transform:scale(var(--tile-image-scale,1)); }
