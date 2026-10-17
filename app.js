@@ -89,7 +89,7 @@ if (miniCake) {
   miniCake.featuredTag = 'MINICAKE DE LA SEMANA';
 }
 // Productos pausados en el menú; se pueden reactivar quitando su ID de esta lista.
-const HIDDEN_ITEM_IDS = ['mini-cake-del-dia', 'brownie', 'tocipapa', 'banana-bread-latte'];
+const HIDDEN_ITEM_IDS = ['mini-cake-del-dia', 'brownie', 'tocipapa', 'banana-bread-latte', 'cupcake-banana'];
 // Información de preparación visible en cada tarjeta.
 ['wachipapa','tocipapa'].forEach(id => {
   const item = MENU.find(product => product.id === id);
@@ -135,7 +135,6 @@ const CAT_BANNERS = {
   ],
   'Snack Dulce': [
     { productId:'boo-cupcake', img:'assets/boo-cupcake.jpeg', alt:'Boo Cupcake — nuestro cupcake de Halloween con harinas sin gluten, naranja y buttercream' },
-    { productId:'cupcake-banana', img:'assets/cupcake-banana.jpeg', alt:'Pumpkin Cupcake Clowder — calabaza con chispas de chocolate, gluten free' },
     { productId:'galleta', img:'assets/galleta.jpeg', alt:'Galleta Clowder con trozos de chocolate' },
     { productId:'funbite', img:'assets/funbite.jpeg', alt:'Funbite — cupcake con cobertura cremosa y chips de colores' },
   ],
@@ -1457,7 +1456,7 @@ async function registerSharedOrder(apiUrl, order){
   const timeout = setTimeout(() => controller.abort(), 15000);
   try {
     const response = await fetch(url.href.replace(/\/$/, '') + '/api/orders', {
-      method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify(order), signal:controller.signal
+      method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify(order), signal:controller.signal, keepalive:true
     });
     const result = await response.json();
     if(!response.ok) throw new Error(result.error || 'No pudimos registrar el pedido.');
@@ -1576,13 +1575,18 @@ async function sendOrder(){
   updateBars();
   try {
     const contact = await MenuContact.refresh();
-    await registerSharedOrder(contact.ordersApiUrl, sharedOrder);
+    // El registro compartido no debe impedir abrir WhatsApp si el servicio externo está lento o caído.
+    const registration = registerSharedOrder(contact.ordersApiUrl, sharedOrder).then(() => true, () => false);
+    const registered = await Promise.race([registration, new Promise(resolve => setTimeout(() => resolve(false), 1200))]);
     if(transfer) msg += `🏦 Cuentas: ${contact.paymentsUrl}\n`;
     msg += `📸 Instagram: ${contact.instagramUrl}\n`;
     msg += `💬 Comunidad: ${contact.communityUrl}`;
     const destination = MenuContact.url(msg);
     // Un enlace directo conserva el gesto del cliente si el navegador bloquea la apertura.
     document.getElementById('whatsappRecoveryLink').href = destination;
+    document.getElementById('whatsappRecoveryMessage').textContent = registered
+      ? 'Tu pedido quedó registrado. Si WhatsApp no se abrió,'
+      : 'El pedido sigue guardado en este teléfono, pero la app no confirmó el registro. Puedes enviarlo por WhatsApp; si no se abrió,';
     document.getElementById('whatsappRecovery').hidden = false;
     try {
       MenuContact.navigate(target, destination);
