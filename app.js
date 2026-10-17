@@ -89,7 +89,7 @@ if (miniCake) {
   miniCake.featuredTag = 'MINICAKE DE LA SEMANA';
 }
 // Productos pausados en el menú; se pueden reactivar quitando su ID de esta lista.
-const HIDDEN_ITEM_IDS = ['mini-cake-del-dia', 'brownie', 'tocipapa'];
+const HIDDEN_ITEM_IDS = ['mini-cake-del-dia', 'brownie', 'tocipapa', 'banana-bread-latte'];
 // Información de preparación visible en cada tarjeta.
 ['wachipapa','tocipapa'].forEach(id => {
   const item = MENU.find(product => product.id === id);
@@ -107,7 +107,7 @@ MENU.forEach(item => {
   if (!ICE_CREAM_AVAILABLE && item.scoop) item.scoop = false;
 });
 // Bebidas temporalmente agotadas; se mantienen visibles en el menú.
-const SOLD_OUT_DRINK_IDS = ['pumpkin-spice-caliente', 'pumpkin-spice-frio'];
+const SOLD_OUT_DRINK_IDS = [];
 MENU.forEach(item => {
   if (SOLD_OUT_DRINK_IDS.includes(item.id)) {
     item.soldOut = true;
