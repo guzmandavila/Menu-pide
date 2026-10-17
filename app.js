@@ -459,7 +459,7 @@ function expandCats(updateHistory = true){
   window.scrollTo({top:0, behavior:'smooth'});
 }
 function selectCat(c, updateHistory = true){
-  if(c === 'Bebida del Mes' || !visibleCats().includes(c)) return;
+  if(!visibleCats().includes(c)) return;
   if(updateHistory && (categoryHome || activeCat !== c)) {
     if(categoryHome) history.pushState({clowderMenu:true, category:c}, '', location.href);
     else history.replaceState({clowderMenu:true, category:c}, '', location.href);
@@ -579,7 +579,7 @@ function renderCategoryHome(){
     const color = catColor(category);
     const imageScale = category === 'Bebidas Calientes' ? '1.4' : '1';
     const imagePosition = category === 'Snack Dulce' ? '50% 0%' : '50% 50%';
-    return `<button type="button" class="category-tile" ${category === 'Bebida del Mes' ? 'disabled aria-disabled="true"' : ''} style="--tile-accent:${color};--tile-pill-text:${textColorFor(color)};--tile-image-scale:${imageScale};--tile-image-position:${imagePosition}" onclick="selectCat('${escapeHtml(category)}')" aria-label="Abrir categoría ${escapeHtml(category)}"><img src="${escapeHtml(image)}" alt="" loading="eager" decoding="async"><span class="category-tile-shade"></span><span class="category-tile-name">${escapeHtml(category)}${category === 'Bebida del Mes' ? ' · Próximamente' : ''}</span></button>`;
+    return `<button type="button" class="category-tile" style="--tile-accent:${color};--tile-pill-text:${textColorFor(color)};--tile-image-scale:${imageScale};--tile-image-position:${imagePosition}" onclick="selectCat('${escapeHtml(category)}')" aria-label="Abrir categoría ${escapeHtml(category)}"><img src="${escapeHtml(image)}" alt="" loading="eager" decoding="async"><span class="category-tile-shade"></span><span class="category-tile-name">${escapeHtml(category)}</span></button>`;
   }).join('');
   return `<section class="category-home-view" aria-label="Categorías del menú"><div class="category-home-grid">${tiles}</div></section>`;
 }
