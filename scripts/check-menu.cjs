@@ -159,7 +159,7 @@ test('Stock actual: helados y pollo disponibles; queso, wachipapas y tocipapas a
   assert.equal(await page.evaluate(() => MENU.find(item => item.id === 'empanada-pizza').img === MENU.find(item => item.id === 'empanada-pollo').img), true);
   await page.evaluate(() => { groupView.empanada = 'empanada-pollo'; renderMenu(); });
   assert.equal(await page.locator('#qty-empanada-pollo').count(), 1);
-  assert.equal(await page.locator('#menu .cat-banner-slide img[src="banners/ss-banner-01.jpg"]').count(), 1);
+  assert.equal(await page.locator('#menu .cat-banner-slide img[src="banners/empanadas-octubre.jpeg"]').count(), 1);
 }));
 
 test('Chocolate disponible y opciones de avellana retiradas', () => useFixture(async ({ page }) => {

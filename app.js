@@ -139,10 +139,10 @@ const CAT_BANNERS = {
     { productId:'funbite', img:'assets/funbite.jpeg', alt:'Funbite — cupcake con cobertura cremosa y chips de colores' },
   ],
   'Snack Sal': [
+    { img:'banners/empanadas-octubre.jpeg', alt:'Empanadas hojaldradas Clowder: Posho con pollo mechado y vegetales por $2,40; Pizza por $2,40; Capresse por $1,80. Pide por nuestra app.' },
     { productId:'clowder-pizza', img:'assets/clowder-pizza-banner-octubre.jpeg', alt:'Clowder Pizza redonda personal con queso mozzarella y jamón Virginia de pura carne de cerdo' },
     { img:'banners/snack-papas.jpg', alt:'Papas y carne grillada en un vaso Clowder' },
     { hidden:true, video:'banners/snack-papas.mp4', poster:'banners/snack-papas-poster.jpg', alt:'Papas Clowder, recién preparadas' },
-    { img:'banners/ss-banner-01.jpg', alt:'Empanada de pollo — vegetales frescos picaditos y pechuga de pollo mechada' },
   ],
   'Bebidas Frías': [
     { img:'banners/bf-banner-02.jpg', alt:'Berry Bloom — limonada con salsa de fresa, refrescante y sin café' },
