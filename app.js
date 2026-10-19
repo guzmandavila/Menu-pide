@@ -20,7 +20,7 @@ const MENU = [
 
   // ---- Bebidas Frías ----
   { id:'affocato', cat:'Bebidas Calientes', name:'AffoCato', desc:'Helado de vainilla Madagascar con espresso doble.', price:3.00, img:'miniaturas/bf-affocato.jpg' },
-  { id:'berrybloom', cat:'Bebidas Frías', name:'BerryBloom', classic:'Limonada de fresa', classicTheme:'fresh', order:6, desc:'Fresa, limón y miel sobre hielo.', price:2.75, img:'assets/image-45bed35fc31fb6b1.jpg' },
+  { id:'berrybloom', soldOut:true, cat:'Bebidas Frías', name:'BerryBloom', classic:'Limonada de fresa', classicTheme:'fresh', order:6, desc:'Fresa, limón y miel sobre hielo.', price:2.75, img:'assets/image-45bed35fc31fb6b1.jpg' },
   { id:'ice-koffin', cat:'Bebidas Frías', name:'Ice Koffin', classic:'Americano helado', classicTheme:'fresh', order:1, desc:'Espresso, agua y hielo.', price:2.00, img:'assets/image-cc920e9b95fa9297.jpg' },
   { id:'nara-sunset', cat:'Bebidas Frías', name:'Nara Sunset', classic:'Naranja y café', classicTheme:'fresh', order:5, desc:'Naranja y café sobre hielo.', price:3.5, img:'assets/image-564f15ba92421bf9.jpg' },
   { id:'nimbus', cat:'Bebidas Frías', name:'Ice Moccatto', classic:'Mocaccino helado', classicTheme:'fresh', order:3, desc:'Espresso, leche y chocolate, bien fríos.', price:3.25, milk:true, img:'assets/image-de2fc99b743f1564.jpg' },
