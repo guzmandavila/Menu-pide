@@ -45,7 +45,7 @@ const MENU = [
   { id:'milkishaki-salted-caramel', cat:'Bebidas Frías', name:'MilkiShaki - Salted Caramel', classic:'Milkshake', classicTheme:'fresh', order:4, desc:'Leche, helado premium y caramelo con un toque de sal.', price:4.9, milk:true, groupFeatured:true, featured:true, featuredTag:'Disponible', img:'assets/image-861d6d271de84321.jpg', group:'milkishaki', flavor:'Salted Caramel'  },
 
   // ---- Snacks ----
-  { id:'clowder-pizza', soldOut:true, soldOutNote:'¡Gracias por todo su cariño! La Clowder Pizza se agotó. ❤️', cat:'Snack Sal', name:'Clowder Pizza', desc:'Pizza redonda personal de masa artesanal delgada sin gluten, hecha por nosotros con aceite de oliva y sin huevo. Lleva pomodoro artesanal, tomate fresco, queso mozzarella, un plus de parmesano y jamón Virginia de pura carne de cerdo, sin embutidos.', price:5.50, img:'assets/clowder-pizza-virginia.png', featured:true, featuredTag:'NUEVO', featuredIcon:'🆕', order:0 },
+  { id:'clowder-pizza', soldOut:true, soldOutNote:'Consultando disponibilidad de las 5 pizzas…', cat:'Snack Sal', name:'Clowder Pizza', desc:'Pizza redonda personal de masa artesanal delgada sin gluten, hecha por nosotros con aceite de oliva y sin huevo. Lleva pomodoro artesanal, tomate fresco, queso mozzarella, un plus de parmesano y jamón Virginia de pura carne de cerdo, sin embutidos.', price:5.50, img:'assets/clowder-pizza-virginia.png', featured:true, featuredTag:'NUEVO', featuredIcon:'🆕', order:0 },
   { id:'tocipapa', cat:'Snack Sal', name:'Tocipapa', desc:'Papas corte recto con tocineta crocante y salsa de la casa. 120 g (20–25 g de tocineta).', price:2.5, soldOut:true, img:'assets/image-9fa7a5da9f5e3cb0.jpg' },
   { id:'papas-fritas', cat:'Snack Sal', name:'Papas fritas', desc:'Papas fritas solas, acompañadas de mayonesa de la casa.', price:2.00, img:'assets/papas-fritas-stock.jpeg', processTag:'♨️ Freidora de aire', order:0 },
   { id:'wachipapa', soldOut:true, cat:'Snack Sal', name:'Wachipapa', desc:'Papas corte recto con chorizo argentino y salsa mayochurri de la casa. 120 g (35–40 g de chorizo).', price:3.0, img:'banners/snack-papas.jpg' },
@@ -1576,8 +1576,17 @@ async function sendOrder(){
   try {
     const contact = await MenuContact.refresh();
     // El registro compartido no debe impedir abrir WhatsApp si el servicio externo está lento o caído.
-    const registration = registerSharedOrder(contact.ordersApiUrl, sharedOrder).then(() => true, () => false);
-    const registered = await Promise.race([registration, new Promise(resolve => setTimeout(() => resolve(false), 1200))]);
+    const hasPizza = entries.some(([id]) => productForCartLine(id)?.id === 'clowder-pizza');
+    let registered;
+    if(hasPizza){
+      if(!contact.ordersApiUrl) throw new Error('No pudimos verificar las pizzas disponibles.');
+      await registerSharedOrder(contact.ordersApiUrl, sharedOrder);
+      registered = true;
+      refreshPizzaAvailability();
+    }else{
+      const registration = registerSharedOrder(contact.ordersApiUrl, sharedOrder).then(() => true, () => false);
+      registered = await Promise.race([registration, new Promise(resolve => setTimeout(() => resolve(false), 1200))]);
+    }
     if(transfer) msg += `🏦 Cuentas: ${contact.paymentsUrl}\n`;
     msg += `📸 Instagram: ${contact.instagramUrl}\n`;
     msg += `💬 Comunidad: ${contact.communityUrl}`;
@@ -1602,6 +1611,7 @@ async function sendOrder(){
     const message = document.getElementById('contactError');
     message.textContent = (error.message && error.name !== 'AbortError' ? error.message + ' ' : '') + 'No pudimos completar el envío. Revisa tu conexión e inténtalo otra vez. Tu pedido sigue guardado.';
     message.hidden = false;
+    refreshPizzaAvailability();
   } finally {
     sendingOrder = false;
     document.getElementById('sendBtn').textContent = `Continuar en WhatsApp · $${grandTotal().toFixed(2)}`;
@@ -1788,3 +1798,30 @@ if ('serviceWorker' in navigator) {
     }).catch(() => {});
   });
 }
+
+// Shared stock is verified on the server before any pizza order opens WhatsApp.
+async function refreshPizzaAvailability(){
+  const pizza = MENU.find(item => item.id === 'clowder-pizza');
+  try {
+    const contact = await MenuContact.refresh();
+    if(!contact.ordersApiUrl) throw new Error('Sin servicio de existencias');
+    const response = await fetch(contact.ordersApiUrl.replace(/\/$/, '') + '/api/availability', {cache:'no-store', signal:AbortSignal.timeout(10000)});
+    if(!response.ok) throw new Error('Sin disponibilidad');
+    const remaining = (await response.json())['clowder-pizza'];
+    if(!Number.isInteger(remaining) || remaining < 0 || remaining > 5) throw new Error('Existencias inválidas');
+    const soldOut = remaining === 0;
+    const note = soldOut ? '¡Gracias por todo su cariño! La Clowder Pizza se agotó. ❤️' : '';
+    if(pizza.soldOut !== soldOut || pizza.soldOutNote !== note){
+      pizza.soldOut = soldOut;
+      pizza.soldOutNote = note;
+      renderMenu();
+      updateBars();
+    }
+  }catch(error){
+    // Keep a previously verified view; checkout always requires server confirmation.
+  }
+}
+refreshPizzaAvailability();
+setInterval(() => { if(document.visibilityState === 'visible') refreshPizzaAvailability(); }, 15000);
+document.addEventListener('visibilitychange', () => { if(document.visibilityState === 'visible') refreshPizzaAvailability(); });
+window.addEventListener('online', refreshPizzaAvailability);

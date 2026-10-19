@@ -23,6 +23,7 @@ let baseURL;
 
 async function fixture(options = {}) {
   const state = { config: { ...originalConfig, ordersApiUrl: '' }, failConfig: false, pageErrors: [], alerts: [] };
+  if(options.pizzaStock !== undefined) state.config.ordersApiUrl = baseURL.replace(/\/$/, '');
   const context = await browser.newContext({
     viewport: { width: 390, height: 844 }, locale: 'es-EC', timezoneId: 'America/Guayaquil',
     serviceWorkers: 'block',
@@ -54,6 +55,8 @@ async function fixture(options = {}) {
   await context.route('**/*', route => {
     const url = new URL(route.request().url());
     if (url.origin !== new URL(baseURL).origin) return route.abort();
+    if(options.pizzaStock !== undefined && url.pathname === '/api/availability') return route.fulfill({status:200,contentType:'application/json',body:JSON.stringify({'clowder-pizza':options.pizzaStock})});
+    if(options.pizzaStock !== undefined && url.pathname === '/api/orders') return route.fulfill({status:options.rejectPizza ? 400 : 200,contentType:'application/json',body:JSON.stringify(options.rejectPizza ? {error:'No quedan suficientes pizzas.'} : {ok:true})});
     if (url.pathname.endsWith('/menu-config.json')) {
       if (state.failConfig) return route.fulfill({ status: 503, body: 'Test: unavailable' });
       return route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify(state.config) });
@@ -596,6 +599,21 @@ test('Transferencia sin banco, papelera y colores de leche', () => useFixture(as
  await page.locator('#sendBtn').click();await page.waitForFunction(()=>window.__whatsappAttempts.length===1);
  const msg=decodeURIComponent((await orderState(page)).destinations[0].url);assert.match(msg,/Pago: transferencia/);assert.doesNotMatch(msg,/transferencia a /);
 }));
+
+test('Pizza: disponibilidad compartida habilita y agotado bloquea el producto', async () => {
+  for(const remaining of [5,0]) await useFixture(async ({page}) => {
+    await page.waitForFunction(remaining => MENU.find(i => i.id === 'clowder-pizza').soldOut === (remaining === 0), remaining);
+    assert.equal(await page.evaluate(() => isItemOrderable(MENU.find(i => i.id === 'clowder-pizza'))), remaining > 0);
+  }, {pizzaStock:remaining});
+});
+test('Pizza: rechazo del servidor conserva el pedido y no abre WhatsApp', () => useFixture(async ({page}) => {
+  await page.waitForFunction(() => !MENU.find(i => i.id === 'clowder-pizza').soldOut);
+  await prepare(page,{items:{'clowder-pizza':1}});
+  await page.evaluate(() => sendOrder());
+  assert.equal((await orderState(page)).destinations.length,0);
+  assert.match(await page.locator('#contactError').textContent(), /No quedan suficientes pizzas/);
+  assert.equal((await orderState(page)).cart['clowder-pizza'].qty,1);
+}, {pizzaStock:5,rejectPizza:true}));
 
 async function main() {
   if (process.env.MENU_TEST_BASE_URL) baseURL = process.env.MENU_TEST_BASE_URL;
