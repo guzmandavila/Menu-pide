@@ -286,7 +286,7 @@ function sanitizeCart(value){
     const legacyStrength = productId === 'long-tail' && ['estandar','suave','muy-suave'].includes(entry?.strength) ? entry.strength : '';
     if(legacyStrength) productId = MENU.find(product => product.group === 'long-tail-intensity' && product.strengthLevel === legacyStrength)?.id || productId;
     const item = MENU.find(product => product.id === productId);
-    if(!item || !isWithinAvailability(item) || item.soldOut || item.comingSoon || HIDDEN_CATS.includes(item.cat) || HIDDEN_ITEM_IDS.includes(item.id) || !entry || typeof entry !== 'object') continue;
+    if(!item || !isWithinAvailability(item) || (item.soldOut && item.id !== 'clowder-pizza') || item.comingSoon || HIDDEN_CATS.includes(item.cat) || HIDDEN_ITEM_IDS.includes(item.id) || !entry || typeof entry !== 'object') continue;
     if(!Number.isInteger(entry.qty) || entry.qty < 1) continue;
     const options = {
       milk:item.milk && ['almendra','avena'].includes(entry.milk) ? entry.milk : '',
