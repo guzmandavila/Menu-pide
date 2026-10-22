@@ -34,7 +34,7 @@ const MENU = [
   { id:'blueberry-matcha', order:0, cat:'Matcha', name:'Blueberry Matcha', desc:'Matcha, leche y puré real de arándano sobre hielo.', price:4.45, milk:true, img:'assets/blueberry-matcha.jpeg' },
 
   // ---- Panadería ----
-  { id:'boo-cupcake', cat:'Snack Dulce', name:'Boo Cupcake', desc:'Nuestro cupcake de Halloween, elaborado con harinas sin gluten y un toque de sabor a naranja, con buttercream.', price:2.00, img:'assets/boo-cupcake.jpeg', featured:true, featuredTag:'NUEVO', featuredIcon:'🎃', order:0 },
+  { id:'boo-cupcake', soldOut:true, cat:'Snack Dulce', name:'Boo Cupcake', desc:'Nuestro cupcake de Halloween, elaborado con harinas sin gluten y un toque de sabor a naranja, con buttercream.', price:2.00, img:'assets/boo-cupcake.jpeg', featured:true, featuredTag:'NUEVO', featuredIcon:'🎃', order:0 },
   { id:'galleta', cat:'Snack Dulce', name:'Galleta', desc:'Gordita, hecha con mix de harinas sin gluten y trozos de chocolate sin leche.', price:2.0, soldOut:true, img:'assets/galleta.jpeg' },
   { id:'funbite', soldOut:true, cat:'Snack Dulce', name:'Funbite', desc:'Cupcake de mix de harinas sin gluten con chips de colores.', price:1.50, img:'assets/funbite.jpeg' },
   { id:'cupcake-banana', cat:'Snack Dulce', name:'Pumpkin Cupcake', desc:'Cupcake de calabaza con chispas de chocolate, gluten free.', price:1.75, img:'assets/cupcake-banana.jpeg' },
