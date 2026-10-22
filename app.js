@@ -20,7 +20,7 @@ const MENU = [
 
   // ---- Bebidas Frías ----
   { id:'affocato', cat:'Bebidas Calientes', name:'AffoCato', desc:'Helado de vainilla Madagascar con espresso doble.', price:3.00, img:'miniaturas/bf-affocato.jpg' },
-  { id:'berrybloom', soldOut:true, cat:'Bebidas Frías', name:'BerryBloom', classic:'Limonada de fresa', classicTheme:'fresh', order:6, desc:'Fresa, limón y miel sobre hielo.', price:2.75, img:'assets/image-45bed35fc31fb6b1.jpg' },
+  { id:'berrybloom', cat:'Bebidas Frías', name:'BerryBloom', classic:'Limonada de fresa', classicTheme:'fresh', order:6, desc:'Fresa, limón y miel sobre hielo.', price:2.75, img:'assets/image-45bed35fc31fb6b1.jpg' },
   { id:'blue-lemon', cat:'Bebidas Frías', name:'Blue Lemon', classic:'Limonada de arándano', classicTheme:'fresh', order:6, desc:'Arándano, limón y miel sobre hielo.', price:2.95 },
   { id:'ice-koffin', cat:'Bebidas Frías', name:'Ice Koffin', classic:'Americano helado', classicTheme:'fresh', order:1, desc:'Espresso, agua y hielo.', price:2.00, img:'assets/image-cc920e9b95fa9297.jpg' },
   { id:'nara-sunset', cat:'Bebidas Frías', name:'Nara Sunset', classic:'Naranja y café', classicTheme:'fresh', order:5, desc:'Naranja y café sobre hielo.', price:3.5, img:'assets/image-564f15ba92421bf9.jpg' },
@@ -662,7 +662,8 @@ function renderMenu(){
       </select>` : '';
     const priceHtml = !i.comingSoon ? `<div class="item-price-col">
       ${i.originalPrice ? `<div class="item-price-was">$${i.originalPrice.toFixed(2)}</div>` : ''}
-      <div class="item-price ${badgeClass}">${badgeText ? badgeText : '$'+i.price.toFixed(2)}</div>
+      <div class="item-price">$${i.price.toFixed(2)}</div>
+      ${i.soldOut ? `<div class="item-price ${badgeClass}">${badgeText}</div>` : ''}
     </div>` : '';
     return `
     <div id="menu-group-${i.__group || i.id}" class="item ${i.featured?'item-featured':''} ${i.cat==='Combos'?'item-combo':''}" style="background:${i.accent ? lighten(i.accent, 0.82) : (isStoreCat(i.cat) ? '#F2EEE6' : pastelBg(i.cat))}; border-left-color:${i.accent || (catColor(i.cat)==='transparent' ? 'var(--line)' : catColor(i.cat))};">
