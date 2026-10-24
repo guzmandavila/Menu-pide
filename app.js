@@ -36,6 +36,7 @@ const MENU = [
   // ---- Panadería ----
   { id:'boo-cupcake', soldOut:true, cat:'Snack Dulce', name:'Boo Cupcake', desc:'Nuestro cupcake de Halloween, elaborado con harinas sin gluten y un toque de sabor a naranja, con buttercream.', price:2.00, img:'assets/boo-cupcake.jpeg', featured:true, featuredTag:'NUEVO', featuredIcon:'🎃', order:0 },
   { id:'galleta', cat:'Snack Dulce', name:'oChips', desc:'Galletas de almendra y avena sin gluten, con chispas de chocolate y azúcar de coco. Crocantes por fuera y suaves por dentro.', price:2.25, img:'assets/ochips.jpeg' },
+  { id:'mini-ochips', cat:'Snack Dulce', name:'Mini oChips', desc:'5 galletas pequeñas con harinas de avena y almendra sin gluten.', price:2.00, img:'assets/mini-ochips.jpeg' },
   { id:'funbite', soldOut:true, cat:'Snack Dulce', name:'Funbite', desc:'Cupcake de mix de harinas sin gluten con chips de colores.', price:1.50, img:'assets/funbite.jpeg' },
   { id:'cupcake-banana', cat:'Snack Dulce', name:'Pumpkin Cupcake', desc:'Cupcake de calabaza con chispas de chocolate, gluten free.', price:1.75, img:'assets/cupcake-banana.jpeg' },
   { id:'mini-cake-del-dia', cat:'Snack Dulce', name:'Apple Crumble Cake', desc:'Harina de almendra, harina de coco, ghee y manzana natural, cobertura de chocolate blanco.', price:2.6, scoop:true, accent:'#C8433B', img:'miniaturas/apple-crumble.jpg', imgScoop:'miniaturas/apple-crumble-helado.jpg' },
