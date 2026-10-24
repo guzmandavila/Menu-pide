@@ -165,6 +165,17 @@ test('Stock actual: helados y pollo disponibles; queso, wachipapas y tocipapas a
   assert.equal(await page.locator('#menu .cat-banner-slide img[src="banners/empanadas-octubre.jpeg"]').count(), 1);
 }));
 
+test('Cambiar el sabor de empanada conserva el orden de las tarjetas', () => useFixture(async ({ page }) => {
+  await page.evaluate(() => selectCat('Snack Sal'));
+  const cardOrder = () => page.locator('#menu .item').evaluateAll(cards => cards.map(card => card.id));
+  const initialOrder = await cardOrder();
+  for(const flavor of ['pizza', 'pollo', 'queso', 'capresse']) {
+    await page.locator('#menu-group-empanada .variant-select').selectOption(`empanada-${flavor}`);
+    assert.deepEqual(await cardOrder(), initialOrder, `El sabor ${flavor} movió la tarjeta`);
+    assert.ok(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth + 1));
+  }
+}));
+
 test('Chocolate disponible y opciones de avellana retiradas', () => useFixture(async ({ page }) => {
   const result = await page.evaluate(() => {
     const ids = ['cozy-claws', 'moccatto', 'nimbus', 'milkishaki-nutella'];

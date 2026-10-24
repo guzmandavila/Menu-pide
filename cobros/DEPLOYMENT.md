@@ -35,3 +35,10 @@ La versión del menú ya abierta en un teléfono puede necesitar recargarse para
 ## Activación verificada
 
 2026-09-22 20:01 -05: prueba completada desde el menú y el panel públicos de GitHub, sin sesión de ChatGPT. Se verificaron cobros bancarios, efectivo, entrega, cancelación, devolución, entrada manual de cobro y pantalla móvil. Se conservaron los registros previos del usuario; los registros técnicos añadidos se cancelaron y su entrega se anuló.
+
+
+## Actualización de caja y semanas — 26 de septiembre de 2026
+
+Publicada en Sites y GitHub Pages. Fuente del servicio: `2cf6d6531d0f2c6f277d851a2e6bc2e26cd3df8c`; panel: `4cf81c373255d4bd743f536e30ce1929898f03ae`.
+
+Añade conteos y movimientos de efectivo persistentes, cambio al cobrar, reportes desde lunes 18:00 hasta domingo, comparación de semanas completas y respaldo JSON privado. Los cobros del lunes antes de las 18:00 aparecen separados. Ver `../clowder-cobros-site/OPERACION.md` para cálculo, respaldo y limitaciones. El prototipo Python no incorpora estas funciones.

@@ -35,7 +35,7 @@ const MENU = [
 
   // ---- Panadería ----
   { id:'boo-cupcake', soldOut:true, cat:'Snack Dulce', name:'Boo Cupcake', desc:'Nuestro cupcake de Halloween, elaborado con harinas sin gluten y un toque de sabor a naranja, con buttercream.', price:2.00, img:'assets/boo-cupcake.jpeg', featured:true, featuredTag:'NUEVO', featuredIcon:'🎃', order:0 },
-  { id:'galleta', cat:'Snack Dulce', name:'Galleta', desc:'Gordita, hecha con mix de harinas sin gluten y trozos de chocolate sin leche.', price:2.0, soldOut:true, img:'assets/galleta.jpeg' },
+  { id:'galleta', cat:'Snack Dulce', name:'oChips', desc:'Galletas de almendra y avena sin gluten, con chispas de chocolate y azúcar de coco. Crocantes por fuera y suaves por dentro.', price:2.0, img:'assets/ochips.jpeg' },
   { id:'funbite', soldOut:true, cat:'Snack Dulce', name:'Funbite', desc:'Cupcake de mix de harinas sin gluten con chips de colores.', price:1.50, img:'assets/funbite.jpeg' },
   { id:'cupcake-banana', cat:'Snack Dulce', name:'Pumpkin Cupcake', desc:'Cupcake de calabaza con chispas de chocolate, gluten free.', price:1.75, img:'assets/cupcake-banana.jpeg' },
   { id:'mini-cake-del-dia', cat:'Snack Dulce', name:'Apple Crumble Cake', desc:'Harina de almendra, harina de coco, ghee y manzana natural, cobertura de chocolate blanco.', price:2.6, scoop:true, accent:'#C8433B', img:'miniaturas/apple-crumble.jpg', imgScoop:'miniaturas/apple-crumble-helado.jpg' },
@@ -90,7 +90,7 @@ if (miniCake) {
   miniCake.featuredTag = 'MINICAKE DE LA SEMANA';
 }
 // Productos pausados en el menú; se pueden reactivar quitando su ID de esta lista.
-const HIDDEN_ITEM_IDS = ['mini-cake-del-dia', 'brownie', 'tocipapa', 'banana-bread-latte', 'cupcake-banana'];
+const HIDDEN_ITEM_IDS = ['funbite', 'mini-cake-del-dia', 'brownie', 'tocipapa', 'banana-bread-latte', 'cupcake-banana'];
 // Información de preparación visible en cada tarjeta.
 ['wachipapa','tocipapa'].forEach(id => {
   const item = MENU.find(product => product.id === id);
@@ -136,8 +136,8 @@ const CAT_BANNERS = {
   ],
   'Snack Dulce': [
     { productId:'boo-cupcake', img:'assets/boo-cupcake.jpeg', alt:'Boo Cupcake — nuestro cupcake de Halloween con harinas sin gluten, naranja y buttercream' },
-    { productId:'galleta', img:'assets/galleta.jpeg', alt:'Galleta Clowder con trozos de chocolate' },
-    { productId:'funbite', img:'assets/funbite.jpeg', alt:'Funbite — cupcake con cobertura cremosa y chips de colores' },
+    { productId:'galleta', img:'banners/ochips.jpeg', alt:'oChips — galletas de almendra y avena sin gluten, con chispas de chocolate y azúcar de coco' },
+    { hidden:true, productId:'funbite', img:'assets/funbite.jpeg', alt:'Funbite — cupcake con cobertura cremosa y chips de colores' },
   ],
   'Snack Sal': [
     { img:'banners/empanadas-octubre.jpeg', alt:'Empanadas hojaldradas Clowder: Posho con pollo mechado y vegetales por $2,40; Pizza por $2,40; Capresse por $1,80. Pide por nuestra app.' },
@@ -565,7 +565,7 @@ function categoryThumbnail(category){
     if(matchaBanner) return matchaBanner.img;
   }
   if(category === 'Bebidas Calientes') return 'miniaturas/bf-affocato.jpg';
-  if(category === 'Snack Dulce') return 'assets/galleta.jpeg';
+  if(category === 'Snack Dulce') return 'assets/ochips.jpeg';
   const productBanner = banners.find(banner => !banner.hidden && banner.img && banner.productId
     && MENU.some(product => product.id === banner.productId && !HIDDEN_ITEM_IDS.includes(product.id) && isWithinAvailability(product)));
   if(productBanner) return productBanner.img;
@@ -601,7 +601,8 @@ function renderMenu(){
       const variants = MENU.filter(m=>m.group===i.group);
       const currentId = groupView[i.group] || variants[0].id;
       const current = variants.find(v=>v.id===currentId) || variants[0];
-      display.push(Object.assign({}, current, {__group:i.group, __variants:variants, __isGroup:true, __sortPrice: variants[0].price}));
+      // La posición pertenece al grupo y no cambia al elegir otro sabor.
+      display.push(Object.assign({}, current, {__group:i.group, __variants:variants, __isGroup:true, __sortOrder: variants[0].order ?? 999, __sortPrice: variants[0].price}));
     } else {
       display.push(i);
     }
@@ -612,8 +613,8 @@ function renderMenu(){
     const bFeatured = b.featured || b.groupFeatured ? 0 : 1;
     if(aFeatured !== bFeatured) return aFeatured - bFeatured;
     // Orden manual explícito (menor primero); si un producto no lo define, se ordena por precio
-    const aOrder = a.order !== undefined ? a.order : 999;
-    const bOrder = b.order !== undefined ? b.order : 999;
+    const aOrder = a.__sortOrder ?? a.order ?? 999;
+    const bOrder = b.__sortOrder ?? b.order ?? 999;
     if(aOrder !== bOrder) return aOrder - bOrder;
     const aPrice = a.__sortPrice !== undefined ? a.__sortPrice : a.price;
     const bPrice = b.__sortPrice !== undefined ? b.__sortPrice : b.price;

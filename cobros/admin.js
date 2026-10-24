@@ -28,8 +28,14 @@ function render() {
   const sum=ClowderLedger.summarize(snapshot.orders,snapshot.settlements,$('day').value);
   $('summary').replaceChildren();
   const bankDay=Object.entries(sum.accounts).filter(([a])=>a!=='Efectivo').reduce((n,[,v])=>n+v.today,0);
-  for(const [label,value] of [['Pendiente para Fernanda',sum.pending],['Transferencias del día',bankDay],['Efectivo del día',sum.accounts.Efectivo.today],['Devoluciones pendientes',sum.refunds]]){const card=element('div',undefined,'card');card.append(element('span',label),element('strong',money(value)));$('summary').append(card);}
-  $('accounts').replaceChildren(); for(const [name,v] of Object.entries(sum.accounts)){const row=element('tr');[name,money(v.today),money(v.total)].forEach(t=>row.append(element('td',t)));$('accounts').append(row);}
+  for(const [label,value,tone,note] of [
+    ['Transferencias pendientes para Fernanda',sum.pending,'pending','Acumulado por entregar · solo transferencias'],
+    ['Efectivo del día · latita de Tea',sum.accounts.Efectivo.today,'cash','Se guarda en la latita · no se entrega a Fernanda'],
+    ['Ya pagado a Fernanda',sum.delivered,'settled','Total de entregas registradas · todos los días'],
+    ['Transferencias del día',bankDay,'','Cobros recibidos en la fecha elegida'],
+    ['Devoluciones pendientes',sum.refunds,'','Dinero por devolver a clientes']
+  ]){const card=element('div',undefined,'card'+(tone?' card--'+tone:''));card.append(element('span',label),element('strong',money(value)),element('small',note));$('summary').append(card);}
+  $('accounts').replaceChildren(); for(const [name,v] of Object.entries(sum.accounts)){const row=element('tr',undefined,name==='Efectivo'?'account--cash':undefined);[name,money(v.today),money(v.total)].forEach(t=>row.append(element('td',t)));$('accounts').append(row);}
   $('orders').replaceChildren();
   const query=$('search').value.toLowerCase();
   for(const o of snapshot.orders.filter(o=>($('filter').value==='all'||o.status===$('filter').value)&&(o.code+' '+o.payload.name).toLowerCase().includes(query))) {
@@ -47,7 +53,7 @@ function render() {
     $('orders').append(article);
   }
   if(!$('orders').children.length)$('orders').append(element('p','No hay pedidos con estos filtros.'));
-  $('settlements').replaceChildren(...snapshot.settlements.map(s=>element('p',`${date(s.created_at)} · ${money(s.cents)} · ${s.note}`)));
+  $('settlements').replaceChildren(...snapshot.settlements.map(s=>element('p',`${date(s.created_at)} · ${money(s.cents)} · ${s.note} · Pagado a Fernanda`,'settlement--paid')));
 }
 setInterval(()=>{
   const editing = document.activeElement.matches('input,select,textarea,[contenteditable="true"]');

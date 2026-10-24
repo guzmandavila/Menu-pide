@@ -1,1 +1,15 @@
 :root{font-family:system-ui,sans-serif;color:#26342a;background:#f5f4ed}*{box-sizing:border-box}body{margin:0}header{background:#183d30;color:#fff;padding:32px max(20px,calc((100vw - 1050px)/2))}header span{font-size:12px;letter-spacing:.14em}h1{font-size:34px;margin:10px 0}main{max-width:1090px;padding:24px 20px;margin:auto}h2{margin-top:32px}label{display:grid;gap:7px;font-size:14px}input,select,button{font:inherit;padding:12px;border-radius:8px;border:1px solid #bfc8bd;min-width:0}button{background:#235541;color:white;cursor:pointer;align-self:end}button:disabled{opacity:.55;cursor:wait}.secondary{background:white;color:#26342a}.danger{background:#8f3434}.toolbar,form{display:flex;flex-wrap:wrap;gap:14px;align-items:end}form label{flex:1;min-width:180px}#login{max-width:620px}.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:16px;margin-top:20px}.card,article{background:white;border:1px solid #d8dfd4;border-radius:14px;padding:20px}.card strong{display:block;font-size:30px;margin-top:8px}table{width:100%;border-collapse:collapse;background:white}th,td{text-align:left;padding:14px;border-bottom:1px solid #e0e5dc}td:not(:first-child),th:not(:first-child){text-align:right}article{margin:14px 0}article h3{margin:0 0 8px}pre{white-space:pre-wrap;overflow-wrap:anywhere;font:inherit;font-size:14px}article form{margin-top:15px}.muted{color:#5e6c60;font-size:14px}#status{color:#833424;min-height:22px}details{margin:14px 0}#settlements p{border-bottom:1px solid #ddd;padding-bottom:12px}[hidden]{display:none!important}@media(max-width:550px){h1{font-size:28px}.toolbar>*{flex:1}th,td{padding:10px 6px;font-size:13px}}
+
+/* Colores por destino del dinero; las etiquetas explican cada estado. */
+.cards{grid-template-columns:repeat(6,minmax(0,1fr))}
+.card{grid-column:span 2}
+.card:nth-child(n+4){grid-column:span 3}
+.card small{display:block;margin-top:12px;font-size:13px;line-height:1.45}
+.card--pending{background:#fff0cc;color:#704500;border:1px solid #d4a33d;border-top:5px solid #ad7100}
+.card--cash{background:#e7f2ff;color:#174b78;border:1px solid #8cb7df;border-top:5px solid #3178b7}
+.card--settled{background:#e7f4e9;color:#205b32;border:1px solid #94c39d;border-top:5px solid #38834b}
+tbody tr.account--cash{background:#e7f2ff;color:#174b78}
+#settlements p.settlement--paid{background:#e7f4e9;color:#205b32;border:1px solid #94c39d;border-left:5px solid #38834b;border-radius:9px;padding:14px}
+#settlements p.settlement--void{color:var(--muted,#716456)}
+@media(max-width:850px){.cards{grid-template-columns:repeat(2,minmax(0,1fr))}.card,.card:nth-child(n+4){grid-column:span 1}.card:last-child{grid-column:span 2}}
+@media(max-width:550px){.cards{grid-template-columns:minmax(0,1fr)}.card,.card:nth-child(n+4),.card:last-child{grid-column:span 1}}
