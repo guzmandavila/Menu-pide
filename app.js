@@ -36,9 +36,10 @@ const MENU = [
   // ---- Panadería ----
   { id:'boo-cupcake', soldOut:true, cat:'Snack Dulce', name:'Boo Cupcake', desc:'Nuestro cupcake de Halloween, elaborado con harinas sin gluten y un toque de sabor a naranja, con buttercream.', price:2.00, img:'assets/boo-cupcake.jpeg', featured:true, featuredTag:'NUEVO', featuredIcon:'🎃', order:0 },
   { id:'galleta', cat:'Snack Dulce', name:'oChips', desc:'Galletas de almendra y avena sin gluten, con chispas de chocolate y azúcar de coco. Crocantes por fuera y suaves por dentro.', price:2.00, img:'assets/ochips.jpeg' },
-  { id:'mini-ochips', cat:'Snack Dulce', name:'Mini oChips', desc:'5 galletas pequeñas con harinas de avena y almendra sin gluten.', price:1.80, img:'assets/mini-ochips.jpeg' },
+  { id:'mini-ochips', soldOut:true, cat:'Snack Dulce', name:'Mini oChips', desc:'5 galletas pequeñas con harinas de avena y almendra sin gluten.', price:1.80, img:'assets/mini-ochips.jpeg' },
   { id:'funbite', soldOut:true, cat:'Snack Dulce', name:'Funbite', desc:'Cupcake de mix de harinas sin gluten con chips de colores.', price:1.50, img:'assets/funbite.jpeg' },
-  { id:'cupcake-banana', cat:'Snack Dulce', name:'Pumpkin Cupcake', desc:'Cupcake de calabaza con chispas de chocolate, gluten free.', price:1.75, img:'assets/cupcake-banana.jpeg' },
+  { id:'cake-cuadrito-limon', cat:'Snack Dulce', name:'Cake cuadrito de limón', desc:'Elaborado con un mix de harinas sin gluten.', price:2.25, img:'assets/cake-cuadrito-limon.jpeg', featured:true, featuredTag:'NUEVO', order:0 },
+  { id:'cupcake-banana', cat:'Snack Dulce', name:'Cupcake de banano', desc:'Banano con chispas de chocolate, elaborado con un mix de harinas sin gluten.', price:1.75, img:'assets/cupcake-banano-chocolate.jpeg' },
   { id:'mini-cake-del-dia', cat:'Snack Dulce', name:'Apple Crumble Cake', desc:'Harina de almendra, harina de coco, ghee y manzana natural, cobertura de chocolate blanco.', price:2.6, scoop:true, accent:'#C8433B', img:'miniaturas/apple-crumble.jpg', imgScoop:'miniaturas/apple-crumble-helado.jpg' },
 
   { id:'brownie', cat:'Snack Dulce', name:'Brownie', desc:'Brownie intenso y húmedo, con cacao orgánico, endulzado con alulosa y panela.', price:3.0, scoop:true, img:'assets/image-6d3c530cc30feadd.jpg' },
@@ -53,8 +54,8 @@ const MENU = [
   { id:'wachipapa', soldOut:true, cat:'Snack Sal', name:'Wachipapa', desc:'Papas corte recto con chorizo argentino y salsa mayochurri de la casa. 120 g (35–40 g de chorizo).', price:3.0, img:'banners/snack-papas.jpg' },
   { id:'empanada-capresse', cat:'Snack Sal', name:'Empanada de Hojaldre', desc:'Queso mozzarella de búfala, tomates frescos y albahaca cuidadosamente trabajada, en hojaldre horneado y crocante. Acompañada de nuestra salsa pesto.', price:1.8, order:0, img:'assets/empanada-capresse.jpeg', group:'empanada', flavor:'Capresse' },
   { id:'empanada-pollo', cat:'Snack Sal', name:'Empanada de Hojaldre', desc:'Pechuga de pollo con nuestra salsa de vegetales. No te pierdas nuestro aderezo de mayonesa de la casa.', price:2.4, order:0, img:'assets/image-b46285ee20adcc24.jpg', group:'empanada', flavor:'Pollo' },
-  { id:'empanada-queso', soldOut:true, cat:'Snack Sal', name:'Empanada de Hojaldre', desc:'Hojaldre horneado y crocante, relleno de queso.', price:1.5, order:0, img:'assets/image-b46285ee20adcc24.jpg', group:'empanada', flavor:'Queso' },
-  { id:'empanada-pizza', cat:'Snack Sal', name:'Empanada de Hojaldre', desc:'Hojaldre horneado y crocante, relleno de pomodoro artesanal, tomate fresco, queso mozzarella, un plus de parmesano y jamón Virginia de pura carne de cerdo, sin embutidos.', price:2.40, img:'assets/image-b46285ee20adcc24.jpg', group:'empanada', flavor:'Pizza' },
+  { id:'empanada-queso', cat:'Snack Sal', name:'Empanada de Hojaldre', desc:'Hojaldre horneado y crocante, relleno de queso.', price:1.5, order:0, img:'assets/image-b46285ee20adcc24.jpg', group:'empanada', flavor:'Queso' },
+  { id:'empanada-pizza', soldOut:true, cat:'Snack Sal', name:'Empanada de Hojaldre', desc:'Hojaldre horneado y crocante, relleno de pomodoro artesanal, tomate fresco, queso mozzarella, un plus de parmesano y jamón Virginia de pura carne de cerdo, sin embutidos.', price:2.40, img:'assets/image-b46285ee20adcc24.jpg', group:'empanada', flavor:'Pizza' },
   { id:'virginia-melt', cat:'Snack Sal', name:'Virginia Melt', desc:'Pan de masa madre tostado con ghee, jamón Virginia, mozzarella de búfala y salsa panini, con chips de papa.', price:3.5, soldOut:true, img:'assets/image-96afa6196cb83296.jpg' },
   { id:'leche-almendras', cat:'Congelados y Más', name:'Leche de Almendras Casera', desc:'Nuestra leche de almendras hecha en casa, en botella para llevar.', price:0, img:'assets/image-f54974e93c477710.jpg', comingSoon:true },
   // Yuki: pan de yuca artesanal, congelado. Se vende solo por paquete de 10 o 20,
@@ -91,7 +92,7 @@ if (miniCake) {
   miniCake.featuredTag = 'MINICAKE DE LA SEMANA';
 }
 // Productos pausados en el menú; se pueden reactivar quitando su ID de esta lista.
-const HIDDEN_ITEM_IDS = ['funbite', 'mini-cake-del-dia', 'brownie', 'tocipapa', 'banana-bread-latte', 'cupcake-banana'];
+const HIDDEN_ITEM_IDS = ['boo-cupcake', 'funbite', 'mini-cake-del-dia', 'brownie', 'tocipapa', 'banana-bread-latte'];
 // Información de preparación visible en cada tarjeta.
 ['wachipapa','tocipapa'].forEach(id => {
   const item = MENU.find(product => product.id === id);
@@ -136,7 +137,9 @@ const CAT_BANNERS = {
     { img:'banners/bc-banner-01.jpg', alt:'Tu mañana empieza aquí — tu dosis de energía lista para llevar' },
   ],
   'Snack Dulce': [
-    { productId:'boo-cupcake', img:'assets/boo-cupcake.jpeg', alt:'Boo Cupcake — nuestro cupcake de Halloween con harinas sin gluten, naranja y buttercream' },
+    { productId:'cake-cuadrito-limon', img:'assets/cake-cuadrito-limon.jpeg', alt:'Cake cuadrito de limón, elaborado con mix de harinas sin gluten, $2.25', title:'Cake cuadrito de limón', description:'Mix de harinas sin gluten', price:'$2.25' },
+    { productId:'cupcake-banana', img:'assets/cupcake-banano-chocolate.jpeg', alt:'Cupcake de banano con chispas de chocolate y mix de harinas sin gluten' },
+    { hidden:true, productId:'boo-cupcake', img:'assets/boo-cupcake.jpeg', alt:'Boo Cupcake — nuestro cupcake de Halloween con harinas sin gluten, naranja y buttercream' },
     { productId:'galleta', img:'banners/ochips.jpeg', alt:'oChips — galletas de almendra y avena sin gluten, con chispas de chocolate y azúcar de coco' },
     { hidden:true, productId:'funbite', img:'assets/funbite.jpeg', alt:'Funbite — cupcake con cobertura cremosa y chips de colores' },
   ],
@@ -526,8 +529,12 @@ let groupView = {milkishaki:'milkishaki-fresa', 'pumpkin-spice-latte':'pumpkin-s
 function selectVariant(group, id){
   const card = document.getElementById(`menu-group-${group}`);
   const previousTop = card?.getBoundingClientRect().top;
+  const bannerScroll = document.getElementById('catBannerTrack')?.scrollLeft;
   groupView[group] = id;
   renderMenu();
+  const bannerTrack = document.getElementById('catBannerTrack');
+  if(bannerTrack && bannerScroll !== undefined) bannerTrack.scrollLeft = bannerScroll;
+  document.querySelector(`#menu-group-${group} .variant-select`)?.focus({preventScroll:true});
   if(previousTop !== undefined){
     const nextCard = document.getElementById(`menu-group-${group}`);
     if(nextCard){
@@ -603,15 +610,15 @@ function renderMenu(){
       const currentId = groupView[i.group] || variants[0].id;
       const current = variants.find(v=>v.id===currentId) || variants[0];
       // La posición pertenece al grupo y no cambia al elegir otro sabor.
-      display.push(Object.assign({}, current, {__group:i.group, __variants:variants, __isGroup:true, __sortOrder: variants[0].order ?? 999, __sortPrice: variants[0].price}));
+      display.push(Object.assign({}, current, {__group:i.group, __variants:variants, __isGroup:true, __sortOrder: variants[0].order ?? 999, __sortPrice: variants[0].price, __sortFeatured: variants.some(v => v.featured || v.groupFeatured)}));
     } else {
       display.push(i);
     }
   });
 
   display.sort((a,b)=>{
-    const aFeatured = a.featured || a.groupFeatured ? 0 : 1;
-    const bFeatured = b.featured || b.groupFeatured ? 0 : 1;
+    const aFeatured = (a.__sortFeatured ?? (a.featured || a.groupFeatured)) ? 0 : 1;
+    const bFeatured = (b.__sortFeatured ?? (b.featured || b.groupFeatured)) ? 0 : 1;
     if(aFeatured !== bFeatured) return aFeatured - bFeatured;
     // Orden manual explícito (menor primero); si un producto no lo define, se ordena por precio
     const aOrder = a.__sortOrder ?? a.order ?? 999;
@@ -631,7 +638,8 @@ function renderMenu(){
       const media = b.video
         ? `<video src="${escapeHtml(b.video)}" poster="${escapeHtml(b.poster || b.img || '')}" aria-label="${escapeHtml(b.alt || 'Promoción Clowder')}" muted loop playsinline controls preload="metadata"></video>`
         : `<img src="${escapeHtml(b.img)}" alt="${escapeHtml(b.alt)}" loading="lazy" decoding="async">`;
-      return `<div class="cat-banner-slide">${media}</div>`;
+      const caption = b.title ? `<div class="cat-banner-caption"><strong>${escapeHtml(b.title)}</strong><span>${escapeHtml(b.description || '')}</span><b>${escapeHtml(b.price || '')}</b></div>` : '';
+      return `<div class="cat-banner-slide">${media}${caption}</div>`;
     }).join('');
     const dots = banners.length > 1
       ? `<div class="cat-banner-dots">${banners.map((_,i)=>`<button type="button" class="cat-banner-dot${i===0?' active':''}" aria-label="Ver promoción ${i+1}" aria-current="${i===0?'true':'false'}"></button>`).join('')}</div>`

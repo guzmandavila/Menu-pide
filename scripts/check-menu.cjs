@@ -121,8 +121,7 @@ async function orderState(page) {
 test('Todos los menús se muestran en móvil sin errores ni desbordamiento horizontal', () => useFixture(async ({ page }) => {
   const categories = await page.evaluate(() => [...CATS]);
   for (const category of categories) {
-    if (category === 'Bebida del Mes') {
-      assert.equal(await page.locator('.category-tile:disabled').count(), 1);
+    if (await page.evaluate(cat => [...document.querySelectorAll('.category-tile')].some(tile => tile.disabled && tile.textContent.includes(cat)), category)) {
       await page.evaluate(category => selectCat(category), category);
       assert.equal(await page.locator('.category-home-view').count(), 1);
       continue;
@@ -133,7 +132,7 @@ test('Todos los menús se muestran en móvil sin errores ni desbordamiento horiz
   }
 }));
 
-test('Stock actual: helados y pollo disponibles; queso, wachipapas y tocipapas agotados', () => useFixture(async ({ page }) => {
+test('Stock actual: helados, pollo y queso disponibles; pizza, wachipapas y tocipapas agotados', () => useFixture(async ({ page }) => {
   const result = await page.evaluate(() => {
     const ids = ['affocato', 'milkishaki-nutella', 'milkishaki-fresa', 'milkishaki-salted-caramel'];
     changeQty('empanada-queso', 1);
@@ -147,18 +146,18 @@ test('Stock actual: helados y pollo disponibles; queso, wachipapas y tocipapas a
     };
   });
   assert.deepEqual(result.iceCream, [true, true, true, true]);
-  assert.equal(result.cheese, false);
+  assert.equal(result.cheese, true);
   assert.equal(result.chicken, true);
   assert.deepEqual(result.potatoes, [false, false, true]);
   assert.equal(result.hidden, true);
-  assert.deepEqual(Object.keys(result.restored), ['empanada-pollo']);
+  assert.deepEqual(Object.keys(result.restored), ['empanada-pollo', 'empanada-queso']);
   assert.equal(result.restored['empanada-pollo'].qty, 8);
   await page.evaluate(() => selectCat('Snack Sal'));
   assert.doesNotMatch(await page.locator('#menu').textContent(), /Últimas 4 empanadas de pollo/);
   assert.equal(await page.locator('#qty-empanada-capresse').count(), 1);
   assert.equal(await page.evaluate(() => MENU.find(item => item.id === 'empanada-capresse').price), 1.8);
   assert.equal(await page.evaluate(() => MENU.find(item => item.id === 'empanada-pizza').price), 2.4);
-  assert.equal(await page.evaluate(() => isItemOrderable(MENU.find(item => item.id === 'empanada-pizza'))), true);
+  assert.equal(await page.evaluate(() => isItemOrderable(MENU.find(item => item.id === 'empanada-pizza'))), false);
   assert.equal(await page.evaluate(() => MENU.find(item => item.id === 'empanada-pizza').img === MENU.find(item => item.id === 'empanada-pollo').img), true);
   await page.evaluate(() => { groupView.empanada = 'empanada-pollo'; renderMenu(); });
   assert.equal(await page.locator('#qty-empanada-pollo').count(), 1);
@@ -613,11 +612,13 @@ test('Transferencia sin banco, papelera y colores de leche', () => useFixture(as
 
 test('Pizza: disponibilidad compartida habilita y agotado bloquea el producto', async () => {
   for(const remaining of [5,0]) await useFixture(async ({page}) => {
+    await page.evaluate(async () => { delete MENU.find(i => i.id === 'clowder-pizza').soldOutManual; await refreshPizzaAvailability(); });
     await page.waitForFunction(remaining => MENU.find(i => i.id === 'clowder-pizza').soldOut === (remaining === 0), remaining);
     assert.equal(await page.evaluate(() => isItemOrderable(MENU.find(i => i.id === 'clowder-pizza'))), remaining > 0);
   }, {pizzaStock:remaining});
 });
 test('Pizza: rechazo del servidor conserva el pedido y no abre WhatsApp', () => useFixture(async ({page}) => {
+  await page.evaluate(async () => { delete MENU.find(i => i.id === 'clowder-pizza').soldOutManual; await refreshPizzaAvailability(); });
   await page.waitForFunction(() => !MENU.find(i => i.id === 'clowder-pizza').soldOut);
   await prepare(page,{items:{'clowder-pizza':1}});
   await page.evaluate(() => sendOrder());
