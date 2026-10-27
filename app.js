@@ -1,8 +1,21 @@
+// El acceso del personal se verifica en el servidor antes de guardar un pedido.
+const STAFF_MODE = new URLSearchParams(location.search).get('staff') === '1';
+let staffSession = null;
+try { staffSession = JSON.parse(sessionStorage.getItem('clowder_staff_session') || 'null'); } catch {}
+const ORDER_DRAFT_KEY = STAFF_MODE ? 'clowder_staff_draft_' + (staffSession?.user || 'sin-sesion') : 'clowder_order_draft';
+const draftStorage = STAFF_MODE ? sessionStorage : localStorage;
+if(STAFF_MODE){
+ const wrap=document.createElement('div'),label=document.createElement('label'),input=document.createElement('input');
+ label.textContent='Teléfono del cliente (opcional)';label.htmlFor='staffCustomerPhone';input.id='staffCustomerPhone';input.type='tel';input.autocomplete='tel';input.placeholder='09XXXXXXXX o +593…';input.className='name-input';input.addEventListener('input',()=>{input.setCustomValidity('');persistOrderDraft();});
+ wrap.append(label,input);document.getElementById('customerName').parentElement.after(wrap);
+ document.querySelector('label[for="customerName"]').textContent='Nombre del cliente';
+}
 /* ============================================================
    EDITA AQUÍ TU MENÚ — cambia nombres, descripciones y precios.
    "cat" agrupa los productos por categoría.
    ============================================================ */
 const MENU = [
+  { id:'jacks-o-lantern', cat:'Bebidas Frías', name:'Jacks O’ Lantern', classic:'Dirty soda', classicTheme:'fresh', desc:'Dirty soda de Clowder, edición Halloween y sabor retro. Los que saben, saben.', price:2.75, img:'assets/jacks-o-lantern.jpeg', featured:true, featuredTag:'EDICIÓN HALLOWEEN', featuredIcon:'🎃', accent:'#CC6425', order:-1 },
   { id:'combo-cafe-empanada-queso', soldOut:true, cat:'Combos', name:'Café + Empanada de queso', desc:'Un café de la casa y una empanada de queso. Disponible únicamente los lunes, todo el día.', price:3.25, originalPrice:3.75, img:'miniaturas/combo-cafe-empanada.jpg', featured:true, featuredTag:'COMBO DEL LUNES', accent:'#D8A24A', order:0, days:[1] },
   { id:'combo-bananacake-catpuccino', cat:'Combos', name:'Bananacake + Catpuccino', desc:'Bananacake con harina de almendras, panela y drizzle de vainilla, acompañado de un Catpuccino. Disponible solo los martes, todo el día.', price:4.60, originalPrice:5.20, img:'banners/cmb-banner-02.jpg', featured:true, featuredTag:'COMBO DEL MARTES', accent:'#D8A24A', order:1, days:[2] },
   { id:'pumpkin-spice-caliente', cat:'Bebida del Mes', name:'Pumpkin Spice Latte · Caliente', desc:'Jarabe pumpkin spice hecho artesanalmente en Clowder.', price:3.00, milk:true, img:'assets/pumpkin-spice-latte.jpg', featured:true, groupFeatured:true, featuredTag:'Bebida del mes', group:'pumpkin-spice-latte', flavor:'Caliente · $3.00', order:0 },
@@ -150,6 +163,7 @@ const CAT_BANNERS = {
     { hidden:true, video:'banners/snack-papas.mp4', poster:'banners/snack-papas-poster.jpg', alt:'Papas Clowder, recién preparadas' },
   ],
   'Bebidas Frías': [
+    { productId:'jacks-o-lantern', img:'assets/jacks-o-lantern.jpeg', alt:'Jacks O’ Lantern — dirty soda de Clowder, edición Halloween y sabor retro. Los que saben, saben.', priceBadge:'$2.75' },
     { img:'banners/bf-banner-02.jpg', alt:'Berry Bloom — limonada con salsa de fresa, refrescante y sin café' },
   ],
   'Bebida del Mes': [
@@ -323,7 +337,7 @@ function sanitizePendingOptions(value){
 
 // Conserva el pedido si la persona actualiza o cierra accidentalmente la página.
 try {
-  const draft = JSON.parse(localStorage.getItem('clowder_order_draft') || 'null');
+  const draft = JSON.parse(draftStorage.getItem(ORDER_DRAFT_KEY) || 'null');
   if(draft){
     cart = sanitizeCart(draft.cart);
     pendingOptions = sanitizePendingOptions(draft.pendingOptions);
@@ -337,9 +351,10 @@ try {
 
 function persistOrderDraft(){
   try {
-    localStorage.setItem('clowder_order_draft', JSON.stringify({
+    draftStorage.setItem(ORDER_DRAFT_KEY, JSON.stringify({
       cart, pendingOptions, mode, payMethod, paymentBank, orderReceiptKey, deliveryLocationUrl, orderCode:currentOrderCode,
           customerName: document.getElementById('customerName')?.value || '',
+          customerPhone: document.getElementById('staffCustomerPhone')?.value || '',
           cashAmount: document.getElementById('cashAmount')?.value || '',
           deliveryManzana: document.getElementById('deliveryManzana')?.value || '',
       deliveryVilla: document.getElementById('deliveryVilla')?.value || ''
@@ -572,7 +587,7 @@ function categoryThumbnail(category){
     const matchaBanner = banners.find(banner => !banner.hidden && banner.img && !banner.productId);
     if(matchaBanner) return matchaBanner.img;
   }
-  if(category === 'Bebidas Calientes') return 'miniaturas/bf-affocato.jpg';
+  if(category === 'Bebidas Calientes') return 'miniaturas/bc-catpuccino.jpg';
   if(category === 'Snack Dulce') return 'assets/ochips.jpeg';
   const productBanner = banners.find(banner => !banner.hidden && banner.img && banner.productId
     && MENU.some(product => product.id === banner.productId && !HIDDEN_ITEM_IDS.includes(product.id) && isWithinAvailability(product)));
@@ -586,11 +601,13 @@ function renderCategoryHome(){
   const tiles = visibleCats().map(category => {
     const image = categoryThumbnail(category);
     const color = catColor(category);
-    const imageScale = category === 'Bebidas Calientes' ? '1.4' : '1';
+    const imageScale = '1';
     const imagePosition = category === 'Snack Dulce' ? '50% 0%' : '50% 50%';
     return `<button type="button" class="category-tile" style="--tile-accent:${color};--tile-pill-text:${textColorFor(color)};--tile-image-scale:${imageScale};--tile-image-position:${imagePosition}" onclick="selectCat('${escapeHtml(category)}')" aria-label="Abrir categoría ${escapeHtml(category)}"><img src="${escapeHtml(image)}" alt="" loading="eager" decoding="async"><span class="category-tile-shade"></span><span class="category-tile-name">${escapeHtml(category)}</span></button>`;
   }).join('');
-  return `<section class="category-home-view" aria-label="Categorías del menú"><div class="category-home-grid">${tiles}</div></section>`;
+  const halloween=MENU.find(item=>item.id==='jacks-o-lantern'&&!HIDDEN_ITEM_IDS.includes(item.id)&&isWithinAvailability(item)&&!item.soldOut);
+  const promo=halloween ? `<button type="button" class="halloween-promo" onclick="selectCat('Bebidas Frías')" aria-label="Ver Jacks O’ Lantern, dirty soda de Halloween, $${halloween.price.toFixed(2)}"><img src="${escapeHtml(halloween.img)}" alt="Jacks O’ Lantern en su vaso de calabaza" decoding="async"><span class="halloween-promo-copy"><small>🎃 EDICIÓN HALLOWEEN</small><strong>Jacks O’ Lantern</strong><span>Dirty soda · sabor retro.<br>Los que saben, saben.</span><b>$${halloween.price.toFixed(2)}</b><span class="halloween-promo-cta">Pídela aquí →</span></span></button>` : '';
+  return `<section class="category-home-view" aria-label="Categorías del menú">${promo}<div class="category-home-grid">${tiles}</div></section>`;
 }
 function renderMenu(){
   const el = document.getElementById('menu');
@@ -639,7 +656,8 @@ function renderMenu(){
         ? `<video src="${escapeHtml(b.video)}" poster="${escapeHtml(b.poster || b.img || '')}" aria-label="${escapeHtml(b.alt || 'Promoción Clowder')}" muted loop playsinline controls preload="metadata"></video>`
         : `<img src="${escapeHtml(b.img)}" alt="${escapeHtml(b.alt)}" loading="lazy" decoding="async">`;
       const caption = b.title ? `<div class="cat-banner-caption"><strong>${escapeHtml(b.title)}</strong><span>${escapeHtml(b.description || '')}</span><b>${escapeHtml(b.price || '')}</b></div>` : '';
-      return `<div class="cat-banner-slide">${media}${caption}</div>`;
+      const priceBadge=b.priceBadge ? `<span class="banner-price-badge">${escapeHtml(b.priceBadge)}</span>` : '';
+      return `<div class="cat-banner-slide${b.priceBadge?' cat-banner-priced':''}">${media}${caption}${priceBadge}</div>`;
     }).join('');
     const dots = banners.length > 1
       ? `<div class="cat-banner-dots">${banners.map((_,i)=>`<button type="button" class="cat-banner-dot${i===0?' active':''}" aria-label="Ver promoción ${i+1}" aria-current="${i===0?'true':'false'}"></button>`).join('')}</div>`
@@ -1209,7 +1227,7 @@ function updateBars(){
   checkoutReady = listo;
   const continueButton = document.getElementById('sendBtn');
   continueButton.disabled = count === 0 || birthdayState().closed || sendingOrder;
-  if(!sendingOrder) continueButton.textContent = `Continuar en WhatsApp · $${total.toFixed(2)}`;
+  if(!sendingOrder) continueButton.textContent = `${STAFF_MODE ? 'Guardar pedido' : 'Continuar en WhatsApp'} · $${total.toFixed(2)}`;
   const hint = document.getElementById('sendHint');
   if(hint){
     const faltan = [];
@@ -1446,7 +1464,7 @@ function setMode(m){
 let sendingOrder = false;
 let currentOrderCode = '';
 try {
-  currentOrderCode = JSON.parse(localStorage.getItem('clowder_order_draft') || 'null')?.orderCode || '';
+  currentOrderCode = JSON.parse(draftStorage.getItem(ORDER_DRAFT_KEY) || 'null')?.orderCode || '';
   if(!/^CL-[A-Z0-9-]{10,60}$/.test(currentOrderCode)) currentOrderCode = '';
 } catch(e) {}
 
@@ -1516,6 +1534,8 @@ async function sendOrder(){
     return;
   }
 
+  let customerPhone='';
+  if(STAFF_MODE){try{customerPhone=ClowderTicket.phone(document.getElementById('staffCustomerPhone').value);}catch(error){const input=document.getElementById('staffCustomerPhone');input.setCustomValidity(error.message);input.reportValidity();return;}}
   const now = new Date();
   if(!currentOrderCode){
     currentOrderCode = createOrderCode(now);
@@ -1578,6 +1598,7 @@ async function sendOrder(){
   msg += `\n☕ *¡Gracias! Te esperamos en Clowder.*\n`;
   const transfer = payMethod === 'transferencia';
   const sharedOrder = {code:orderCode, receiptKey:orderReceiptKey, name, method:payMethod, bank:'', totalCents:Math.round(grandTotal()*100), details:msg};
+  if(STAFF_MODE){ await saveStaffOrder({...sharedOrder,customerPhone}); return; }
   // Build the complete order before the asynchronous contact check.
   const target = MenuContact.reserveWindow();
   sendingOrder = true;
@@ -1644,7 +1665,7 @@ function completeOrder(){
   // El mensaje se preparó en WhatsApp; su envío final ocurre allí.
   locationRequestVersion++;
   document.getElementById('locationStatus').textContent = '';
-  try { localStorage.removeItem('clowder_order_draft'); } catch(e) {}
+  try { draftStorage.removeItem(ORDER_DRAFT_KEY); } catch(e) {}
   try { sessionStorage.removeItem('clowder_active_order_code'); } catch(e) {}
   cart = {};
   mode = '';
@@ -1653,7 +1674,7 @@ function completeOrder(){
   orderReceiptKey = '';
   deliveryLocationUrl = '';
   currentOrderCode = '';
-  ['customerName','cashAmount','deliveryManzana','deliveryVilla'].forEach(id => {
+  ['customerName','staffCustomerPhone','cashAmount','deliveryManzana','deliveryVilla'].forEach(id => {
     const el = document.getElementById(id);
     if(el) el.value = '';
   });
@@ -1662,7 +1683,7 @@ function completeOrder(){
   closeCart();
   renderMenu();
   updateBars();
-  try { localStorage.removeItem('clowder_order_draft'); } catch(e) {}
+  try { draftStorage.removeItem(ORDER_DRAFT_KEY); } catch(e) {}
   document.getElementById('orderComplete').classList.remove('open');
 }
 
@@ -1687,9 +1708,10 @@ function completeOrder(){
 })();
 
 try {
-  const draft = JSON.parse(localStorage.getItem('clowder_order_draft') || 'null');
+  const draft = JSON.parse(draftStorage.getItem(ORDER_DRAFT_KEY) || 'null');
   if(draft){
     if(document.getElementById('customerName')) document.getElementById('customerName').value = typeof draft.customerName === 'string' ? draft.customerName : '';
+    if(document.getElementById('staffCustomerPhone')) document.getElementById('staffCustomerPhone').value = typeof draft.customerPhone === 'string' ? draft.customerPhone : '';
     if(document.getElementById('cashAmount')) document.getElementById('cashAmount').value = typeof draft.cashAmount === 'string' ? draft.cashAmount : '';
     if(document.getElementById('deliveryManzana')) document.getElementById('deliveryManzana').value = typeof draft.deliveryManzana === 'string' ? draft.deliveryManzana : '';
     if(document.getElementById('deliveryVilla')) document.getElementById('deliveryVilla').value = typeof draft.deliveryVilla === 'string' ? draft.deliveryVilla : '';
@@ -1838,3 +1860,40 @@ refreshPizzaAvailability();
 setInterval(() => { if(document.visibilityState === 'visible') refreshPizzaAvailability(); }, 15000);
 document.addEventListener('visibilitychange', () => { if(document.visibilityState === 'visible') refreshPizzaAvailability(); });
 window.addEventListener('online', refreshPizzaAvailability);
+
+async function saveStaffOrder(order){
+ sendingOrder=true;
+ const errorBox=document.getElementById('contactError');errorBox.hidden=true;
+ document.getElementById('sendBtn').textContent='Guardando pedido…';updateBars();
+ try{
+  if(!staffSession?.token)throw new Error('Entra al panel con tu usuario y PIN antes de crear pedidos.');
+  const contact=await MenuContact.refresh();
+  if(!contact.ordersApiUrl)throw new Error('No se encontró el servicio de pedidos.');
+  const response=await fetch(contact.ordersApiUrl.replace(/\/$/,'')+'/api/staff/orders',{
+   method:'POST',headers:{'Content-Type':'application/json',Authorization:'Bearer '+staffSession.token},body:JSON.stringify(order),signal:AbortSignal.timeout(15000)
+  });
+  const result=await response.json();
+  if(!response.ok){if(response.status===401){sessionStorage.removeItem('clowder_staff_session');staffSession=null;}throw new Error(result.error||'No se pudo guardar el pedido.');}
+  sendingOrder=false;completeOrder();
+  const confirmation=document.getElementById('orderComplete');
+  confirmation.replaceChildren(document.createTextNode('Pedido '+order.code+' guardado por '+result.createdBy+'. Pendiente de cobro. '));
+  const link=document.createElement('a');link.href='./maomao/';link.textContent='Ver en pedidos y cobros';confirmation.append(link);confirmation.classList.add('open');
+  const saved={payload:{...order,createdBy:result.createdBy},status:'pending',created_at:result.createdAt};
+  const view=document.createElement('button');view.type='button';view.textContent='Ver ticket virtual';view.onclick=()=>ClowderTicket.show(saved);confirmation.append(view);
+  ClowderTicket.show(saved);
+ }catch(error){errorBox.textContent=(error.name==='TimeoutError'?'La conexión tardó demasiado. Puedes reintentar sin duplicar el pedido.':error.message)+' El pedido sigue guardado aquí.';errorBox.hidden=false;}
+ finally{sendingOrder=false;updateBars();}
+}
+if(STAFF_MODE){
+ const banner=document.createElement('aside');banner.className='staff-order-notice';banner.setAttribute('role','status');
+ const label=document.createElement('strong');label.textContent='Verificando sesión…';
+ const back=document.createElement('a');back.href='./maomao/';back.textContent='Volver a cobros';banner.append(label,back);document.body.prepend(banner);
+ const confirmation=document.getElementById('orderComplete');confirmation.replaceChildren();
+ (async()=>{try{
+  if(!staffSession?.token)throw new Error('Entra con tu usuario y PIN');
+  const contact=await MenuContact.refresh();const response=await fetch(contact.ordersApiUrl.replace(/\/$/,'')+'/api/me',{headers:{Authorization:'Bearer '+staffSession.token},signal:AbortSignal.timeout(15000)});
+  if(!response.ok)throw new Error('Sesión vencida. Vuelve a entrar');const current=await response.json();
+  if(current.user!==staffSession.user)throw new Error('Vuelve a entrar al panel');
+  label.textContent='Nuevo pedido · '+current.user;
+ }catch(error){label.textContent=error.message;}})();
+}

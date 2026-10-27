@@ -1210,3 +1210,20 @@ body.category-home .bottom-navigation:not(:has(.cartbar.show)){display:none;}
 .cat-banner-caption strong{font-size:1.3rem;}
 .cat-banner-caption span{font-size:.9rem;}
 .cat-banner-caption b{font-size:1.5rem;color:#faef9a;}
+
+.staff-order-notice{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;padding:14px 18px;background:#faef9a;color:#332519;position:relative;z-index:2;}
+.staff-order-notice a{color:inherit;text-decoration:underline;}
+
+/* Lanzamiento de Halloween: precio visible y fotografía original. */
+.halloween-promo{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.15fr);width:100%;padding:0;margin:0 0 18px;border:1px solid #ce7138;border-radius:20px;overflow:hidden;background:#2e1d16;color:#fff5db;text-align:left;cursor:pointer;box-shadow:0 8px 24px rgba(55,27,13,.16);}
+.halloween-promo>img{display:block;width:100%;height:100%;min-height:220px;object-fit:cover;object-position:50% 35%;}
+.halloween-promo-copy{display:flex;flex-direction:column;align-items:flex-start;justify-content:center;gap:9px;padding:20px 16px;line-height:1.4;}
+.halloween-promo-copy>small{font:700 10px/1.4 'Inter',sans-serif;letter-spacing:.07em;color:#ffc28c;}
+.halloween-promo-copy>strong{font:400 clamp(25px,5vw,38px)/1.05 'Doughie','Inter',sans-serif;}
+.halloween-promo-copy>span{font-size:13px;}
+.halloween-promo-copy>b{display:inline-block;border-radius:12px;padding:5px 12px;background:#fba352;color:#2e1d16;font:800 27px/1.2 'Inter',sans-serif;}
+.halloween-promo-cta{font-weight:700;text-decoration:underline;text-underline-offset:3px;}
+.cat-banner-priced{position:relative;}
+.banner-price-badge{position:absolute;top:16px;left:16px;border:2px solid #fff0d4;border-radius:999px;background:#fba352;color:#2e1d16;box-shadow:0 4px 12px rgba(0,0,0,.3);padding:10px 16px;font:800 26px/1 'Inter',sans-serif;}
+.item-thumb[src="assets/jacks-o-lantern.jpeg"]{object-fit:cover;object-position:50% 35%;}
+@media(min-width:768px){.halloween-promo{grid-template-columns:1fr 1fr;max-width:760px;margin-inline:auto;}.halloween-promo>img{max-height:350px;}.halloween-promo-copy{padding:26px;gap:13px;}.halloween-promo-copy>span{font-size:16px;}}

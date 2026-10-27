@@ -3,23 +3,24 @@ const $ = id => document.getElementById(id);
 const banks = ['Guayaquil','Pichincha','Bolivariano','Pacífico','Produbanco','Efectivo'];
 const money = cents => new Intl.NumberFormat('es-EC',{style:'currency',currency:'USD'}).format(cents/100);
 const date = iso => new Date(iso).toLocaleString('es-EC',{timeZone:'America/Guayaquil'});
+const STAFF_SESSION_KEY = 'clowder_staff_session';
 let token = '', snapshot = null, busy = false, settlementAttempt = null, manualAttempt = null, cashAttempt = null;
 $('day').value = ClowderLedger.day(new Date().toISOString());
 function element(tag,text,className) { const el=document.createElement(tag); if(text !== undefined) el.textContent=text; if(className) el.className=className; return el; }
 async function api(path, data) {
   const response = await fetch((window.CLOWDER_API || '') + path,{method:data?'POST':'GET',cache:'no-store',headers:{Authorization:'Bearer '+token,...(data?{'Content-Type':'application/json'}:{})},body:data?JSON.stringify(data):undefined,signal:AbortSignal.timeout(15000)});
-  const result=await response.json(); if(!response.ok) throw new Error(result.error || 'No se pudo completar la operación.'); return result;
+  const result=await response.json(); if(!response.ok) { if(response.status===401){token='';sessionStorage.removeItem(STAFF_SESSION_KEY);$('workspace').hidden=true;$('login').hidden=false;} throw new Error(result.error || 'No se pudo completar la operación.'); } return result;
 }
-async function refresh() { snapshot=await api('/api/admin'); render(); $('updated').textContent='Actualizado: '+date(new Date().toISOString()); }
+async function refresh() { snapshot=await api('/api/admin'); $('signedIn').textContent='Sesión de '+snapshot.currentUser; render(); $('updated').textContent='Actualizado: '+date(new Date().toISOString()); }
 async function run(fn) {
   if(busy) return; busy=true; $('status').textContent=''; document.querySelectorAll('button').forEach(b=>b.disabled=true);
   try { await fn(); } catch(e) { $('status').textContent=e.message+' Si hubo un problema de conexión, actualiza para verificar el resultado antes de cambiar los datos.'; }
   finally { busy=false; document.querySelectorAll('button').forEach(b=>b.disabled=false); }
 }
-$('login').onsubmit=e=>{e.preventDefault(); run(async()=>{token=$('token').value; await refresh(); $('token').value=''; $('login').hidden=true; $('workspace').hidden=false;});};
-$('logout').onclick=()=>{token='';snapshot=null;location.reload();};
+$('login').onsubmit=e=>{e.preventDefault(); run(async()=>{const session=await api('/api/login',{user:$('staffUser').value,pin:$('token').value}); token=session.token; sessionStorage.setItem(STAFF_SESSION_KEY,JSON.stringify(session)); await refresh(); $('token').value=''; $('login').hidden=true; $('workspace').hidden=false;});};
+$('logout').onclick=()=>run(async()=>{await api('/api/logout',{});token='';snapshot=null;sessionStorage.removeItem(STAFF_SESSION_KEY);location.reload();});
 $('refresh').onclick=()=>run(refresh);
-for(const id of ['day','filter','search']) $(id).oninput=()=>{if(snapshot)render();};
+for(const id of ['day','filter','search','operatorFilter']) $(id).oninput=()=>{if(snapshot)render();};
 $('settlement').onsubmit=e=>{e.preventDefault(); const cents=Math.round(Number($('settlementAmount').value)*100),note=$('settlementNote').value.trim(); if(!Number.isSafeInteger(cents)||cents<=0)return;
   if(!confirm(`¿Confirmas que Fernanda ya recibió ${money(cents)}?`))return;
   run(async()=>{const signature=JSON.stringify({cents,note}); if(!settlementAttempt||settlementAttempt.signature!==signature)settlementAttempt={signature,id:crypto.randomUUID()}; await api('/api/settlements',{cents,note,id:settlementAttempt.id}); $('settlement').reset(); settlementAttempt=null; await refresh();});
@@ -36,6 +37,7 @@ $('manual').onsubmit=e=>{
   $('manual').reset();updateManualChange();manualAttempt=null;await refresh();
  });
 };
+function orderOperator(o){return o.payload.createdBy || (o.code.startsWith('CL-MANUAL-') ? 'Sin identificar · anterior' : 'Cliente · app');}
 function render() {
   renderFinance();
   const sum=ClowderLedger.summarize(snapshot.orders,snapshot.settlements,$('day').value);
@@ -58,10 +60,15 @@ function render() {
   $('accounts').replaceChildren(); for(const [name,v] of Object.entries(sum.accounts)){const row=element('tr',undefined,name==='Efectivo'?'account--cash':undefined);[name,money(v.today),money(v.total)].forEach(t=>row.append(element('td',t)));$('accounts').append(row);}
   $('orders').replaceChildren();
   const query=$('search').value.toLowerCase();
-  for(const o of snapshot.orders.filter(o=>($('filter').value==='all'||o.status===$('filter').value)&&(o.code+' '+o.payload.name).toLowerCase().includes(query))) {
+  for(const o of snapshot.orders.filter(o=>($('filter').value==='all'||o.status===$('filter').value)&&(o.code+' '+o.payload.name).toLowerCase().includes(query)&&(!$('operatorFilter').value||orderOperator(o)===$('operatorFilter').value))) {
     const p=o.payload, article=element('article'); article.append(element('h3',p.name+' · '+money(o.cents ?? p.totalCents)),element('p',o.code+' · '+date(o.created_at),'muted'));
+    article.append(element('p','Ingresado por: '+orderOperator(o)));
+    if(o.paid_by)article.append(element('p','Cobrado por: '+o.paid_by,'muted'));
+    if(o.cancelled_by)article.append(element('p','Cancelado por: '+o.cancelled_by,'muted'));
+    if(o.refunded_by)article.append(element('p','Devolución registrada por: '+o.refunded_by,'muted'));
     article.append(element('p',({pending:'Pendiente de confirmar',paid:'Cobrado',cancelled:'Cancelado'})[o.status]+' · '+(o.account || (p.method==='efectivo'?'Efectivo':p.bank))));
     if(o.account==='Efectivo'&&o.tender_cents!=null)article.append(element('p','Recibido: '+money(o.tender_cents)+' · Cambio entregado: '+money(o.tender_cents-o.cents)));
+    const ticket=element('button','Ver ticket virtual','secondary');ticket.type='button';ticket.onclick=()=>ClowderTicket.show(o);article.append(ticket);
     const details=element('details');details.append(element('summary','Ver pedido'),element('pre',p.details));article.append(details);
     if(o.status==='pending') {
       const form=element('form'),label=element('label','Cuenta donde recibiste el pago'),select=element('select'),amountLabel=element('label','Monto recibido ($)'),input=element('input');
@@ -126,3 +133,5 @@ for(const [index,key] of workspaceTabs.entries()){
 }
 function tabFromHash(){selectWorkspaceTab(location.hash==='#contabilidad'?'accounting':'orders');}
 window.addEventListener('hashchange',tabFromHash);tabFromHash();
+
+try { const saved=JSON.parse(sessionStorage.getItem(STAFF_SESSION_KEY)||'null'); if(saved?.token){ token=saved.token; run(async()=>{await refresh();$('login').hidden=true;$('workspace').hidden=false;}); } } catch { sessionStorage.removeItem(STAFF_SESSION_KEY); }

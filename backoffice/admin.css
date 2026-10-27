@@ -32,3 +32,5 @@ section.workspace-panel{border:0;padding:0;margin:0}
 #dailySummary .card{grid-column:span 2}#dailySummary .card:last-child{grid-column:span 2}
 @media(max-width:850px){#dailySummary .card{grid-column:span 1}}
 @media(max-width:550px){.panel-tabs{gap:4px;padding:4px}.panel-tabs [role="tab"]{font-size:14px;padding:10px 8px}#dailySummary .card,#dailySummary .card:last-child{grid-column:span 1}}
+
+#newStaffOrder{background:var(--coffee);color:#fffdf8;padding:12px 18px;border-radius:9px;font-weight:600;text-decoration:none;}

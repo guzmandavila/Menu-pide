@@ -1,0 +1,13 @@
+.virtual-ticket{box-sizing:border-box;width:min(600px,calc(100% - 24px));max-height:90dvh;overflow:auto;border:1px solid #dfd5c6;border-radius:18px;background:#fffdf8;color:#30251d;padding:22px;font:16px/1.5 system-ui,sans-serif;}
+.virtual-ticket::backdrop{background:rgba(25,18,12,.6);}
+.virtual-ticket h2{font-size:23px;margin:0 0 16px;}
+.virtual-ticket pre{white-space:pre-wrap;overflow-wrap:anywhere;user-select:text;font:15px/1.6 system-ui,sans-serif;background:#f8f4ea;border:1px solid #dfd5c6;border-radius:12px;padding:16px;}
+.virtual-ticket button,.virtual-ticket .ticket-whatsapp{box-sizing:border-box;display:inline-block;min-height:44px;padding:11px 14px;border:1px solid #cdbfac;border-radius:9px;background:#30251d;color:#fffdf8;font:600 14px/1.5 system-ui,sans-serif;cursor:pointer;text-decoration:none;}
+.virtual-ticket .ticket-actions{display:flex;flex-wrap:wrap;gap:10px;margin:16px 0;}
+.virtual-ticket label{display:grid;gap:8px;font-weight:600;margin:16px 0 12px;}
+.virtual-ticket input{box-sizing:border-box;width:100%;min-height:46px;border:1px solid #cdbfac;border-radius:9px;padding:12px;font:16px system-ui,sans-serif;background:white;color:#30251d;}
+.virtual-ticket .ticket-whatsapp{background:#24633b;border-color:#24633b;}
+.virtual-ticket .ticket-whatsapp[aria-disabled=true]{opacity:.6;cursor:default;}
+.virtual-ticket>p{font-size:14px;}
+.virtual-ticket .ticket-status{font-weight:600;}
+.virtual-ticket :focus-visible{outline:3px solid #a77440;outline-offset:3px;}
