@@ -39,7 +39,7 @@ const MENU = [
   { id:'mini-ochips', soldOut:true, cat:'Snack Dulce', name:'Mini oChips', desc:'5 galletas pequeñas con harinas de avena y almendra sin gluten.', price:1.80, img:'assets/mini-ochips.jpeg' },
   { id:'funbite', soldOut:true, cat:'Snack Dulce', name:'Funbite', desc:'Cupcake de mix de harinas sin gluten con chips de colores.', price:1.50, img:'assets/funbite.jpeg' },
   { id:'cake-cuadrito-limon', cat:'Snack Dulce', name:'Cake cuadrito de limón', desc:'Elaborado con un mix de harinas sin gluten.', price:2.25, img:'assets/cake-cuadrito-limon.jpeg', featured:true, featuredTag:'NUEVO', order:0 },
-  { id:'cupcake-banana', cat:'Snack Dulce', name:'Cupcake de banano', desc:'Banano con chispas de chocolate, elaborado con un mix de harinas sin gluten.', price:1.75, img:'assets/cupcake-banano-chocolate.jpeg' },
+  { id:'cupcake-banana', soldOut:true, cat:'Snack Dulce', name:'Cupcake de banano', desc:'Banano con chispas de chocolate, elaborado con un mix de harinas sin gluten.', price:1.75, img:'assets/cupcake-banano-chocolate.jpeg' },
   { id:'mini-cake-del-dia', cat:'Snack Dulce', name:'Apple Crumble Cake', desc:'Harina de almendra, harina de coco, ghee y manzana natural, cobertura de chocolate blanco.', price:2.6, scoop:true, accent:'#C8433B', img:'miniaturas/apple-crumble.jpg', imgScoop:'miniaturas/apple-crumble-helado.jpg' },
 
   { id:'brownie', cat:'Snack Dulce', name:'Brownie', desc:'Brownie intenso y húmedo, con cacao orgánico, endulzado con alulosa y panela.', price:3.0, scoop:true, img:'assets/image-6d3c530cc30feadd.jpg' },
