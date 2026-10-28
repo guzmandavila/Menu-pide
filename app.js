@@ -1328,14 +1328,71 @@ function renderCartList(){
 const productPhotoDialog = document.createElement('dialog');
 productPhotoDialog.className = 'product-photo-dialog';
 productPhotoDialog.setAttribute('aria-label', 'Imagen ampliada');
-productPhotoDialog.innerHTML = '<button type="button" class="product-photo-close" aria-label="Cerrar foto">×</button><button type="button" class="product-photo-zoom" aria-pressed="false">Acercar</button><div class="product-photo-viewport"><img alt=""></div><p></p>';
+productPhotoDialog.innerHTML = '<button type="button" class="product-photo-close" aria-label="Cerrar foto">×</button><div class="product-photo-viewport" tabindex="0" role="region" aria-label="Imagen: pellizca o haz doble clic para ampliar; usa + y - con teclado"><img alt="" draggable="false"></div><p></p>';
 document.body.append(productPhotoDialog);
 productPhotoDialog.querySelector('.product-photo-close').addEventListener('click', () => productPhotoDialog.close());
-const photoZoomButton = productPhotoDialog.querySelector('.product-photo-zoom');
-photoZoomButton.addEventListener('click', () => {
-  const zoomed = productPhotoDialog.classList.toggle('is-zoomed');
-  photoZoomButton.setAttribute('aria-pressed', String(zoomed));
-  photoZoomButton.textContent = zoomed ? 'Ajustar' : 'Acercar';
+const photoViewport = productPhotoDialog.querySelector('.product-photo-viewport');
+const photoPointers = new Map();
+let photoScale = 1;
+let photoPinchDistance = 0;
+let photoLastTap = 0;
+function setPhotoScale(value){
+  photoScale = Math.max(1, Math.min(4, value));
+  productPhotoDialog.classList.toggle('is-zoomed', photoScale > 1);
+  productPhotoDialog.style.setProperty('--photo-scale', photoScale);
+}
+function photoPointerDistance(){
+  const [a,b] = [...photoPointers.values()];
+  return a && b ? Math.hypot(a.x-b.x, a.y-b.y) : 0;
+}
+photoViewport.addEventListener('dblclick', event => {
+  if(event.pointerType === 'touch') return;
+  event.preventDefault();
+  setPhotoScale(photoScale > 1 ? 1 : 2);
+});
+photoViewport.addEventListener('keydown', event => {
+  if(!['+', '=', '-', '0'].includes(event.key)) return;
+  event.preventDefault();
+  setPhotoScale(event.key === '0' ? 1 : photoScale + (event.key === '-' ? -.5 : .5));
+});
+photoViewport.addEventListener('pointerdown', event => {
+  if(event.button !== 0) return;
+  photoPointers.set(event.pointerId, {x:event.clientX, y:event.clientY, startX:event.clientX, startY:event.clientY, moved:false});
+  photoViewport.setPointerCapture(event.pointerId);
+  if(photoPointers.size > 1){
+    photoPointers.forEach(point => { point.moved = true; });
+    photoPinchDistance = photoPointerDistance();
+  }
+});
+photoViewport.addEventListener('pointermove', event => {
+  const previous = photoPointers.get(event.pointerId);
+  if(!previous) return;
+  const dx = event.clientX-previous.x, dy = event.clientY-previous.y;
+  previous.moved ||= Math.hypot(event.clientX-previous.startX, event.clientY-previous.startY) > 5;
+  previous.x = event.clientX; previous.y = event.clientY;
+  if(photoPointers.size === 2){
+    const distance = photoPointerDistance();
+    if(photoPinchDistance > 0) setPhotoScale(photoScale * distance / photoPinchDistance);
+    photoPinchDistance = distance;
+  }else if(photoScale > 1){
+    photoViewport.scrollLeft -= dx;
+    photoViewport.scrollTop -= dy;
+  }
+});
+function finishPhotoPointer(event){
+  const point = photoPointers.get(event.pointerId);
+  if(!point) return;
+  if(event.type === 'pointerup' && event.pointerType === 'touch' && !point.moved){
+    const now = Date.now();
+    if(photoLastTap && now-photoLastTap < 300){ setPhotoScale(photoScale > 1 ? 1 : 2); photoLastTap = 0; }
+    else photoLastTap = now;
+  }
+  photoPointers.delete(event.pointerId);
+  photoPinchDistance = 0;
+}
+['pointerup','pointercancel','lostpointercapture'].forEach(type => photoViewport.addEventListener(type, finishPhotoPointer));
+productPhotoDialog.addEventListener('close', () => {
+  photoPointers.clear(); photoPinchDistance = 0; photoLastTap = 0;
 });
 productPhotoDialog.addEventListener('click', event => {
   if (event.target === productPhotoDialog) productPhotoDialog.close();
@@ -1346,9 +1403,7 @@ function openMenuPhoto(thumb){
   photo.src = thumb.currentSrc || thumb.src;
   photo.alt = thumb.alt || 'Imagen de Clowder';
   productPhotoDialog.querySelector('p').textContent = photo.alt;
-  productPhotoDialog.classList.remove('is-zoomed');
-  photoZoomButton.setAttribute('aria-pressed', 'false');
-  photoZoomButton.textContent = 'Acercar';
+  setPhotoScale(1);
   const viewport = productPhotoDialog.querySelector('.product-photo-viewport');
   viewport.scrollTop = viewport.scrollLeft = 0;
   productPhotoDialog.showModal();
