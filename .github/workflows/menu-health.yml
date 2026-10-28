@@ -1,0 +1,19 @@
+name: Menu health
+on:
+  push:
+  pull_request:
+permissions:
+  contents: read
+jobs:
+  cart-and-cache:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - run: node --check app.js && node --check contact-config.js && node --check sw.js
+      - run: node scripts/check-cart-preservation.cjs
+      - run: node scripts/check-service-worker.cjs
+      - run: npm install --no-save --package-lock=false jsdom@26
+      - run: node scripts/check-photo-viewer.cjs

@@ -971,7 +971,20 @@ function removeExtra(id, type){
   const nextLineId = cartLineId(productId, options);
   const entry = {...cart[id], ...options};
   if(nextLineId !== id){
-    if(cart[nextLineId]) cart[nextLineId].qty = Math.min(itemQuantityLimit(productForCartLine(nextLineId)), cart[nextLineId].qty + entry.qty);
+    if(cart[nextLineId]){
+      const destination = cart[nextLineId];
+      const mergedQty = destination.qty + entry.qty;
+      if(mergedQty > itemQuantityLimit(productForCartLine(nextLineId))){
+        alert('Al quitar este extra se supera el límite de unidades de la misma opción. Reduce la cantidad antes de continuar. Tu pedido no ha cambiado.');
+        return;
+      }
+      // Distinct instructions cannot safely be assigned to the merged quantity.
+      if((destination.note || '') !== (entry.note || '')){
+        alert('Estas opciones tienen notas diferentes. Iguala o elimina sus notas antes de combinarlas. Tu pedido no ha cambiado.');
+        return;
+      }
+      destination.qty = mergedQty;
+    }
     else cart[nextLineId] = entry;
     delete cart[id];
   } else cart[id] = entry;
@@ -1314,22 +1327,64 @@ function renderCartList(){
 // Foto ampliada: el diálogo conserva el foco y permite cerrar con Escape.
 const productPhotoDialog = document.createElement('dialog');
 productPhotoDialog.className = 'product-photo-dialog';
-productPhotoDialog.setAttribute('aria-label', 'Foto del producto');
-productPhotoDialog.innerHTML = '<button type="button" class="product-photo-close" aria-label="Cerrar foto">×</button><img alt=""><p></p>';
+productPhotoDialog.setAttribute('aria-label', 'Imagen ampliada');
+productPhotoDialog.innerHTML = '<button type="button" class="product-photo-close" aria-label="Cerrar foto">×</button><button type="button" class="product-photo-zoom" aria-pressed="false">Acercar</button><div class="product-photo-viewport"><img alt=""></div><p></p>';
 document.body.append(productPhotoDialog);
-productPhotoDialog.querySelector('button').addEventListener('click', () => productPhotoDialog.close());
+productPhotoDialog.querySelector('.product-photo-close').addEventListener('click', () => productPhotoDialog.close());
+const photoZoomButton = productPhotoDialog.querySelector('.product-photo-zoom');
+photoZoomButton.addEventListener('click', () => {
+  const zoomed = productPhotoDialog.classList.toggle('is-zoomed');
+  photoZoomButton.setAttribute('aria-pressed', String(zoomed));
+  photoZoomButton.textContent = zoomed ? 'Ajustar' : 'Acercar';
+});
 productPhotoDialog.addEventListener('click', event => {
   if (event.target === productPhotoDialog) productPhotoDialog.close();
 });
-document.getElementById('menu').addEventListener('click', event => {
-  const thumb = event.target.closest('.item-thumb');
-  if (!thumb) return;
+function openMenuPhoto(thumb){
+  if(productPhotoDialog.open || !thumb.getAttribute('src')) return;
   const photo = productPhotoDialog.querySelector('img');
   photo.src = thumb.currentSrc || thumb.src;
-  photo.alt = thumb.alt;
-  productPhotoDialog.querySelector('p').textContent = thumb.alt;
+  photo.alt = thumb.alt || 'Imagen de Clowder';
+  productPhotoDialog.querySelector('p').textContent = photo.alt;
+  productPhotoDialog.classList.remove('is-zoomed');
+  photoZoomButton.setAttribute('aria-pressed', 'false');
+  photoZoomButton.textContent = 'Acercar';
+  const viewport = productPhotoDialog.querySelector('.product-photo-viewport');
+  viewport.scrollTop = viewport.scrollLeft = 0;
   productPhotoDialog.showModal();
+}
+// Attach to images themselves so photos inside category/promotion buttons open
+// the viewer without triggering the parent action. Carousel drag stays intact.
+const expandablePhotos = new WeakSet();
+function enablePhotoExpansion(root){
+  const images = root.matches?.('img') ? [root] : [...(root.querySelectorAll?.('img') || [])];
+  images.forEach(img => {
+    if(img.closest('.product-photo-dialog') || expandablePhotos.has(img)) return;
+    expandablePhotos.add(img);
+    img.setAttribute('role', 'button');
+    img.setAttribute('tabindex', '0');
+    img.setAttribute('aria-label', `Ampliar imagen: ${img.alt || img.closest('[aria-label]')?.getAttribute('aria-label') || 'Clowder'}`);
+    img.classList.add('expandable-photo');
+    img.addEventListener('click', event => {
+      event.preventDefault();
+      event.stopPropagation();
+      openMenuPhoto(img);
+    });
+    img.addEventListener('keydown', event => {
+      if(event.key !== 'Enter' && event.key !== ' ') return;
+      event.preventDefault();
+      event.stopPropagation();
+      openMenuPhoto(img);
+    });
+  });
+}
+enablePhotoExpansion(document);
+const photoExpansionObserver = new MutationObserver(records => {
+  records.forEach(record => record.addedNodes.forEach(node => {
+    if(node.nodeType === 1) enablePhotoExpansion(node);
+  }));
 });
+photoExpansionObserver.observe(document.body, {childList:true, subtree:true});
 
 document.getElementById('cartbar').addEventListener('click', openCart);
 document.addEventListener('keydown', event => {
