@@ -15,3 +15,5 @@ jobs:
       - run: node --check app.js && node --check contact-config.js && node --check sw.js
       - run: node scripts/check-cart-preservation.cjs
       - run: node scripts/check-service-worker.cjs
+      - run: npm install --no-save --package-lock=false jsdom@26
+      - run: node scripts/check-photo-viewer.cjs
