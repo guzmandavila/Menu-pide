@@ -8,6 +8,7 @@ const dom = new JSDOM('<body><button id="category"><img src="banner.jpg" alt="Ba
 const {window} = dom;
 window.HTMLDialogElement.prototype.showModal = function(){this.open = true;};
 window.HTMLDialogElement.prototype.close = function(){this.open = false;};
+window.HTMLElement.prototype.setPointerCapture = function(){};
 const start = source.indexOf('const productPhotoDialog =');
 const end = source.indexOf("document.getElementById('cartbar').addEventListener", start);
 assert.ok(start >= 0 && end > start);
@@ -24,9 +25,33 @@ async function main(){
   assert.equal(photo.getAttribute('src'), 'https://example.test/banner.jpg');
   assert.equal(categoryClicks, 0, 'A photo must not navigate its parent category');
   assert.equal(banner.getAttribute('role'), 'button');
-  viewer.querySelector('.product-photo-zoom').click();
+  assert.equal(viewer.querySelector('.product-photo-zoom'), null, 'No visible zoom button');
+  const viewport = viewer.querySelector('.product-photo-viewport');
+  viewport.dispatchEvent(new window.MouseEvent('dblclick', {bubbles:true, cancelable:true}));
   assert.ok(viewer.classList.contains('is-zoomed'));
-  assert.equal(viewer.querySelector('.product-photo-zoom').getAttribute('aria-pressed'), 'true');
+  viewport.dispatchEvent(new window.MouseEvent('dblclick', {bubbles:true, cancelable:true}));
+  assert.equal(viewer.classList.contains('is-zoomed'), false);
+  function pointer(type, id, x, y){
+    const event = new window.Event(type, {bubbles:true, cancelable:true});
+    Object.assign(event, {pointerId:id, pointerType:'touch', button:0, clientX:x, clientY:y});
+    viewport.dispatchEvent(event);
+  }
+  pointer('pointerdown', 1, 0, 0);
+  pointer('pointerdown', 2, 100, 0);
+  pointer('pointermove', 2, 200, 0);
+  assert.equal(viewer.style.getPropertyValue('--photo-scale'), '2', 'Pinch outward enlarges');
+  pointer('pointermove', 2, 100, 0);
+  assert.equal(viewer.style.getPropertyValue('--photo-scale'), '1', 'Pinch inward restores fit');
+  pointer('pointerup', 2, 100, 0);
+  pointer('pointerup', 1, 0, 0);
+  for(let i=0;i<2;i++) { pointer('pointerdown', 1, 50, 50); pointer('pointerup', 1, 50, 50); }
+  assert.equal(viewer.style.getPropertyValue('--photo-scale'), '2', 'Double tap enlarges');
+  pointer('pointerdown', 1, 50, 50);
+  pointer('pointermove', 1, 25, 25);
+  assert.equal(viewport.scrollLeft, 25, 'Drag pans enlarged image');
+  pointer('pointerup', 1, 25, 25);
+  viewport.dispatchEvent(new window.KeyboardEvent('keydown', {key:'0', bubbles:true, cancelable:true}));
+  assert.equal(viewer.style.getPropertyValue('--photo-scale'), '1');
   viewer.querySelector('.product-photo-close').click();
   assert.equal(viewer.open, false);
   doc.querySelector('#category span').click();
@@ -55,6 +80,6 @@ async function main(){
   assert.equal(viewer.open, true);
   viewer.dispatchEvent(new window.MouseEvent('click', {bubbles:true}));
   assert.equal(viewer.open, false, 'Backdrop click closes the viewer');
-  console.log('Photo viewer checks passed: banners, logos, dynamic photos, keyboard, zoom, category actions and drag suppression.');
+  console.log('Photo viewer checks passed: pinch, double tap/click, pan, keyboard, dynamic photos, category actions and drag suppression.');
 }
 main().catch(error => {console.error(error);process.exitCode = 1;}).finally(() => window.close());
