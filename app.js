@@ -971,7 +971,20 @@ function removeExtra(id, type){
   const nextLineId = cartLineId(productId, options);
   const entry = {...cart[id], ...options};
   if(nextLineId !== id){
-    if(cart[nextLineId]) cart[nextLineId].qty = Math.min(itemQuantityLimit(productForCartLine(nextLineId)), cart[nextLineId].qty + entry.qty);
+    if(cart[nextLineId]){
+      const destination = cart[nextLineId];
+      const mergedQty = destination.qty + entry.qty;
+      if(mergedQty > itemQuantityLimit(productForCartLine(nextLineId))){
+        alert('Al quitar este extra se supera el límite de unidades de la misma opción. Reduce la cantidad antes de continuar. Tu pedido no ha cambiado.');
+        return;
+      }
+      // Distinct instructions cannot safely be assigned to the merged quantity.
+      if((destination.note || '') !== (entry.note || '')){
+        alert('Estas opciones tienen notas diferentes. Iguala o elimina sus notas antes de combinarlas. Tu pedido no ha cambiado.');
+        return;
+      }
+      destination.qty = mergedQty;
+    }
     else cart[nextLineId] = entry;
     delete cart[id];
   } else cart[id] = entry;
