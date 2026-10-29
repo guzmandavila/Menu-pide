@@ -541,6 +541,10 @@ const GROUP_NAMES = {
 };
 let groupView = {milkishaki:'milkishaki-fresa', 'pumpkin-spice-latte':'pumpkin-spice-frio'}; // group -> currently displayed variant id
 
+function closeTouchSelector(select){
+  if(window.matchMedia('(hover: none) and (pointer: coarse)').matches) select.blur();
+}
+
 function selectVariant(group, id){
   const card = document.getElementById(`menu-group-${group}`);
   const previousTop = card?.getBoundingClientRect().top;
@@ -549,7 +553,9 @@ function selectVariant(group, id){
   renderMenu();
   const bannerTrack = document.getElementById('catBannerTrack');
   if(bannerTrack && bannerScroll !== undefined) bannerTrack.scrollLeft = bannerScroll;
-  document.querySelector(`#menu-group-${group} .variant-select`)?.focus({preventScroll:true});
+  if(!window.matchMedia('(hover: none) and (pointer: coarse)').matches){
+    document.querySelector(`#menu-group-${group} .variant-select`)?.focus({preventScroll:true});
+  }
   if(previousTop !== undefined){
     const nextCard = document.getElementById(`menu-group-${group}`);
     if(nextCard){
@@ -685,7 +691,7 @@ function renderMenu(){
     const badgeClass = i.comingSoon ? 'coming-soon-price' : (i.soldOut ? 'sold-out-price' : '');
     const unavailableNote = i.comingSoon ? (i.comingSoonNote || 'Todavía no está disponible para pedir.') : (i.soldOut ? (i.soldOutNote || 'Se agotó por hoy — vuelve pronto.') : '');
     const variantSelect = i.__isGroup ? `
-      <select class="variant-select" style="background-color:${flavorColor}; color:${flavorText}; background-image:${arrowSvg(flavorText)};" onchange="selectVariant('${i.__group}', this.value)">
+      <select class="variant-select" style="background-color:${flavorColor}; color:${flavorText}; background-image:${arrowSvg(flavorText)};" onchange="closeTouchSelector(this); selectVariant('${i.__group}', this.value)">
         ${i.__variants.map(v=>`<option value="${v.id}" ${v.id===i.id?'selected':''}>${v.flavor}${v.comingSoon ? ' — Vuelve pronto' : ''}</option>`).join('')}
       </select>` : '';
     const priceHtml = !i.comingSoon ? `<div class="item-price-col">
@@ -722,17 +728,17 @@ function renderMenu(){
         <button class="note-toggle ${note?'has-note':''}" id="notebtn-${i.id}" onclick="toggleNote('${i.id}')">${note ? '✎ '+escapeHtml(truncate(note)) : '+ nota'}</button>
       </div>
       ${i.milk ? `
-      <select class="milk-select" id="milk-${i.id}" onchange="setMilk('${i.id}', this.value)">
+      <select class="milk-select" id="milk-${i.id}" onchange="closeTouchSelector(this); setMilk('${i.id}', this.value)">
         <option value="" ${milk===''?'selected':''}>Leche deslactosada</option>
         <option value="almendra" ${milk==='almendra'?'selected':''}>+ Leche vegetal de almendras, casera (+$0.50)</option>
       </select>` : ''}
       ${i.scoop ? `
-      <select class="milk-select" id="scoop-${i.id}" onchange="setScoop('${i.id}', this.value)">
+      <select class="milk-select" id="scoop-${i.id}" onchange="closeTouchSelector(this); setScoop('${i.id}', this.value)">
         <option value="" ${scoop===''?'selected':''}>Sin bola de helado</option>
         <option value="si" ${scoop==='si'?'selected':''}>+ Bola de helado de vainilla Madagascar (+$0.75)</option>
       </select>` : ''}
       ${i.syrupOption ? `
-      <select class="milk-select syrup-select" id="syrup-${i.id}" style="${syrupSelectStyle(syrup)}" onchange="setSyrup('${i.id}', this.value)">
+      <select class="milk-select syrup-select" id="syrup-${i.id}" style="${syrupSelectStyle(syrup)}" onchange="closeTouchSelector(this); setSyrup('${i.id}', this.value)">
         <option value="" ${syrup===''?'selected':''}>Personaliza tu bebida con un toque de sabor (opcional)</option>
         ${i.syrupOption.map(flavorKey => { const color = SYRUP_COLORS[flavorKey] || SYRUP_COLORS['']; return `<option value="${flavorKey}" style="background-color:${color};color:${textColorFor(color)}" ${syrup===flavorKey?'selected':''}>Toque de ${SYRUP_LABELS[flavorKey]} (+$0.50)</option>`; }).join('')}
       </select>` : ''}
