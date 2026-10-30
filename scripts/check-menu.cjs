@@ -132,7 +132,7 @@ test('Todos los menús se muestran en móvil sin errores ni desbordamiento horiz
   }
 }));
 
-test('Stock actual: helados, pollo y queso disponibles; pizza, wachipapas y tocipapas agotados', () => useFixture(async ({ page }) => {
+test('Stock actual: helados y queso disponibles; pollo, pizza, wachipapas y tocipapas agotados', () => useFixture(async ({ page }) => {
   const result = await page.evaluate(() => {
     const ids = ['affocato', 'milkishaki-nutella', 'milkishaki-fresa', 'milkishaki-salted-caramel'];
     changeQty('empanada-queso', 1);
@@ -147,11 +147,10 @@ test('Stock actual: helados, pollo y queso disponibles; pizza, wachipapas y toci
   });
   assert.deepEqual(result.iceCream, [true, true, true, true]);
   assert.equal(result.cheese, true);
-  assert.equal(result.chicken, true);
+  assert.equal(result.chicken, false);
   assert.deepEqual(result.potatoes, [false, false, true]);
   assert.equal(result.hidden, true);
-  assert.deepEqual(Object.keys(result.restored), ['empanada-pollo', 'empanada-queso']);
-  assert.equal(result.restored['empanada-pollo'].qty, 8);
+  assert.deepEqual(Object.keys(result.restored), ['empanada-queso']);
   await page.evaluate(() => selectCat('Snack Sal'));
   assert.doesNotMatch(await page.locator('#menu').textContent(), /Últimas 4 empanadas de pollo/);
   assert.equal(await page.locator('#qty-empanada-capresse').count(), 1);
@@ -160,7 +159,8 @@ test('Stock actual: helados, pollo y queso disponibles; pizza, wachipapas y toci
   assert.equal(await page.evaluate(() => isItemOrderable(MENU.find(item => item.id === 'empanada-pizza'))), false);
   assert.equal(await page.evaluate(() => MENU.find(item => item.id === 'empanada-pizza').img === MENU.find(item => item.id === 'empanada-pollo').img), true);
   await page.evaluate(() => { groupView.empanada = 'empanada-pollo'; renderMenu(); });
-  assert.equal(await page.locator('#qty-empanada-pollo').count(), 1);
+  assert.equal(await page.locator('#qty-empanada-pollo').count(), 0);
+  assert.match(await page.locator('#menu-group-empanada').textContent(), /Agotado/);
   assert.equal(await page.locator('#menu .cat-banner-slide img[src="banners/empanadas-octubre.jpeg"]').count(), 1);
 }));
 
@@ -790,6 +790,61 @@ test('Si falla guardar la copia de recuperación, conserva el carrito para reint
   assert.equal((await orderState(page)).destinations.length,1);
   assert.equal(await page.locator('#whatsappRecovery').isVisible(),true);
 }));
+
+test('Mao Mao toma pedidos de los tres usuarios; el backoffice concentra cobros y contabilidad', async () => {
+  for(const user of ['Alessa','Fernanda','Ronald']) await useFixture(async ({page,ready}) => {
+    const calls=[],orders=[];let loggedIn=false;
+    const session={user,token:'a'.repeat(64),expiresAt:'2026-10-31T23:59:59Z'};
+    await page.route('**/api-config.js*',route=>route.fulfill({contentType:'text/javascript',body:`window.CLOWDER_API=${JSON.stringify(baseURL.replace(/\/$/,''))};`}));
+    await page.route('**/api/**',route=>{
+      const pathname=new URL(route.request().url()).pathname;calls.push(pathname);
+      const reply=(body,status=200)=>route.fulfill({status,contentType:'application/json',body:JSON.stringify(body)});
+      if(pathname==='/api/login'){assert.equal(route.request().postDataJSON().user,user);loggedIn=true;return reply(session);}
+      if(!loggedIn)return reply({error:'Sesión vencida'},401);
+      if(pathname==='/api/me')return reply({user});
+      if(pathname==='/api/logout'){loggedIn=false;return reply({ok:true});}
+      if(pathname==='/api/staff/orders'){
+        assert.equal(route.request().headers().authorization,'Bearer '+session.token);
+        const payload={...route.request().postDataJSON(),createdBy:user};
+        orders.push({code:payload.code,payload,status:'pending',created_at:'2026-10-30T20:00:00Z'});
+        return reply({ok:true,createdBy:user,createdAt:orders[0].created_at});
+      }
+      if(pathname==='/api/admin')return reply({currentUser:user,orders,settlements:[],cashMovements:[],audit:[]});
+      return reply({ok:true});
+    });
+    await page.goto(new URL('maomao/',baseURL).href);
+    await page.locator('#staffUser').selectOption(user);await page.locator('#token').fill('123456');
+    await page.locator('#login button').click();await page.locator('#workspace').waitFor({state:'visible'});
+    assert.match(await page.locator('#signedIn').textContent(),new RegExp(user));
+    assert.equal(await page.locator('#orders,#summary,#manual,#cashForm,#settlement,.panel-tabs').count(),0);
+    assert.ok(!calls.includes('/api/admin'));
+    await page.reload();await page.locator('#workspace').waitFor({state:'visible'});
+    assert.ok(calls.includes('/api/me'));assert.ok(!calls.includes('/api/admin'));
+    await page.locator('#newStaffOrder').click();await ready();
+    await page.waitForFunction(user=>document.querySelector('.staff-order-notice')?.textContent.includes('Nuevo pedido · '+user),user);
+    await prepare(page,{name:'Cliente atendido en persona',items:{catpuccino:1}});
+    await page.locator('#staffCustomerPhone').fill('0991234567');
+    await page.evaluate(()=>sendOrder());
+    assert.equal(orders.length,1);assert.equal(orders[0].status,'pending');assert.equal(orders[0].payload.createdBy,user);
+    assert.deepEqual((await orderState(page)).cart,{});
+    assert.equal((await orderState(page)).destinations.length,0);
+    assert.match(await page.locator('#virtualTicket pre').textContent(),new RegExp(user));
+    assert.match(await page.locator('#virtualTicket pre').textContent(),/Cliente atendido en persona/);
+    assert.ok(!calls.includes('/api/admin'));
+    await page.goto(new URL('backoffice/',baseURL).href);await page.locator('#workspace').waitFor({state:'visible'});
+    assert.match(await page.locator('h1').textContent(),/Cobros y contabilidad/);
+    assert.equal(await page.locator('#orders article').count(),1);
+    assert.match(await page.locator('#orders article').textContent(),new RegExp('Ingresado por: '+user));
+    assert.equal(await page.locator('#newStaffOrder').count(),0);
+    assert.equal(await page.locator('#tab-accounting').count(),1);
+    assert.equal(await page.locator('#manual,#cashForm,#settlement').count(),3);
+    await page.goto(new URL('maomao/',baseURL).href);await page.locator('#workspace').waitFor({state:'visible'});
+    assert.ok(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth+1));
+    await page.screenshot({path:'/tmp/clowder-maomao-mobile.png',fullPage:true});
+    await page.locator('#logout').click();await page.locator('#login').waitFor({state:'visible'});
+    assert.equal(await page.evaluate(()=>sessionStorage.getItem('clowder_staff_session')),null);
+  });
+});
 
 async function main() {
   if (process.env.MENU_TEST_BASE_URL) baseURL = process.env.MENU_TEST_BASE_URL;
