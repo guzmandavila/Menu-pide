@@ -178,8 +178,21 @@ const CAT_BANNERS = {
 // pero no aparecen como pestaña hasta sacarlas de esta lista.
 const HIDDEN_CATS = ['Merch Clowder', 'Congelados y Más', 'Combos']; // categorías ocultas temporalmente
 const CATS = [...new Set(MENU.map(i=>i.cat))].filter(c => !HIDDEN_CATS.includes(c));
+// Jornada especial: expira a medianoche en Ecuador sin cambiar el stock.
+const DRINKS_ONLY_START = Date.parse('2026-10-30T00:00:00-05:00');
+const DRINKS_ONLY_END = Date.parse('2026-10-31T00:00:00-05:00');
+const DRINKS_ONLY_CATS = ['Bebidas Calientes', 'Bebidas Frías', 'Matcha', 'Bebida del Mes'];
+function isDrinksOnlyDay(now = Date.now()){
+  return now >= DRINKS_ONLY_START && now < DRINKS_ONLY_END;
+}
+function isAllowedToday(item){
+  return !isDrinksOnlyDay() || DRINKS_ONLY_CATS.includes(item.cat);
+}
 function visibleCats(){
-  return CATS;
+  return CATS.filter(cat => !isDrinksOnlyDay() || DRINKS_ONLY_CATS.includes(cat));
+}
+function refreshDrinksOnlyNotice(){
+  document.getElementById('drinksOnlyNotice').hidden = !isDrinksOnlyDay();
 }
 
 /* Colores secundarios de marca — uno por categoría de sabor */
@@ -223,6 +236,7 @@ let payMethod = '';
 const PAYMENT_BANKS = ['Guayaquil','Pichincha','Bolivariano','Pacífico','Produbanco'];
 let paymentBank = '';
 let orderReceiptKey = '';
+let lastAttemptFingerprint = '';
 let deliveryLocationUrl = '';
 let lastCartCount = 0;
 let locationRequestVersion = 0;
@@ -305,7 +319,7 @@ function sanitizeCart(value){
     const legacyStrength = productId === 'long-tail' && ['estandar','suave','muy-suave'].includes(entry?.strength) ? entry.strength : '';
     if(legacyStrength) productId = MENU.find(product => product.group === 'long-tail-intensity' && product.strengthLevel === legacyStrength)?.id || productId;
     const item = MENU.find(product => product.id === productId);
-    if(!item || !isWithinAvailability(item) || (item.soldOut && item.id !== 'clowder-pizza') || item.comingSoon || HIDDEN_CATS.includes(item.cat) || HIDDEN_ITEM_IDS.includes(item.id) || !entry || typeof entry !== 'object') continue;
+    if(!item || !isAllowedToday(item) || !isWithinAvailability(item) || (item.soldOut && item.id !== 'clowder-pizza') || item.comingSoon || HIDDEN_CATS.includes(item.cat) || HIDDEN_ITEM_IDS.includes(item.id) || !entry || typeof entry !== 'object') continue;
     if(!Number.isInteger(entry.qty) || entry.qty < 1) continue;
     const options = {
       milk:item.milk && ['almendra','avena'].includes(entry.milk) ? entry.milk : '',
@@ -344,7 +358,8 @@ try {
     mode = ['mesa','llevar','delivery'].includes(draft.mode) ? draft.mode : '';
     payMethod = ['efectivo','transferencia'].includes(draft.payMethod) ? draft.payMethod : '';
     paymentBank = PAYMENT_BANKS.includes(draft.paymentBank) ? draft.paymentBank : '';
-    orderReceiptKey = /^[a-f0-9]{64}$/.test(draft.orderReceiptKey || '') ? draft.orderReceiptKey : '';
+    lastAttemptFingerprint = typeof draft.attemptFingerprint === 'string' ? draft.attemptFingerprint : '';
+    orderReceiptKey = lastAttemptFingerprint && /^[a-f0-9]{64}$/.test(draft.orderReceiptKey || '') ? draft.orderReceiptKey : '';
     deliveryLocationUrl = typeof draft.deliveryLocationUrl === 'string' && /^https:\/\/www\.google\.com\/maps\?q=-?[\d.]+,-?[\d.]+$/.test(draft.deliveryLocationUrl) ? draft.deliveryLocationUrl : '';
   }
 } catch(e) {}
@@ -352,7 +367,7 @@ try {
 function persistOrderDraft(){
   try {
     draftStorage.setItem(ORDER_DRAFT_KEY, JSON.stringify({
-      cart, pendingOptions, mode, payMethod, paymentBank, orderReceiptKey, deliveryLocationUrl, orderCode:currentOrderCode,
+      cart, pendingOptions, mode, payMethod, paymentBank, orderReceiptKey, deliveryLocationUrl, orderCode:currentOrderCode, attemptFingerprint:lastAttemptFingerprint,
           customerName: document.getElementById('customerName')?.value || '',
           customerPhone: document.getElementById('staffCustomerPhone')?.value || '',
           cashAmount: document.getElementById('cashAmount')?.value || '',
@@ -616,13 +631,15 @@ function renderCategoryHome(){
   return `<section class="category-home-view" aria-label="Categorías del menú">${promo}<div class="category-home-grid">${tiles}</div></section>`;
 }
 function renderMenu(){
+  refreshDrinksOnlyNotice();
+  if(!visibleCats().includes(activeCat)) categoryHome = true;
   const el = document.getElementById('menu');
   if(categoryHome){
     el.innerHTML = renderCategoryHome();
     return;
   }
   const today = businessTime().day;
-  const items = MENU.filter(i=>i.cat===activeCat && !HIDDEN_ITEM_IDS.includes(i.id) && isWithinAvailability(i));
+  const items = MENU.filter(i=>i.cat===activeCat && isAllowedToday(i) && !HIDDEN_ITEM_IDS.includes(i.id) && isWithinAvailability(i));
   const seenGroups = new Set();
   const display = [];
   items.forEach(i=>{
@@ -1077,7 +1094,7 @@ function shareLocation(){
 }
 function isItemOrderable(item){
   if(birthdayState().closed) return false;
-  if(!isWithinAvailability(item) || item.soldOut || item.comingSoon || HIDDEN_CATS.includes(item.cat) || HIDDEN_ITEM_IDS.includes(item.id)) return false;
+  if(!isAllowedToday(item) || !isWithinAvailability(item) || item.soldOut || item.comingSoon || HIDDEN_CATS.includes(item.cat) || HIDDEN_ITEM_IDS.includes(item.id)) return false;
   if(item.days && !item.days.includes(businessTime().day)) return false;
   if(KITCHEN_HOURS_ITEM_IDS.includes(item.id)) return isMenuOpenNow();
   if(FULL_MENU_ORDERING_ENABLED) return true;
@@ -1529,6 +1546,10 @@ function itemDayNotice(item){
 function showUnavailableNotice(id){
   if(birthdayState().closed){ openHours('🎂 Cerrado por cumpleaños', 'Hoy cerramos a las 19h00 para celebrar al gato mesero. Puedes dejar un regalo desde $1 para los michis de la calle en el aviso de cumpleaños.'); return; }
   const item = MENU.find(product => product.id === id);
+  if(item && !isAllowedToday(item)){
+    openHours('Hoy solo bebidas', 'Estamos preparando Clowder para Halloween 🎃. Por hoy, elige entre nuestras bebidas.');
+    return;
+  }
   if(item && !isWithinAvailability(item)){
     openHours('Promoción por tiempo limitado', item.promoNote || 'Este producto ya no está disponible.');
     return;
@@ -1581,7 +1602,7 @@ let sendingOrder = false;
 let currentOrderCode = '';
 try {
   currentOrderCode = JSON.parse(draftStorage.getItem(ORDER_DRAFT_KEY) || 'null')?.orderCode || '';
-  if(!/^CL-[A-Z0-9-]{10,60}$/.test(currentOrderCode)) currentOrderCode = '';
+  if(!lastAttemptFingerprint || !/^CL-[A-Z0-9-]{10,60}$/.test(currentOrderCode)) currentOrderCode = '';
 } catch(e) {}
 
 // La parte aleatoria evita colisiones entre dispositivos en el mismo minuto.
@@ -1594,8 +1615,8 @@ function createOrderCode(now){
 }
 
 async function registerSharedOrder(apiUrl, order){
-  // Sin servidor configurado, el menú conserva su funcionamiento actual.
-  if(!apiUrl) return;
+  // No continuar a WhatsApp si falta el registro compartido.
+  if(!apiUrl) throw new Error('No se encontró el servicio de pedidos.');
   const url = new URL(apiUrl);
   if(url.protocol !== 'https:' && !(['localhost','127.0.0.1'].includes(url.hostname) && url.protocol === 'http:')) throw new Error('La dirección del registro de pedidos no es válida.');
   const controller = new AbortController();
@@ -1661,7 +1682,7 @@ async function sendOrder(){
     orderReceiptKey = Array.from(crypto.getRandomValues(new Uint8Array(32)), b => b.toString(16).padStart(2,'0')).join('');
     persistOrderDraft();
   }
-  const orderCode = currentOrderCode;
+  let orderCode = currentOrderCode;
   const totalItems = entries.reduce((s,[,c])=>s+c.qty,0);
 
   let msg = `\u{1F9FE} *Pedido Clowder* #${orderCode}\n`;
@@ -1712,6 +1733,16 @@ async function sendOrder(){
   });
   if(hasFrozenOrder) msg += `📦 Producto bajo stock: coordinamos contigo la entrega o retiro.\n`;
   msg += `\n☕ *¡Gracias! Te esperamos en Clowder.*\n`;
+  // Un reintento idéntico conserva su código; cualquier cambio crea otro.
+  const fingerprint = JSON.stringify({name, customerPhone, method:payMethod, total:grandTotal(), details:msg.replace(orderCode, '<codigo>')});
+  if(lastAttemptFingerprint && lastAttemptFingerprint !== fingerprint){
+    const previousCode = orderCode;
+    currentOrderCode = orderCode = createOrderCode(now);
+    orderReceiptKey = Array.from(crypto.getRandomValues(new Uint8Array(32)), b => b.toString(16).padStart(2,'0')).join('');
+    msg = msg.replace(previousCode, orderCode);
+  }
+  lastAttemptFingerprint = fingerprint;
+  persistOrderDraft();
   const transfer = payMethod === 'transferencia';
   const sharedOrder = {code:orderCode, receiptKey:orderReceiptKey, name, method:payMethod, bank:'', totalCents:Math.round(grandTotal()*100), details:msg};
   if(STAFF_MODE){ await saveStaffOrder({...sharedOrder,customerPhone}); return; }
@@ -1719,37 +1750,24 @@ async function sendOrder(){
   const target = MenuContact.reserveWindow();
   sendingOrder = true;
   document.getElementById('contactError').hidden = true;
-  document.getElementById('whatsappRecovery').hidden = true;
   document.getElementById('sendBtn').textContent = 'Conectando con WhatsApp…';
   updateBars();
   try {
     const contact = await MenuContact.refresh();
-    // El registro compartido no debe impedir abrir WhatsApp si el servicio externo está lento o caído.
-    const hasPizza = entries.some(([id]) => productForCartLine(id)?.id === 'clowder-pizza');
-    let registered;
-    if(hasPizza){
-      if(!contact.ordersApiUrl) throw new Error('No pudimos verificar las pizzas disponibles.');
-      await registerSharedOrder(contact.ordersApiUrl, sharedOrder);
-      registered = true;
-      refreshPizzaAvailability();
-    }else{
-      const registration = registerSharedOrder(contact.ordersApiUrl, sharedOrder).then(() => true, () => false);
-      registered = await Promise.race([registration, new Promise(resolve => setTimeout(() => resolve(false), 1200))]);
-    }
+    // WhatsApp solo recibe pedidos cuyo registro fue confirmado.
+    await registerSharedOrder(contact.ordersApiUrl, sharedOrder);
+    refreshPizzaAvailability();
     if(transfer) msg += `🏦 Cuentas: ${contact.paymentsUrl}\n`;
     msg += `📸 Instagram: ${contact.instagramUrl}\n`;
     msg += `💬 Comunidad: ${contact.communityUrl}`;
     const destination = MenuContact.url(msg);
-    // Un enlace directo conserva el gesto del cliente si el navegador bloquea la apertura.
-    document.getElementById('whatsappRecoveryLink').href = destination;
-    document.getElementById('whatsappRecoveryMessage').textContent = registered
-      ? 'Tu pedido quedó registrado. Si WhatsApp no se abrió,'
-      : 'El pedido sigue guardado en este teléfono, pero la app no confirmó el registro. Puedes enviarlo por WhatsApp; si no se abrió,';
-    document.getElementById('whatsappRecovery').hidden = false;
+    rememberOrder(sharedOrder, msg);
+    completeOrder();
+    renderOrderHistory();
+    renderWhatsAppRecovery();
     try {
       MenuContact.navigate(target, destination);
     } catch (_) {
-      // El pedido ya está registrado: el enlace permite continuar sin volver a registrarlo.
       try { if(target) target.close(); } catch (_) {}
     }
   const confirmation = document.getElementById('orderComplete');
@@ -1768,6 +1786,13 @@ async function sendOrder(){
   }
 }
 
+// Mientras se confirma el registro, conservar intactos los datos enviados.
+for(const eventName of ['click', 'keydown', 'input', 'change']) document.addEventListener(eventName, event => {
+  if(sendingOrder && event.target.closest('#overlay, #menu, #orderHistory, #whatsappRecovery')){
+    event.preventDefault(); event.stopImmediatePropagation();
+  }
+}, true);
+
 function startNewOrder(){
   checkoutAttempted = false;
   if(sendingOrder) return;
@@ -1776,14 +1801,15 @@ function startNewOrder(){
 }
 
 function completeOrder(){
-  document.getElementById('whatsappRecovery').hidden = true;
-  document.getElementById('whatsappRecoveryLink').removeAttribute('href');
   // El mensaje se preparó en WhatsApp; su envío final ocurre allí.
   locationRequestVersion++;
   document.getElementById('locationStatus').textContent = '';
   try { draftStorage.removeItem(ORDER_DRAFT_KEY); } catch(e) {}
   try { sessionStorage.removeItem('clowder_active_order_code'); } catch(e) {}
   cart = {};
+  pendingOptions = {};
+  lastAttemptFingerprint = '';
+  checkoutAttempted = false;
   mode = '';
   payMethod = '';
   paymentBank = '';
@@ -1802,6 +1828,73 @@ function completeOrder(){
   try { draftStorage.removeItem(ORDER_DRAFT_KEY); } catch(e) {}
   document.getElementById('orderComplete').classList.remove('open');
 }
+
+// Historial privado de este dispositivo; nunca reutiliza códigos ni credenciales.
+const ORDER_HISTORY_KEY = STAFF_MODE ? ORDER_DRAFT_KEY + '_history' : 'clowder_order_history';
+let orderHistory = [];
+try {
+  const saved = JSON.parse(draftStorage.getItem(ORDER_HISTORY_KEY) || '[]');
+  if(Array.isArray(saved)) orderHistory = saved.filter(entry => entry && /^CL-[A-Z0-9-]{10,60}$/.test(entry.code) && typeof entry.message === 'string' && entry.message.length <= 20000 && Number.isFinite(entry.totalCents)).slice(0, 10);
+} catch (_) {}
+function rememberOrder(order, message){
+  const entry = {code:order.code, message, totalCents:order.totalCents, preparedAt:new Date().toISOString(), needsRecovery:true, cart:JSON.parse(JSON.stringify(cart))};
+  const nextHistory = [entry, ...orderHistory.filter(previous => previous.code !== entry.code)].slice(0, 10);
+  // Si no se puede conservar la copia, mantener el carrito para reintentar.
+  try { draftStorage.setItem(ORDER_HISTORY_KEY, JSON.stringify(nextHistory)); }
+  catch (_) { throw new Error('No pudimos guardar la copia para recuperar tu pedido.'); }
+  orderHistory = nextHistory;
+}
+function renderWhatsAppRecovery(){
+  const entry = orderHistory.find(previous => previous.needsRecovery !== false);
+  const section = document.getElementById('whatsappRecovery');
+  section.hidden = !entry || STAFF_MODE;
+  if(!entry) return;
+  document.getElementById('whatsappRecoveryMessage').textContent = `${entry.code} · $${(entry.totalCents / 100).toFixed(2)} · Registrado en Clowder. Falta que envíes el mensaje en WhatsApp si aún no lo hiciste.`;
+  document.getElementById('recoveryOrderDetails').textContent = entry.message;
+  const link = document.getElementById('whatsappRecoveryLink');
+  link.dataset.message = entry.message;
+  link.href = MenuContact.value ? MenuContact.url(entry.message) : '#';
+}
+function acknowledgeWhatsAppMessage(){
+  if(sendingOrder) return;
+  const entry = orderHistory.find(previous => previous.needsRecovery !== false);
+  if(!entry) return;
+  const nextHistory = orderHistory.map(previous => previous.code === entry.code ? {...previous, needsRecovery:false} : previous);
+  try { draftStorage.setItem(ORDER_HISTORY_KEY, JSON.stringify(nextHistory)); }
+  catch (_) { alert('No pudimos guardar tu confirmación. El pedido sigue disponible aquí.'); return; }
+  orderHistory = nextHistory;
+  renderWhatsAppRecovery();
+}
+function renderOrderHistory(){
+  renderWhatsAppRecovery();
+  const section = document.getElementById('orderHistory');
+  section.hidden = !orderHistory.length || STAFF_MODE;
+  const list = document.getElementById('orderHistoryList');
+  list.replaceChildren();
+  for(const entry of orderHistory){
+    const item = document.createElement('details');
+    const title = document.createElement('summary');
+    title.textContent = `${entry.code} · $${(entry.totalCents / 100).toFixed(2)}`;
+    const message = document.createElement('pre'); message.textContent = entry.message;
+    const recover = document.createElement('a'); recover.textContent = 'Volver a abrir este mensaje en WhatsApp';
+    recover.href = '#'; recover.dataset.whatsapp = ''; recover.dataset.message = entry.message;
+    const repeat = document.createElement('button'); repeat.type = 'button'; repeat.textContent = 'Repetir como pedido nuevo';
+    repeat.onclick = () => repeatPreviousOrder(entry);
+    item.append(title, message, recover, repeat); list.append(item);
+  }
+}
+function repeatPreviousOrder(entry){
+  if(sendingOrder) return;
+  if(cartCount() && !confirm('¿Reemplazar el pedido que estás armando por este pedido anterior?')) return;
+  completeOrder();
+  cart = sanitizeCart(entry.cart);
+  for(const lineId of Object.keys(cart)) if(!isItemOrderable(productForCartLine(lineId))) delete cart[lineId];
+  renderMenu(); updateBars(); openCart();
+  document.getElementById('sendHint').textContent = 'Se cargaron los productos disponibles con sus precios actuales. Revisa tu pedido y completa tus datos para continuar.';
+}
+// Recuperar de una interrupción entre guardar la copia y limpiar el borrador.
+if(orderHistory.some(entry => entry.code === currentOrderCode)) completeOrder();
+renderOrderHistory();
 
 // Prueba visible de emojis: si aqui se ven rombos, el navegador o la fuente es el problema.
 // Si se ven bien aqui pero rotos en WhatsApp, el problema es otro.
@@ -1837,13 +1930,19 @@ try {
 refreshBirthday();
 let lastAvailability = '';
 function refreshAvailability(){
-  if(document.visibilityState !== 'visible' || document.activeElement?.matches('input,textarea,select')) return;
+  if(sendingOrder || document.visibilityState !== 'visible' || document.activeElement?.matches('input,textarea,select')) return;
   const time = businessTime();
-  const key = `${time.day}:${isMenuOpenNow()}:${JSON.stringify(birthdayState())}:${MENU.map(item => isWithinAvailability(item)).join()}`;
+  const key = `${isDrinksOnlyDay()}:${time.day}:${isMenuOpenNow()}:${JSON.stringify(birthdayState())}:${MENU.map(item => isWithinAvailability(item)).join()}`;
   if(key === lastAvailability) return;
   lastAvailability = key;
   cart = sanitizeCart(cart);
   refreshBirthday();
+  if(!visibleCats().includes(activeCat)){
+    categoryHome = true;
+    history.replaceState({...history.state, clowderMenu:true, category:null}, '', location.href);
+  }
+  applyMenuTheme();
+  renderCats();
   renderMenu();
   updateBars();
 }
@@ -1884,7 +1983,7 @@ renderMenu();
     window.setTimeout(() => splash.remove(), 850);
   };
   document.getElementById('introSkip').addEventListener('click', dismiss);
-  if(window.matchMedia('(prefers-reduced-motion: reduce)').matches || navigator.connection?.saveData){
+  if(orderHistory.some(entry => entry.needsRecovery !== false) || window.matchMedia('(prefers-reduced-motion: reduce)').matches || navigator.connection?.saveData){
     dismiss();
     return;
   }
@@ -1982,7 +2081,7 @@ async function saveStaffOrder(order){
  const errorBox=document.getElementById('contactError');errorBox.hidden=true;
  document.getElementById('sendBtn').textContent='Guardando pedido…';updateBars();
  try{
-  if(!staffSession?.token)throw new Error('Entra al panel con tu usuario y PIN antes de crear pedidos.');
+  if(!staffSession?.token)throw new Error('Entra a Mao Mao con tu usuario y PIN antes de crear pedidos.');
   const contact=await MenuContact.refresh();
   if(!contact.ordersApiUrl)throw new Error('No se encontró el servicio de pedidos.');
   const response=await fetch(contact.ordersApiUrl.replace(/\/$/,'')+'/api/staff/orders',{
@@ -1993,7 +2092,7 @@ async function saveStaffOrder(order){
   sendingOrder=false;completeOrder();
   const confirmation=document.getElementById('orderComplete');
   confirmation.replaceChildren(document.createTextNode('Pedido '+order.code+' guardado por '+result.createdBy+'. Pendiente de cobro. '));
-  const link=document.createElement('a');link.href='./maomao/';link.textContent='Ver en pedidos y cobros';confirmation.append(link);confirmation.classList.add('open');
+  const link=document.createElement('a');link.href='./maomao/';link.textContent='Volver a Mao Mao';confirmation.append(link);confirmation.classList.add('open');
   const saved={payload:{...order,createdBy:result.createdBy},status:'pending',created_at:result.createdAt};
   const view=document.createElement('button');view.type='button';view.textContent='Ver ticket virtual';view.onclick=()=>ClowderTicket.show(saved);confirmation.append(view);
   ClowderTicket.show(saved);
@@ -2003,7 +2102,7 @@ async function saveStaffOrder(order){
 if(STAFF_MODE){
  const banner=document.createElement('aside');banner.className='staff-order-notice';banner.setAttribute('role','status');
  const label=document.createElement('strong');label.textContent='Verificando sesión…';
- const back=document.createElement('a');back.href='./maomao/';back.textContent='Volver a cobros';banner.append(label,back);document.body.prepend(banner);
+ const back=document.createElement('a');back.href='./maomao/';back.textContent='Volver a Mao Mao';banner.append(label,back);document.body.prepend(banner);
  const confirmation=document.getElementById('orderComplete');confirmation.replaceChildren();
  (async()=>{try{
   if(!staffSession?.token)throw new Error('Entra con tu usuario y PIN');

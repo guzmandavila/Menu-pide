@@ -26,7 +26,7 @@
 <link rel="icon" type="image/png" href="assets/image-37567444807043c1.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,600;1,9..144,500&family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@500;600&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="./styles.css?v=20261026-maomao">
+<link rel="stylesheet" href="./styles.css?v=20261030-pedidos-nuevos">
 <link rel="stylesheet" href="./order-ticket.css?v=20261026">
 </head>
 <body>
@@ -99,6 +99,21 @@
   </div>
 </header>
 
+<section id="whatsappRecovery" class="order-history order-recovery" hidden aria-labelledby="recoveryTitle">
+  <h2 id="recoveryTitle">Tu pedido está guardado</h2>
+  <p id="whatsappRecoveryMessage" role="status"></p>
+  <p>Si WhatsApp no abrió o quedó en blanco, vuelve a abrir el mismo mensaje. No necesitas armar el pedido otra vez.</p>
+  <a id="whatsappRecoveryLink" data-whatsapp>Continuar este pedido en WhatsApp</a>
+  <details><summary>Ver mi pedido guardado</summary><pre id="recoveryOrderDetails"></pre></details>
+  <button type="button" onclick="acknowledgeWhatsAppMessage()">Ya envié el mensaje</button>
+  <small>Este botón solo oculta el aviso; no confirma el pago.</small>
+</section>
+
+<aside id="drinksOnlyNotice" class="drinks-only-notice" hidden aria-labelledby="drinksOnlyTitle">
+  <strong id="drinksOnlyTitle">Hoy solo bebidas ☕</strong>
+  <p>Estamos preparando Clowder para Halloween 🎃. Por hoy, disfruta nuestras bebidas; la comida vuelve mañana.</p>
+</aside>
+
 <section id="birthdayNotice" hidden style="max-width:720px;margin:16px auto;padding:20px;border-radius:20px;background:#faef9a;color:#332519;box-sizing:border-box" aria-labelledby="birthdayTitle">
   <img src="banners/cumple-gato-mesero.png" alt="El gato mesero celebra su cumpleaños con un pastel, café y un michi, en una ilustración cálida de Clowder." width="1049" height="1499" loading="lazy" decoding="async" style="display:block;width:100%;max-width:300px;height:auto;margin:0 auto 18px;border-radius:14px">
   <h2 id="birthdayTitle" style="margin:0 0 8px">🎂 ¡El gato mesero está de cumpleaños!</h2>
@@ -112,6 +127,12 @@
   <p id="birthdayGiftInstructions" hidden>Transfiere el valor elegido a una de nuestras cuentas y adjunta tu comprobante en WhatsApp. <a id="birthdayReceipt" data-whatsapp target="_blank" rel="noopener">Enviar comprobante</a>. Abrir WhatsApp no confirma el aporte.</p>
 </section>
 <main id="menu"></main>
+
+<details id="orderHistory" class="order-history" hidden>
+  <summary>Mis pedidos anteriores</summary>
+  <p>Últimos 10 pedidos preparados en este dispositivo. Puedes recuperar el mensaje o repetir los productos como un pedido nuevo. Abrir WhatsApp no confirma que hayas enviado el mensaje ni pagado.</p>
+  <div id="orderHistoryList"></div>
+</details>
 
 <footer id="preview-footer" class="footer-mascot footer-compact">
   <div class="footer-brand">
@@ -154,7 +175,7 @@
   </div>
 </div>
 </nav>
-<div class="order-complete" id="orderComplete" role="status" aria-live="polite">Continúa en WhatsApp<br><small>Envía allí el mensaje para completar tu pedido. Tu pedido queda guardado aquí por si necesitas reintentarlo.</small></div>
+<div class="order-complete" id="orderComplete" role="status" aria-live="polite">Continúa en WhatsApp<br><small>Envía allí el mensaje para completar tu pedido. Tu carrito está limpio. Puedes recuperar el mensaje en Mis pedidos anteriores.</small></div>
 
 <div class="overlay" id="paymentsOverlay">
   <div class="drawer">
@@ -338,7 +359,6 @@
     </div>
 
     <p id="sendHint" class="modal-hint" role="status" aria-live="polite"></p>
-    <p id="whatsappRecovery" class="modal-hint" hidden><span id="whatsappRecoveryMessage"></span> <a id="whatsappRecoveryLink">ábrelo aquí</a> y envía el mensaje.</p>
     <p id="contactError" class="modal-hint" role="alert" hidden></p>
     <button class="send-btn" id="sendBtn" onclick="sendOrder()">Continuar en WhatsApp</button>
     <button class="new-order-btn" type="button" onclick="startNewOrder()">Empezar un pedido nuevo</button>
@@ -347,6 +367,6 @@
 
 <script src="./contact-config.js"></script>
 <script src="./order-ticket.js?v=20261026"></script>
-<script src="./app.js?v=20261026-maomao"></script>
+<script src="./app.js?v=20261030-pedidos-nuevos"></script>
 </body>
 </html>

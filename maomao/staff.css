@@ -1,0 +1,1 @@
+main{max-width:720px}#workspace{background:#fffdf8;border:1px solid var(--line);padding:24px;border-radius:14px}#workspace h2{margin-top:12px}#newStaffOrder{display:block;text-align:center;margin:24px 0 18px;min-height:50px}#logout{margin-top:16px}#signedIn{font-weight:700}#login[hidden],#workspace[hidden]{display:none}#status{overflow-wrap:anywhere}

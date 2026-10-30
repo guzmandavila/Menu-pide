@@ -22,7 +22,7 @@ let server;
 let baseURL;
 
 async function fixture(options = {}) {
-  const state = { config: { ...originalConfig, ordersApiUrl: '' }, failConfig: false, pageErrors: [], alerts: [] };
+  const state = { config: { ...originalConfig, ordersApiUrl: baseURL.replace(/\/$/, '') }, failConfig: false, pageErrors: [], alerts: [] };
   if(options.pizzaStock !== undefined) state.config.ordersApiUrl = baseURL.replace(/\/$/, '');
   const context = await browser.newContext({
     viewport: { width: 390, height: 844 }, locale: 'es-EC', timezoneId: 'America/Guayaquil',
@@ -56,7 +56,7 @@ async function fixture(options = {}) {
     const url = new URL(route.request().url());
     if (url.origin !== new URL(baseURL).origin) return route.abort();
     if(options.pizzaStock !== undefined && url.pathname === '/api/availability') return route.fulfill({status:200,contentType:'application/json',body:JSON.stringify({'clowder-pizza':options.pizzaStock})});
-    if(options.pizzaStock !== undefined && url.pathname === '/api/orders') return route.fulfill({status:options.rejectPizza ? 400 : 200,contentType:'application/json',body:JSON.stringify(options.rejectPizza ? {error:'No quedan suficientes pizzas.'} : {ok:true})});
+    if(url.pathname === '/api/orders') return route.fulfill({status:options.rejectPizza ? 400 : 200,contentType:'application/json',body:JSON.stringify(options.rejectPizza ? {error:'No quedan suficientes pizzas.'} : {ok:true})});
     if (url.pathname.endsWith('/menu-config.json')) {
       if (state.failConfig) return route.fulfill({ status: 503, body: 'Test: unavailable' });
       return route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify(state.config) });
@@ -207,14 +207,15 @@ test('Pago exacto funciona con 3 × $4.90 y rechaza efectivo insuficiente o frac
   assert.equal(await page.locator('#drawerTotal').textContent(), '$14.70');
   assert.equal(await page.locator('#cashAmount').inputValue(), '14.70');
   assert.equal(await page.evaluate(() => !checkoutReady), false);
-  await page.evaluate(() => sendOrder());
-  const state = await orderState(page);
-  assert.match(decodeURIComponent(state.destinations.at(-1).url), /14\.70/);
   for (const value of ['14.69', '20.001']) {
     await page.locator('#cashAmount').fill(value);
     await page.evaluate(() => updateBars());
     assert.equal(await page.evaluate(() => !checkoutReady), true, `Efectivo inválido aceptado: ${value}`);
   }
+  await page.evaluate(() => setExactCash());
+  await page.evaluate(() => sendOrder());
+  const state = await orderState(page);
+  assert.match(decodeURIComponent(state.destinations.at(-1).url), /14\.70/);
 }));
 
 test('Video del banner: reproduce en silencio, pausa fuera de pantalla y respeta una pausa manual', () => useFixture(async ({ page }) => {
@@ -360,30 +361,37 @@ test('Un botón renderizado antes de abrir cocina permite pedir al llegar la hor
   assert.equal((await orderState(page)).cart['papas-fritas']?.qty, 1);
 }));
 
-test('Abrir WhatsApp y recargar conserva todos los datos y el mismo código', () => useFixture(async ({ page, ready }) => {
+test('Abrir WhatsApp limpia el carrito; recargar conserva solo el historial y permite repetir con código nuevo', () => useFixture(async ({ page, ready }) => {
   await prepare(page, { mode: 'delivery' });
   await page.evaluate(() => { cart = {}; setMilk('catpuccino', 'almendra'); setSyrup('catpuccino', 'vainilla-francesa'); changeQty('catpuccino', 1); saveNote('catpuccino', 'Poca espuma'); });
   await page.evaluate(() => sendOrder());
   const before = await orderState(page);
-  assert.ok(before.currentOrderCode);
-  assert.equal(Object.values(before.cart)[0].qty, 1);
-  assert.equal(Object.values(before.cart)[0].milk, 'almendra');
-  assert.equal(Object.values(before.cart)[0].syrup, 'vainilla-francesa');
-  assert.equal(Object.values(before.cart)[0].note, 'Poca espuma');
-  assert.equal(before.draft.orderCode, before.currentOrderCode);
-  await page.reload({ waitUntil: 'domcontentloaded' });
-  await ready();
-  const after = await orderState(page);
-  assert.deepEqual(after.cart, before.cart);
-  assert.equal(after.mode, 'delivery');
-  assert.equal(after.name, before.name);
-  assert.equal(await page.locator('#deliveryManzana').inputValue(), '12');
-  assert.equal(await page.locator('#deliveryVilla').inputValue(), '8');
-  assert.equal(after.currentOrderCode, before.currentOrderCode);
+  const history = await page.evaluate(() => orderHistory);
+  assert.equal(history.length, 1);
+  assert.deepEqual(before.cart, {});
+  assert.equal(before.currentOrderCode, '');
+  assert.equal(before.mode, '');
+  assert.equal(before.name, '');
+  const previous = Object.values(history[0].cart)[0];
+  assert.equal(previous.milk, 'almendra'); assert.equal(previous.syrup, 'vainilla-francesa'); assert.equal(previous.note, 'Poca espuma');
+  assert.ok(!before.draft || !Object.keys(before.draft.cart).length);
+  await page.reload({waitUntil:'domcontentloaded'}); await ready();
+  assert.deepEqual((await orderState(page)).cart, {});
+  assert.equal(await page.evaluate(() => orderHistory[0].code), history[0].code);
+  await page.evaluate(() => repeatPreviousOrder(orderHistory[0]));
+  assert.equal((await orderState(page)).currentOrderCode, '');
+  assert.equal(Object.values((await orderState(page)).cart)[0].milk, 'almendra');
+  await page.evaluate(() => {document.getElementById('customerName').value='ANDREA';setMode('mesa');setPay('transferencia');});
   await page.evaluate(() => sendOrder());
-  assert.equal((await orderState(page)).currentOrderCode, before.currentOrderCode);
+  assert.notEqual(await page.evaluate(() => orderHistory[0].code), history[0].code);
+  await page.evaluate(() => { document.getElementById('introSkip')?.click();document.getElementById('orderHistory').open=true;document.querySelector('#orderHistoryList details').open=true;document.getElementById('orderHistory').scrollIntoView(); });
+  await page.waitForFunction(() => !document.getElementById('introSplash'));
+  assert.ok(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth + 1));
+  await page.locator('#orderHistory').screenshot({path:'/tmp/clowder-historial-mobile.png'});
+  await page.setViewportSize({width:1440,height:1000});
+  assert.ok(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth + 1));
+  await page.locator('#orderHistory').screenshot({path:'/tmp/clowder-historial-desktop.png'});
 }));
-
 
 test('El envío lento mantiene el menú visible y abre WhatsApp en la misma pestaña', () => useFixture(async ({ page, context, state }) => {
   state.config.ordersApiUrl = 'https://orders.test';
@@ -411,7 +419,7 @@ test('El envío lento mantiene el menú visible y abre WhatsApp en la misma pest
   assert.equal(context.pages().length,1);
   assert.ok(new URL(page.url()).searchParams.get('text').includes('Pedido Clowder'));
   await page.goBack();
-  assert.equal((await orderState(page)).cart.catpuccino.qty,1);
+  assert.deepEqual((await orderState(page)).cart,{});
 }));
 
 test('Un fallo de conexión no abre pestañas vacías y conserva el pedido', () => useFixture(async ({ page, state, context }) => {
@@ -423,13 +431,13 @@ test('Un fallo de conexión no abre pestañas vacías y conserva el pedido', () 
   assert.equal((await orderState(page)).draft.cart.catpuccino.qty,1);
 }));
 
-test('El bloqueo de popup conserva el pedido y prepara el destino alternativo', () => useFixture(async ({ page }) => {
+test('El bloqueo de popup limpia el carrito y conserva el mensaje en el historial', () => useFixture(async ({ page }) => {
   await prepare(page);
   await page.evaluate(() => { window.__popupBlocked = true; return sendOrder(); });
   const state = await orderState(page);
   assert.equal(state.destinations.at(-1).blocked, true);
-  assert.equal(state.cart.catpuccino.qty, 1);
-  assert.equal(state.draft.cart.catpuccino.qty, 1);
+  assert.deepEqual(state.cart, {});
+  assert.equal(await page.evaluate(() => orderHistory[0].cart.catpuccino.qty), 1);
 }));
 
 test('Pedido registrado permite recuperar WhatsApp cuando la navegación falla o se bloquea', () => useFixture(async ({ page, state }) => {
@@ -449,6 +457,7 @@ test('Pedido registrado permite recuperar WhatsApp cuando la navegación falla o
   assert.equal(new URL(destination).hostname, 'wa.me');
   assert.ok(new URL(destination).searchParams.get('text').includes(orders[0].code));
   await page.route('https://wa.me/**', route => route.fulfill({ status: 200, body: 'WhatsApp interceptado' }));
+  await page.evaluate(() => { MenuContact.navigate = window.__realContactNavigate; });
   await page.locator('#whatsappRecoveryLink').click();
   await page.waitForURL('https://wa.me/**');
   assert.equal(orders.length, 1, 'El enlace de recuperación no debe registrar otro pedido');
@@ -457,7 +466,7 @@ test('Pedido registrado permite recuperar WhatsApp cuando la navegación falla o
 test('Nuevo pedido limpia carrito y código; el siguiente recibe otro código', () => useFixture(async ({ page }) => {
   await prepare(page);
   await page.evaluate(() => sendOrder());
-  const first = (await orderState(page)).currentOrderCode;
+  const first = await page.evaluate(() => orderHistory[0].code);
   await page.evaluate(() => startNewOrder());
   const cleared = await orderState(page);
   assert.deepEqual(cleared.cart, {});
@@ -465,7 +474,7 @@ test('Nuevo pedido limpia carrito y código; el siguiente recibe otro código', 
   assert.ok(!cleared.draft || Object.keys(cleared.draft.cart).length === 0);
   await prepare(page);
   await page.evaluate(() => sendOrder());
-  assert.notEqual((await orderState(page)).currentOrderCode, first);
+  assert.notEqual(await page.evaluate(() => orderHistory[0].code), first);
 }));
 
 test('Dos dispositivos nuevos en el mismo minuto reciben códigos diferentes', async () => {
@@ -476,7 +485,7 @@ test('Dos dispositivos nuevos en el mismo minuto reciben códigos diferentes', a
     for (const { page } of [first, second]) {
       await prepare(page);
       await page.evaluate(() => sendOrder());
-      codes.push((await orderState(page)).currentOrderCode);
+      codes.push(await page.evaluate(() => orderHistory[0].code));
     }
     assert.ok(codes.every(Boolean));
     assert.notEqual(codes[0], codes[1]);
@@ -495,7 +504,7 @@ test('Cambiar la configuración actualiza enlaces y pedidos sin perder el borrad
   assert.deepEqual((await orderState(page)).cart, before);
   await page.evaluate(() => sendOrder());
   assert.equal(new URL((await orderState(page)).destinations.at(-1).url).pathname, '/593990001122');
-  assert.deepEqual((await orderState(page)).cart, before);
+  assert.deepEqual((await orderState(page)).cart, {});
 }));
 
 test('Si falla verificar el contacto, no se abre un número guardado ni se pierde el pedido', () => useFixture(async ({ page, state }) => {
@@ -626,6 +635,161 @@ test('Pizza: rechazo del servidor conserva el pedido y no abre WhatsApp', () => 
   assert.match(await page.locator('#contactError').textContent(), /No quedan suficientes pizzas/);
   assert.equal((await orderState(page)).cart['clowder-pizza'].qty,1);
 }, {pizzaStock:5,rejectPizza:true}));
+
+test('Solo bebidas: oculta comida sin cambiar stock y limpia un borrador anterior', () => useFixture(async ({page}) => {
+  assert.equal(await page.locator('#drinksOnlyNotice').isVisible(), true);
+  assert.deepEqual(await page.evaluate(() => visibleCats()), ['Bebidas Frías', 'Bebida del Mes', 'Bebidas Calientes', 'Matcha']);
+  assert.equal(await page.locator('.category-tile').count(), 4);
+  assert.doesNotMatch(await page.locator('#menu').textContent(), /Snack Dulce|Snack Sal|Empanada|oChips/);
+  assert.deepEqual(Object.keys((await orderState(page)).cart), ['catpuccino']);
+  assert.equal(await page.evaluate(() => MENU.find(i => i.id === 'empanada-queso').soldOut || false), false);
+  await page.evaluate(() => { selectCat('Snack Sal'); changeQty('empanada-queso', 1); });
+  assert.equal(await page.evaluate(() => categoryHome), true);
+  assert.equal((await orderState(page)).cart['empanada-queso'], undefined);
+  assert.match(await page.locator('#hoursNotice').textContent(), /Halloween/);
+  for(const category of ['Bebidas Frías', 'Bebida del Mes', 'Bebidas Calientes', 'Matcha']) {
+    await page.evaluate(category => selectCat(category), category);
+    assert.ok(await page.locator('#menu .item').count());
+    assert.ok(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth + 1));
+  }
+  await page.evaluate(() => { closeHours(); expandCats(false); document.getElementById('introSkip')?.click(); });
+  await page.waitForFunction(() => !document.getElementById('introSplash'));
+  await page.screenshot({path:'/tmp/clowder-solo-bebidas-mobile.png', fullPage:true});
+  await page.setViewportSize({width:1440,height:1000});
+  assert.ok(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth + 1));
+  await page.screenshot({path:'/tmp/clowder-solo-bebidas-desktop.png', fullPage:true});
+}, {time:'2026-10-30T20:00:00-05:00', draft:{cart:{catpuccino:{qty:1}, 'empanada-queso':{qty:1}}, mode:'mesa'}}));
+
+test('Solo bebidas: empieza y termina a medianoche de Ecuador con la página abierta', () => useFixture(async ({page}) => {
+  assert.equal(await page.locator('#drinksOnlyNotice').isVisible(), false);
+  await page.evaluate(() => {selectCat('Snack Sal'); changeQty('empanada-queso',1); window.__setTestTime('2026-10-30T05:00:00Z'); refreshAvailability();});
+  assert.equal(await page.locator('#drinksOnlyNotice').isVisible(), true);
+  assert.equal(await page.evaluate(() => categoryHome), true);
+  assert.equal(await page.locator('.category-tile').count(), 4);
+  assert.deepEqual((await orderState(page)).cart, {});
+  await page.evaluate(() => {window.__setTestTime('2026-10-31T04:59:59Z');refreshAvailability();});
+  assert.equal(await page.locator('#drinksOnlyNotice').isVisible(), true);
+  await page.evaluate(() => {window.__setTestTime('2026-10-31T05:00:00Z');refreshAvailability();selectCat('Snack Sal');changeQty('empanada-queso',1);});
+  assert.equal(await page.locator('#drinksOnlyNotice').isVisible(), false);
+  assert.equal((await orderState(page)).cart['empanada-queso'].qty, 1);
+  assert.equal(await page.evaluate(() => visibleCats().includes('Snack Dulce')), true);
+}, {time:'2026-10-30T04:59:59Z'}));
+
+test('Borrador antiguo de Andrea genera un código nuevo antes de registrar', () => useFixture(async ({page}) => {
+  let sent;
+  await page.route('**/api/orders', route => {sent=route.request().postDataJSON();return route.fulfill({status:200,contentType:'application/json',body:'{"ok":true}'});});
+  await prepare(page, {items:{'milkishaki-salted-caramel':1}, name:'ANDREA'});
+  await page.evaluate(() => sendOrder());
+  assert.notEqual(sent.code, 'CL-20261017-1807-1B9189AE');
+  assert.match(sent.code, /^CL-20261029-/);
+  assert.deepEqual((await orderState(page)).cart, {});
+}, {time:'2026-10-29T20:00:00-05:00',draft:{orderCode:'CL-20261017-1807-1B9189AE',orderReceiptKey:'a'.repeat(64),cart:{catpuccino:{qty:1}}}}));
+
+test('Registro rechazado bloquea WhatsApp; reintentar conserva código y modificarlo genera otro', () => useFixture(async ({page}) => {
+  const orders=[]; let reject=true;
+  await page.route('**/api/orders', route => {orders.push(route.request().postDataJSON());return route.fulfill({status:reject?400:200,contentType:'application/json',body:JSON.stringify(reject?{error:'Este pedido ya fue registrado. Empieza un pedido nuevo para cambiarlo.'}:{ok:true})});});
+  await prepare(page);
+  await page.evaluate(() => sendOrder());
+  assert.equal((await orderState(page)).destinations.length,0);
+  assert.equal((await orderState(page)).cart.catpuccino.qty,1);
+  await page.evaluate(() => sendOrder());
+  assert.equal(orders[0].code,orders[1].code);
+  reject=false;
+  await page.evaluate(() => {changeQty('catpuccino',1);return sendOrder();});
+  assert.notEqual(orders[1].code,orders[2].code);
+  assert.equal((await orderState(page)).destinations.length,1);
+  assert.deepEqual((await orderState(page)).cart,{});
+}));
+
+test('Repetir historial respeta precios y disponibilidad actuales sin recuperar datos personales', () => useFixture(async ({page}) => {
+  await prepare(page,{items:{catpuccino:1,'empanada-queso':1}});
+  await page.evaluate(() => sendOrder());
+  await page.evaluate(() => {window.__setTestTime('2026-10-30T20:00:00-05:00');MENU.find(i=>i.id==='catpuccino').price=3;repeatPreviousOrder(orderHistory[0]);});
+  const state=await orderState(page);
+  assert.deepEqual(Object.keys(state.cart),['catpuccino']);
+  assert.equal(await page.evaluate(() => grandTotal()),3);
+  assert.equal(state.currentOrderCode,'');assert.equal(state.name,'');assert.equal(state.mode,'');assert.equal(state.payMethod,'');
+  assert.equal(await page.evaluate(() => orderHistory[0].totalCents),400);
+}, {time:'2026-10-29T20:00:00-05:00'}));
+
+test('Si el servidor guardó pero se perdió la respuesta, recargar y reintentar no duplica el pedido', () => useFixture(async ({page,ready}) => {
+  const orders=[];let fail=true;
+  await page.route('**/api/orders',route=>{orders.push(route.request().postDataJSON());return fail?route.abort():route.fulfill({status:200,contentType:'application/json',body:'{"ok":true}'});});
+  await prepare(page);await page.evaluate(()=>sendOrder());
+  assert.equal((await orderState(page)).destinations.length,0);
+  assert.equal((await orderState(page)).cart.catpuccino.qty,1);
+  await page.reload({waitUntil:'domcontentloaded'});await ready();fail=false;
+  await page.evaluate(()=>sendOrder());
+  assert.equal(orders.length,2);assert.deepEqual(orders[0],orders[1]);
+  assert.deepEqual((await orderState(page)).cart,{});
+  assert.equal(await page.evaluate(()=>orderHistory.length),1);
+}));
+
+test('Historial conserva como máximo diez pedidos y muestra notas como texto', () => useFixture(async ({page}) => {
+  await prepare(page);
+  await page.evaluate(() => {
+    for(let i=0;i<12;i++) rememberOrder({code:`CL-20261029-2000-TEST${i}`,totalCents:250},'<img src=x onerror="window.__historyXss=true">');
+    renderOrderHistory();
+  });
+  assert.equal(await page.evaluate(()=>orderHistory.length),10);
+  assert.equal(await page.locator('#orderHistoryList img').count(),0);
+  assert.equal(await page.evaluate(()=>window.__historyXss),undefined);
+  await page.reload({waitUntil:'domcontentloaded'});
+  assert.equal(await page.locator('#orderHistoryList details').count(),10);
+}));
+
+test('WhatsApp en blanco: volver y recargar muestra el mismo pedido arriba sin registrar otra venta', () => useFixture(async ({page,ready,state}) => {
+  const orders=[];
+  await page.route('**/api/orders',route=>{orders.push(route.request().postDataJSON());return route.fulfill({status:200,contentType:'application/json',body:'{"ok":true}'});});
+  await prepare(page);
+  await page.evaluate(()=>{MenuContact.navigate=()=>{throw new Error('WhatsApp en blanco');};return sendOrder();});
+  const code=orders[0].code;
+  assert.equal(await page.locator('#whatsappRecovery').isVisible(),true);
+  assert.match(await page.locator('#recoveryOrderDetails').textContent(),new RegExp(code));
+  await page.reload({waitUntil:'domcontentloaded'});await ready();
+  await page.waitForFunction(()=>!document.getElementById('introSplash'));
+  assert.equal(await page.locator('#whatsappRecovery').isVisible(),true);
+  assert.ok(await page.locator('#whatsappRecovery').evaluate(el=>el.getBoundingClientRect().top<innerHeight));
+  assert.match(await page.locator('#whatsappRecoveryMessage').textContent(),new RegExp(code));
+  await page.locator('#whatsappRecovery details summary').click();
+  assert.match(await page.locator('#recoveryOrderDetails').textContent(),/Catpuccino/);
+  state.config.whatsappNumber='593990001122';
+  await page.route('https://wa.me/**',route=>route.fulfill({status:200,body:'WhatsApp interceptado'}));
+  await page.locator('#whatsappRecoveryLink').click();
+  await page.waitForURL('https://wa.me/**');
+  const destination=page.url();
+  assert.equal(new URL(destination).pathname,'/593990001122');
+  assert.match(new URL(destination).searchParams.get('text'),new RegExp(code));
+  assert.equal(orders.length,1);
+  await page.goBack();await ready();
+  assert.deepEqual((await orderState(page)).cart,{});
+  await page.waitForFunction(()=>!document.getElementById('introSplash'));
+  await page.evaluate(()=>window.scrollTo(0,0));
+  await page.screenshot({path:'/tmp/clowder-recuperar-whatsapp.png',fullPage:false});
+  await page.getByRole('button',{name:'Ya envié el mensaje',exact:true}).click();
+  assert.equal(await page.locator('#whatsappRecovery').isVisible(),false);
+  await page.reload({waitUntil:'domcontentloaded'});await ready();
+  assert.equal(await page.locator('#whatsappRecovery').isVisible(),false);
+  assert.equal(await page.evaluate(()=>orderHistory[0].code),code);
+}));
+
+test('Si falla guardar la copia de recuperación, conserva el carrito para reintentar sin duplicar', () => useFixture(async ({page}) => {
+  const orders=[];
+  await page.route('**/api/orders',route=>{orders.push(route.request().postDataJSON());return route.fulfill({status:200,contentType:'application/json',body:'{"ok":true}'});});
+  await prepare(page);
+  await page.evaluate(()=>{
+    window.__originalSetItem=Storage.prototype.setItem;
+    Storage.prototype.setItem=function(key,value){if(key==='clowder_order_history')throw new Error('Quota');return window.__originalSetItem.call(this,key,value);};
+    return sendOrder();
+  });
+  assert.equal((await orderState(page)).destinations.length,0);
+  assert.equal((await orderState(page)).cart.catpuccino.qty,1);
+  assert.match(await page.locator('#contactError').textContent(),/copia para recuperar/);
+  await page.evaluate(()=>{Storage.prototype.setItem=window.__originalSetItem;return sendOrder();});
+  assert.deepEqual(orders[0],orders[1]);
+  assert.equal((await orderState(page)).destinations.length,1);
+  assert.equal(await page.locator('#whatsappRecovery').isVisible(),true);
+}));
 
 async function main() {
   if (process.env.MENU_TEST_BASE_URL) baseURL = process.env.MENU_TEST_BASE_URL;

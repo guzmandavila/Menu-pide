@@ -38,6 +38,18 @@ Esto funciona en páginas que ya cargaron este código. Una página antigua que 
 | Imágenes | `assets/`, `miniaturas/` y `banners/`; usa rutas relativas, sin `/` inicial, para GitHub Pages. |
 | Actualización del contacto y caché | `contact-config.js` y `sw.js`. No hace falta modificarlos para cambiar el número. |
 
+## Envío, reinicio e historial de pedidos
+
+Al continuar en WhatsApp, el menú espera primero la confirmación del servicio de pedidos. Si falla, conserva el carrito y permite reintentar; no abre un mensaje sin registro confirmado. Un reintento con los mismos datos conserva el código; cambiar el pedido genera otro. Los borradores de versiones anteriores conservan sus productos, pero reciben un código nuevo.
+
+Después de confirmar el registro, guarda una copia del mensaje en «Mis pedidos anteriores» y limpia carrito, opciones, nombre, dirección, pago y código antes de abrir WhatsApp. Un aviso destacado al inicio permite ver el pedido completo y volver a abrir ese mismo mensaje sin registrar otro pedido. El aviso sobrevive a recargas y cierres; solo se oculta al pulsar «Ya envié el mensaje» (los demás pedidos sin confirmar siguen disponibles). La introducción no se reproduce si hay un mensaje pendiente de recuperar. Si no puede guardar la copia de recuperación, la app conserva el carrito para reintentar con el mismo código. La app no puede comprobar si el cliente pulsó Enviar en WhatsApp ni si pagó.
+
+El historial conserva los últimos diez pedidos en ese dispositivo (no se sincroniza entre dispositivos). «Repetir como pedido nuevo» carga únicamente productos disponibles, con los precios actuales y sin recuperar el código ni los datos personales del formulario anterior. El historial contiene el texto original del pedido y se pierde si se borran los datos del navegador. Los pedidos reales y sus cobros permanecen en el servicio.
+
+## Jornada de solo bebidas
+
+El 30 de octubre de 2026 se muestran únicamente bebidas calientes, frías, matcha y bebida del mes, con un aviso de preparación para Halloween. La comida se oculta y se excluye de los pedidos y borradores restaurados sin modificar `soldOut`. La restricción y el aviso expiran automáticamente el 31 de octubre a las 00:00 de Ecuador, incluso si la página sigue abierta (al actualizar disponibilidad). El stock previo se conserva. Las fechas y categorías se definen en `DRINKS_ONLY_START`, `DRINKS_ONLY_END` y `DRINKS_ONLY_CATS` en `app.js`.
+
 ## Banners de video
 
 La intro de temporada permite entrar directamente con «Ir al menú». No reproduce el video con movimiento reducido o ahorro de datos; si falla, revela el menú automáticamente. Sin JavaScript, la intro queda oculta.
@@ -74,6 +86,11 @@ git push origin main
 ```
 
 Si cambias código o imágenes, incluye también esos archivos. Espera a que termine el despliegue de Pages en GitHub y verifica el [menú publicado](https://clowder.cafe/) y su [configuración publicada](https://clowder.cafe/menu-config.json). Comprueba los botones de contacto y el destino de un pedido de prueba sin enviarlo. Un `push` correcto por sí solo no confirma que Pages ya sirva la versión nueva.
+
+## Mao Mao y backoffice
+
+- `/maomao/`: acceso de Alessa, Fernanda y Ronald con sus PIN actuales, exclusivamente para tomar pedidos en el teléfono del personal. No carga datos ni controles de contabilidad. «Tomar un pedido» abre el menú del personal, guarda directamente en el servicio y muestra un ticket; el pedido queda pendiente de cobro e identifica quién lo tomó.
+- `/backoffice/`: confirma cobros y conserva caja, reportes, entregas y contabilidad. Comparte los mismos pedidos y sesiones con Mao Mao. Esta separación organiza las pantallas; no cambia los permisos de las tres cuentas en el servicio.
 
 ## Registro de pedidos y cierre de cobros
 

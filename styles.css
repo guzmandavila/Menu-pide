@@ -1235,3 +1235,24 @@ body.category-home .bottom-navigation:not(:has(.cartbar.show)){display:none;}
 .banner-price-badge{position:absolute;top:16px;left:16px;border:2px solid #fff0d4;border-radius:999px;background:#fba352;color:#2e1d16;box-shadow:0 4px 12px rgba(0,0,0,.3);padding:10px 16px;font:800 26px/1 'Inter',sans-serif;}
 .item-thumb[src="assets/jacks-o-lantern.jpeg"]{object-fit:cover;object-position:50% 35%;}
 @media(min-width:768px){.halloween-promo{grid-template-columns:1fr 1fr;max-width:760px;margin-inline:auto;}.halloween-promo>img{max-height:350px;}.halloween-promo-copy{padding:26px;gap:13px;}.halloween-promo-copy>span{font-size:16px;}}
+
+/* Aviso temporal de la jornada de bebidas. */
+.drinks-only-notice{max-width:720px;margin:16px auto 24px;padding:20px 24px;border:1px solid #d49a60;border-radius:20px;background:#fff0d7;color:#452c20;text-align:center;box-sizing:border-box}
+.drinks-only-notice[hidden]{display:none}
+.drinks-only-notice strong{display:block;font-size:1.3rem}
+.drinks-only-notice p{margin:8px 0 0;line-height:1.5}
+@media(max-width:760px){.drinks-only-notice{margin:12px 16px 20px;padding:18px}}
+
+.order-history{font-family:system-ui,'Apple Color Emoji','Segoe UI Emoji',sans-serif;text-align:left;letter-spacing:normal;word-spacing:normal;max-width:720px;margin:24px auto;padding:18px;border:1px solid #9c8070;border-radius:16px;box-sizing:border-box;color:inherit}
+.order-history[hidden]{display:none}
+.order-history summary{cursor:pointer;font-weight:700;padding:10px 0;overflow-wrap:anywhere}
+.order-history p{line-height:1.5}
+.order-history pre{white-space:pre-wrap;overflow-wrap:anywhere;font:14px/1.6 system-ui,'Apple Color Emoji','Segoe UI Emoji',sans-serif}
+.order-history a{color:inherit;display:inline-block;padding:12px 0;text-decoration:underline}
+.order-history button{display:block;min-height:44px;margin:12px 0;padding:12px 16px;border:1px solid #9c8070;border-radius:12px;background:#fff0d7;color:#452c20;cursor:pointer;font:inherit}
+@media(max-width:760px){.order-history{margin:20px 16px}}
+
+.order-recovery{position:relative;z-index:1;border:2px solid #83b976;background:var(--bg-alt)}
+.order-recovery h2{font-size:21px;margin:0 0 12px}
+.order-recovery>a{display:block;padding:14px 18px;background:#3f854a;border-radius:12px;color:#fff;font-weight:700;text-align:center;text-decoration:none}
+.order-recovery small{display:block;line-height:1.5}

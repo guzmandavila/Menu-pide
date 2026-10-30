@@ -1,10 +1,10 @@
 <!doctype html><html lang="es"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self'; connect-src 'self' https://clowder-cobros.rnnld.chatgpt.site; base-uri 'self'; form-action 'self'"><meta name="referrer" content="no-referrer"><meta name="robots" content="noindex,nofollow"><title>Cobros · Clowder</title><link rel="stylesheet" href="./admin.css?v=d5f3867c11f52a09">
 <link rel="stylesheet" href="../order-ticket.css?v=20261026">
-<body><header><a href="https://clowder.cafe/" class="menu-link">Abrir menú</a><span class="brand">Clowder</span><h1>Panel de Clowder</h1><p>Pedidos, cobros y cuentas del negocio.</p></header><main>
+<body><header><a href="https://clowder.cafe/" class="menu-link">Abrir menú</a><span class="brand">Clowder</span><h1>Cobros y contabilidad</h1><p>Confirma pagos, revisa la caja y lleva las cuentas de Clowder.</p></header><main>
 <form id="login"><label>Usuario<select id="staffUser" autocomplete="username" required><option value="">Elige tu nombre</option><option>Alessa</option><option>Fernanda</option><option>Ronald</option></select></label><label>PIN de 6 dígitos<input id="token" type="password" inputmode="numeric" pattern="[0-9]{6}" minlength="6" maxlength="6" autocomplete="current-password" required></label><button>Entrar</button></form>
 <p id="status" role="status" aria-live="polite"></p>
 <section id="workspace" hidden><div class="toolbar"><label>Fecha de consulta<input id="day" type="date" required></label><button id="refresh">Actualizar</button><button id="logout" class="secondary">Salir</button></div>
-<p id="signedIn" class="muted"></p><p><a class="menu-link" href="../?staff=1" id="newStaffOrder">Nuevo pedido</a></p><p id="updated" class="muted"></p><div class="panel-tabs" role="tablist" aria-label="Secciones del panel">
+<p id="signedIn" class="muted"></p><p><a class="menu-link" href="../maomao/">Tomar un pedido en Mao Mao</a></p><p id="updated" class="muted"></p><div class="panel-tabs" role="tablist" aria-label="Secciones del panel">
 <button type="button" role="tab" id="tab-orders" aria-selected="true" aria-controls="panel-orders" tabindex="0">Pedidos y cobros</button>
 <button type="button" role="tab" id="tab-accounting" aria-selected="false" aria-controls="panel-accounting" tabindex="-1">Contabilidad</button>
 </div>
