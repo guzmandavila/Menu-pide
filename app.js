@@ -43,7 +43,7 @@ const MENU = [
 
   // ---- Matcha ----
   { id:'nekomatchalatte', cat:'Matcha', name:'NekoMatchaLatte', syrupOption:['caramelo','vainilla'], desc:'Matcha y leche bien fría. Verde, suave y cremoso. Se bebe despacio, si te acuerdas.', price:3.5, milk:true, img:'assets/image-a21806fe3017f9d8.jpg' },
-  { id:'sakuramatcha-latte', soldOut:true, cat:'Matcha', name:'SakuraMatcha Latte', desc:'Matcha, leche y puré real de fresa sobre hielo.', price:4.15, milk:true, img:'assets/image-73038c7da3c63e99.jpg' },
+  { id:'sakuramatcha-latte', cat:'Matcha', name:'SakuraMatcha Latte', desc:'Matcha, leche y puré real de fresa sobre hielo.', price:4.15, milk:true, img:'assets/image-73038c7da3c63e99.jpg' },
   { id:'blueberry-matcha', order:0, cat:'Matcha', name:'Blueberry Matcha', desc:'Matcha, leche y puré real de arándano sobre hielo.', price:4.45, milk:true, img:'assets/blueberry-matcha.jpeg' },
 
   // ---- Panadería ----
