@@ -25,6 +25,8 @@ La versión actual revisa el contacto cada 60 segundos mientras está visible y 
 
 Esto funciona en páginas que ya cargaron este código. Una página antigua que siga abierta con código previo puede necesitar una actualización para recibirlo; publicar en GitHub no reemplaza inmediatamente el código que ya está ejecutándose en todos los teléfonos.
 
+Para habilitar un producto, quita `soldOut`; no agregues etiquetas «Disponible». Un producto que se puede comprar muestra su precio y controles habituales.
+
 ## Dónde editar el resto
 
 | Cambio | Archivo o referencia |
