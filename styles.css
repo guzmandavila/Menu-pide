@@ -8,7 +8,7 @@
     unicode-range:U+0020-007E,U+00A0-024F,U+1E00-1EFF;
   }
   :root{
-    --bg:#1b151b;
+    --bg:#000000;
     --bg-alt:#2a2029;
     --card:#241c24;
     --cream:#f8f1e5;
@@ -34,7 +34,7 @@
     --line-solid:#dfd0bd;
   }
   *{box-sizing:border-box;}
-  html{margin:0; padding:0; background:#40323d;}
+  html{margin:0; padding:0; background:#000000;}
   html:has(body.light-theme){background:#dfd0bd;}
   body{margin:0; min-height:100vh; padding:0; border:0; border-radius:0; overflow-x:hidden; box-shadow:none;}
   body{
@@ -1256,3 +1256,14 @@ body.category-home .bottom-navigation:not(:has(.cartbar.show)){display:none;}
 .order-recovery h2{font-size:21px;margin:0 0 12px}
 .order-recovery>a{display:block;padding:14px 18px;background:#3f854a;border-radius:12px;color:#fff;font-weight:700;text-align:center;text-decoration:none}
 .order-recovery small{display:block;line-height:1.5}
+
+/* Jornada del 31 de octubre: conserva los controles y contraste del menú. */
+.halloween-day .tag{color:#df8a48}
+.halloween-notice{background:#2e1d16;color:#fff5db;border-color:#ce7138}
+.halloween-notice strong{color:#ffc28c}
+.halloween-notice-actions{display:flex;justify-content:center;flex-wrap:wrap;gap:10px;margin-top:16px}
+.halloween-notice-actions button{border:1px solid #ce7138;border-radius:12px;background:#fba352;color:#2e1d16;padding:10px 14px;font:600 13px/1.4 'Inter',sans-serif;cursor:pointer}
+.halloween-notice-actions button:focus-visible{outline:3px solid #fff5db;outline-offset:3px}
+
+.theme-toggle{cursor:default}
+.halloween-notice{font-family:system-ui,sans-serif;letter-spacing:normal;word-spacing:normal}

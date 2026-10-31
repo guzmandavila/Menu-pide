@@ -103,3 +103,11 @@ El panel se publica desde `backoffice/` en este repositorio; las pantallas está
 El pendiente para Fernanda excluye efectivo y cancelados. Las entregas reducen el pendiente acumulado. Los cobros de hoy previos a la activación y los pedidos tomados fuera del menú pueden registrarse desde el panel con «Registrar un cobro de hoy fuera del menú». No se importan cobros históricos automáticamente.
 
 Más detalles de operación y publicación en [`cobros/DEPLOYMENT.md`](cobros/DEPLOYMENT.md). `cobros/server.py` es únicamente el prototipo local: el servicio de producción está en el checkout independiente `clowder-cobros-site`.
+
+### Halloween · 31 de octubre de 2026
+
+La Mini Clowder Pizza cuesta $3, mantiene los ingredientes de la original y es sin huevo. Se ofrece solo el 31 de octubre en horario del menú; el producto, su banner y el aviso de Halloween expiran a las 00:00 del 1 de noviembre en Ecuador, incluso con la página abierta. La pizza habitual se oculta durante esa jornada y conserva su precio y estado de agotado. La mini tiene ID y nombre propios para no consumir el lote antiguo de cinco pizzas del servicio de cobros; no se ha indicado un cupo para esta edición. Se destacan las bebidas existentes Jacks O’ Lantern y Pumpkin Spice Latte, sin añadir recetas ni precios nuevos.
+
+Por indicación del usuario, el fondo del menú permanece negro a toda hora, sin cambio automático ni selector de tema. Se conservan Jacks O’ Lantern y Pumpkin Spice Latte y se añaden emojis de Halloween a los avisos y destacados.
+
+Snack Dulce queda temporalmente agotado en todos sus productos, conservando las tarjetas visibles, precios y productos ya ocultos.

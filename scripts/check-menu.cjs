@@ -164,6 +164,23 @@ test('Stock actual: helados y queso disponibles; pollo, pizza, wachipapas y toci
   assert.equal(await page.locator('#menu .cat-banner-slide img[src="banners/empanadas-octubre.jpeg"]').count(), 1);
 }));
 
+test('Snack Dulce agotado: tarjetas visibles, pedidos y borradores bloqueados', () => useFixture(async ({page}) => {
+  await page.evaluate(() => selectCat('Snack Dulce'));
+  const result = await page.evaluate(() => {
+    const sweets = MENU.filter(item => item.cat === 'Snack Dulce');
+    for(const item of sweets) changeQty(item.id,1);
+    return {
+      paused: sweets.every(item => item.soldOut && !isItemOrderable(item)),
+      cart, restored:sanitizeCart(Object.fromEntries(sweets.map(item => [item.id,{qty:1}]))),
+      visible:sweets.filter(item => !HIDDEN_ITEM_IDS.includes(item.id)).map(item => item.id),
+    };
+  });
+  assert.equal(result.paused,true);
+  assert.deepEqual(result.cart,{});
+  assert.deepEqual(result.restored,{});
+  for(const id of result.visible) assert.match(await page.locator('#menu-group-'+id).textContent(),/Agotado por el momento/);
+}, {time:'2026-10-31T20:00:00-05:00'}));
+
 test('Cambiar el sabor de empanada conserva el orden de las tarjetas', () => useFixture(async ({ page }) => {
   await page.evaluate(() => selectCat('Snack Sal'));
   const cardOrder = () => page.locator('#menu .item').evaluateAll(cards => cards.map(card => card.id));
@@ -635,6 +652,65 @@ test('Pizza: rechazo del servidor conserva el pedido y no abre WhatsApp', () => 
   assert.match(await page.locator('#contactError').textContent(), /No quedan suficientes pizzas/);
   assert.equal((await orderState(page)).cart['clowder-pizza'].qty,1);
 }, {pizzaStock:5,rejectPizza:true}));
+
+test('Halloween: mini de $3 independiente del lote agotado, bebidas y pedido correctos', () => useFixture(async ({page}) => {
+  assert.equal(await page.locator('#drinksOnlyNotice').isVisible(), false);
+  assert.equal(await page.locator('#halloweenNotice').isVisible(), true);
+  const mini = await page.evaluate(() => MENU.find(i => i.id === 'mini-clowder-pizza-halloween'));
+  assert.equal(mini.price, 3);
+  assert.match(mini.desc, /sin huevo/);
+  for(const ingredient of ['pomodoro', 'tomate fresco', 'mozzarella', 'parmesano', 'jamón Virginia']) assert.ok(mini.desc.toLowerCase().includes(ingredient.toLowerCase()));
+  assert.equal(await page.evaluate(() => isItemOrderable(MENU.find(i => i.id === 'mini-clowder-pizza-halloween'))), true);
+  for(const id of ['jacks-o-lantern', 'pumpkin-spice-caliente', 'pumpkin-spice-frio']) assert.equal(await page.evaluate(id => isItemOrderable(MENU.find(i => i.id === id)), id), true);
+  await page.locator('#halloweenNotice button').first().click();
+  assert.equal(await page.locator('#menu-group-mini-clowder-pizza-halloween').count(), 1);
+  assert.equal(await page.locator('#menu-group-clowder-pizza').count(), 0);
+  assert.equal(await page.locator('img[src="assets/clowder-pizza-banner-octubre.jpeg"]').count(), 0);
+  assert.ok(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth + 1));
+  await page.locator('#introSplash').waitFor({state:'detached'});
+  await page.evaluate(async () => {await document.fonts.ready;await Promise.all(Array.from(document.querySelectorAll('#menu img')).map(img => img.decode().catch(() => {})));});
+  await page.screenshot({path:'/tmp/clowder-halloween-mini-mobile.png',fullPage:true});
+  await page.setViewportSize({width:1440,height:1000});
+  assert.ok(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth + 1));
+  await page.screenshot({path:'/tmp/clowder-halloween-mini-desktop.png',fullPage:true});
+  let payload;
+  page.on('request', request => { if(new URL(request.url()).pathname === '/api/orders') payload = request.postDataJSON(); });
+  await prepare(page, {items:{'mini-clowder-pizza-halloween':2}});
+  assert.equal(await page.locator('#drawerTotal').textContent(), '$6.00');
+  await page.evaluate(() => sendOrder());
+  assert.equal(payload.totalCents, 600);
+  assert.match(payload.details, /2x \*Mini Clowder Pizza\*/);
+  assert.equal([...payload.details.matchAll(/^• (\d+)x \*Clowder Pizza[^*\n]*\*/gm)].length, 0, 'La mini no consume el lote antiguo');
+  assert.equal((await orderState(page)).destinations.length, 1);
+}, {time:'2026-10-31T20:00:00-05:00', pizzaStock:0}));
+
+test('Tema negro fijo: mañana, tarde, noche y navegación de categorías', () => useFixture(async ({page}) => {
+  for(const time of ['2026-10-31T08:00:00-05:00','2026-10-31T17:00:00-05:00','2026-10-31T23:00:00-05:00','2026-11-01T08:00:00-05:00']) {
+    await page.evaluate(time => {window.__setTestTime(time);refreshAvailability();}, time);
+    for(const category of ['Snack Sal','Bebidas Frías','Bebida del Mes']) {
+      await page.evaluate(category => selectCat(category), category);
+      assert.equal(await page.evaluate(() => document.body.classList.contains('light-theme')), false);
+      assert.equal(await page.evaluate(() => getComputedStyle(document.body).backgroundColor), 'rgb(0, 0, 0)');
+      assert.equal(await page.evaluate(() => getComputedStyle(document.documentElement).backgroundColor), 'rgb(0, 0, 0)');
+    }
+  }
+  assert.equal(await page.locator('button#themeToggle').count(), 0);
+}, {time:'2026-10-31T08:00:00-05:00'}));
+
+test('Halloween: inicio, vencimiento y limpieza del carrito a medianoche de Ecuador', () => useFixture(async ({page}) => {
+  assert.equal(await page.locator('#halloweenNotice').isVisible(), false);
+  await page.evaluate(() => {window.__setTestTime('2026-10-31T05:00:00Z');refreshAvailability();});
+  assert.equal(await page.locator('#halloweenNotice').isVisible(), true);
+  await page.evaluate(() => {selectCat('Snack Sal');changeQty('mini-clowder-pizza-halloween',1);window.__setTestTime('2026-11-01T04:59:59Z');refreshAvailability();});
+  assert.equal((await orderState(page)).cart['mini-clowder-pizza-halloween'].qty, 1);
+  await page.evaluate(() => {window.__setTestTime('2026-11-01T05:00:00Z');refreshAvailability();});
+  assert.equal(await page.locator('#halloweenNotice').isVisible(), false);
+  assert.equal(await page.locator('#menu-group-mini-clowder-pizza-halloween').count(), 0);
+  assert.equal(await page.locator('#menu-group-clowder-pizza').count(), 1);
+  assert.deepEqual((await orderState(page)).cart, {});
+  assert.equal(await page.evaluate(() => MENU.find(i => i.id === 'clowder-pizza').price), 5.5);
+  assert.equal(await page.evaluate(() => MENU.find(i => i.id === 'clowder-pizza').soldOut), true);
+}, {time:'2026-10-31T04:59:59Z'}));
 
 test('Solo bebidas: oculta comida sin cambiar stock y limpia un borrador anterior', () => useFixture(async ({page}) => {
   assert.equal(await page.locator('#drinksOnlyNotice').isVisible(), true);

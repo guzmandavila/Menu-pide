@@ -61,6 +61,7 @@ const MENU = [
   { id:'milkishaki-salted-caramel', cat:'Bebidas Frías', name:'MilkiShaki - Salted Caramel', classic:'Milkshake', classicTheme:'fresh', order:4, desc:'Leche, helado premium y caramelo con un toque de sal.', price:4.9, milk:true, groupFeatured:true, img:'assets/image-861d6d271de84321.jpg', group:'milkishaki', flavor:'Salted Caramel'  },
 
   // ---- Snacks ----
+  { id:'mini-clowder-pizza-halloween', cat:'Snack Sal', name:'Mini Clowder Pizza', desc:'Versión mini de nuestra pizza: masa artesanal delgada sin gluten, hecha por nosotros con aceite de oliva y sin huevo. Pomodoro artesanal, tomate fresco, queso mozzarella, un plus de parmesano y jamón Virginia de pura carne de cerdo, sin embutidos.', price:3.00, availableFrom:'2026-10-31T00:00:00-05:00', availableUntil:'2026-11-01T00:00:00-05:00', promoNote:'Solo hoy, 31 de octubre · versión mini · sin huevo.', img:'assets/clowder-pizza-virginia.png', featured:true, featuredTag:'SOLO HOY · HALLOWEEN', featuredIcon:'👻', accent:'#CC6425', order:-1 },
   { id:'clowder-pizza', soldOut:true, soldOutManual:true, soldOutNote:'¡Gracias por todo su cariño! ¡Agotado! ❤️', cat:'Snack Sal', name:'Clowder Pizza', desc:'Pizza redonda personal de masa artesanal delgada sin gluten, hecha por nosotros con aceite de oliva y sin huevo. Lleva pomodoro artesanal, tomate fresco, queso mozzarella, un plus de parmesano y jamón Virginia de pura carne de cerdo, sin embutidos.', price:5.50, img:'assets/clowder-pizza-virginia.png', featured:true, featuredTag:'NUEVO', featuredIcon:'🆕', order:0 },
   { id:'tocipapa', cat:'Snack Sal', name:'Tocipapa', desc:'Papas corte recto con tocineta crocante y salsa de la casa. 120 g (20–25 g de tocineta).', price:2.5, soldOut:true, img:'assets/image-9fa7a5da9f5e3cb0.jpg' },
   { id:'papas-fritas', cat:'Snack Sal', name:'Papas fritas', desc:'Papas fritas solas, acompañadas de mayonesa de la casa.', price:2.00, img:'assets/papas-fritas-stock.jpeg', processTag:'♨️ Freidora de aire', order:0 },
@@ -139,6 +140,12 @@ MENU.forEach(item => {
   }
 });
 
+// Snack Dulce pausado temporalmente; conservar tarjetas y precios.
+MENU.filter(item => item.cat === 'Snack Dulce').forEach(item => {
+  item.soldOut = true;
+  item.soldOutNote = 'Agotado por el momento. 👻';
+});
+
 /* Banners por categoría: usa img para fotos o video + poster para clips. */
 const CAT_BANNERS = {
   'Matcha': [
@@ -157,6 +164,7 @@ const CAT_BANNERS = {
     { hidden:true, productId:'funbite', img:'assets/funbite.jpeg', alt:'Funbite — cupcake con cobertura cremosa y chips de colores' },
   ],
   'Snack Sal': [
+    { productId:'mini-clowder-pizza-halloween', img:'assets/clowder-pizza-virginia.png', alt:'Mini Clowder Pizza sin huevo, solo el 31 de octubre por $3', title:'Mini pizza', description:'Solo hoy · sin huevo', price:'$3.00' },
     { img:'banners/empanadas-octubre.jpeg', alt:'Empanadas hojaldradas Clowder: Posho con pollo mechado y vegetales por $2,40; Pizza por $2,40; Capresse por $1,80. Pide por nuestra app.' },
     { productId:'clowder-pizza', img:'assets/clowder-pizza-banner-octubre.jpeg', alt:'Clowder Pizza redonda personal con queso mozzarella y jamón Virginia de pura carne de cerdo' },
     { img:'banners/snack-papas.jpg', alt:'Papas y carne grillada en un vaso Clowder' },
@@ -185,7 +193,13 @@ const DRINKS_ONLY_CATS = ['Bebidas Calientes', 'Bebidas Frías', 'Matcha', 'Bebi
 function isDrinksOnlyDay(now = Date.now()){
   return now >= DRINKS_ONLY_START && now < DRINKS_ONLY_END;
 }
+const HALLOWEEN_START = Date.parse('2026-10-31T00:00:00-05:00');
+const HALLOWEEN_END = Date.parse('2026-11-01T00:00:00-05:00');
+function isHalloweenDay(now = Date.now()){
+  return now >= HALLOWEEN_START && now < HALLOWEEN_END;
+}
 function isAllowedToday(item){
+  if(isHalloweenDay() && item.id === 'clowder-pizza') return false;
   return !isDrinksOnlyDay() || DRINKS_ONLY_CATS.includes(item.cat);
 }
 function visibleCats(){
@@ -193,6 +207,7 @@ function visibleCats(){
 }
 function refreshDrinksOnlyNotice(){
   document.getElementById('drinksOnlyNotice').hidden = !isDrinksOnlyDay();
+  document.getElementById('halloweenNotice').hidden = !isHalloweenDay();
 }
 
 /* Colores secundarios de marca — uno por categoría de sabor */
@@ -219,14 +234,12 @@ function pastelBg(c){ const hex = catColor(c); return hex==='transparent' ? 'tra
 // La portada inicial muestra categorías; Bebida del Mes permanece como sección destacada.
 let activeCat = CATS.includes('Bebida del Mes') ? 'Bebida del Mes' : (CATS.includes('Bebidas Frías') ? 'Bebidas Frías' : CATS[0]);
 let categoryHome = true;
-let themeManuallySelected = false;
 function applyMenuTheme(){
   const halloweenFeature = !categoryHome && activeCat === 'Bebida del Mes';
   document.body.classList.toggle('halloween-feature', halloweenFeature);
   document.body.classList.add('halloween-season');
-  if(themeManuallySelected) return;
-  const hour = new Date().getHours();
-  document.body.classList.toggle('light-theme', !halloweenFeature && hour >= 7 && hour < 19);
+  document.body.classList.toggle('halloween-day', isHalloweenDay());
+  document.body.classList.remove('light-theme');
 }
 applyMenuTheme();
 let cart = {}; // id -> {qty, note}
@@ -627,7 +640,7 @@ function renderCategoryHome(){
     return `<button type="button" class="category-tile" style="--tile-accent:${color};--tile-pill-text:${textColorFor(color)};--tile-image-scale:${imageScale};--tile-image-position:${imagePosition}" onclick="selectCat('${escapeHtml(category)}')" aria-label="Abrir categoría ${escapeHtml(category)}"><img src="${escapeHtml(image)}" alt="" loading="eager" decoding="async"><span class="category-tile-shade"></span><span class="category-tile-name">${escapeHtml(category)}</span></button>`;
   }).join('');
   const halloween=MENU.find(item=>item.id==='jacks-o-lantern'&&!HIDDEN_ITEM_IDS.includes(item.id)&&isWithinAvailability(item)&&!item.soldOut);
-  const promo=halloween ? `<button type="button" class="halloween-promo" onclick="selectCat('Bebidas Frías')" aria-label="Ver Jacks O’ Lantern, dirty soda de Halloween, $${halloween.price.toFixed(2)}"><img src="${escapeHtml(halloween.img)}" alt="Jacks O’ Lantern en su vaso de calabaza" decoding="async"><span class="halloween-promo-copy"><small>🎃 EDICIÓN HALLOWEEN</small><strong>Jacks O’ Lantern</strong><span>Dirty soda · sabor retro.<br>Los que saben, saben.</span><b>$${halloween.price.toFixed(2)}</b><span class="halloween-promo-cta">Pídela aquí →</span></span></button>` : '';
+  const promo=halloween ? `<button type="button" class="halloween-promo" onclick="selectCat('Bebidas Frías')" aria-label="Ver Jacks O’ Lantern, dirty soda de Halloween, $${halloween.price.toFixed(2)}"><img src="${escapeHtml(halloween.img)}" alt="Jacks O’ Lantern en su vaso de calabaza" decoding="async"><span class="halloween-promo-copy"><small>🎃 EDICIÓN HALLOWEEN</small><strong>Jacks O’ Lantern</strong><span>Dirty soda · sabor retro.<br>Los que saben, saben.</span><b>$${halloween.price.toFixed(2)}</b><span class="halloween-promo-cta">🦇 Pídela aquí →</span></span></button>` : '';
   return `<section class="category-home-view" aria-label="Categorías del menú">${promo}<div class="category-home-grid">${tiles}</div></section>`;
 }
 function renderMenu(){
@@ -669,7 +682,7 @@ function renderMenu(){
     return aPrice - bPrice;
   });
 
-  const categoryBanners = (CAT_BANNERS[activeCat] || []).filter(b => !b.hidden && (!b.productId || MENU.some(item => item.id === b.productId && isWithinAvailability(item))));
+  const categoryBanners = (CAT_BANNERS[activeCat] || []).filter(b => !b.hidden && (!b.productId || MENU.some(item => item.id === b.productId && isAllowedToday(item) && isWithinAvailability(item))));
   const dailyBanner = activeCat === 'Combos' && categoryBanners.find(b=>b.day===today);
   const banners = dailyBanner ? [dailyBanner] : categoryBanners;
   let bannerHtml = '';
@@ -1546,8 +1559,12 @@ function itemDayNotice(item){
 function showUnavailableNotice(id){
   if(birthdayState().closed){ openHours('🎂 Cerrado por cumpleaños', 'Hoy cerramos a las 19h00 para celebrar al gato mesero. Puedes dejar un regalo desde $1 para los michis de la calle en el aviso de cumpleaños.'); return; }
   const item = MENU.find(product => product.id === id);
-  if(item && !isAllowedToday(item)){
+  if(item && isDrinksOnlyDay() && !isAllowedToday(item)){
     openHours('Hoy solo bebidas', 'Estamos preparando Clowder para Halloween 🎃. Por hoy, elige entre nuestras bebidas.');
+    return;
+  }
+  if(item && !isAllowedToday(item)){
+    openHours('Pizza de Halloween', 'Hoy tenemos Mini Clowder Pizza por $3, con los mismos ingredientes y sin huevo.');
     return;
   }
   if(item && !isWithinAvailability(item)){
@@ -1566,11 +1583,6 @@ function showUnavailableNotice(id){
 }
 function closeHours(){ document.getElementById('hoursOverlay').classList.remove('open'); }
 
-function toggleTheme(){
-  themeManuallySelected = true;
-  document.body.classList.add('theme-manual');
-  document.body.classList.toggle('light-theme');
-}
 
 function setPay(p){
   payMethod = p;
@@ -1932,7 +1944,7 @@ let lastAvailability = '';
 function refreshAvailability(){
   if(sendingOrder || document.visibilityState !== 'visible' || document.activeElement?.matches('input,textarea,select')) return;
   const time = businessTime();
-  const key = `${isDrinksOnlyDay()}:${time.day}:${isMenuOpenNow()}:${JSON.stringify(birthdayState())}:${MENU.map(item => isWithinAvailability(item)).join()}`;
+  const key = `${isDrinksOnlyDay()}:${isHalloweenDay()}:${time.day}:${isMenuOpenNow()}:${JSON.stringify(birthdayState())}:${MENU.map(item => isWithinAvailability(item)).join()}`;
   if(key === lastAvailability) return;
   lastAvailability = key;
   cart = sanitizeCart(cart);
