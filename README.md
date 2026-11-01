@@ -106,7 +106,7 @@ Más detalles de operación y publicación en [`cobros/DEPLOYMENT.md`](cobros/DE
 
 ### Halloween · 31 de octubre de 2026
 
-La Mini Clowder Pizza cuesta $3, mantiene los ingredientes de la original y es sin huevo. Se ofrece solo el 31 de octubre en horario del menú; el producto, su banner y el aviso de Halloween expiran a las 00:00 del 1 de noviembre en Ecuador, incluso con la página abierta. La pizza habitual se oculta durante esa jornada y conserva su precio y estado de agotado. La mini tiene ID y nombre propios para no consumir el lote antiguo de cinco pizzas del servicio de cobros; no se ha indicado un cupo para esta edición. Se destacan las bebidas existentes Jacks O’ Lantern y Pumpkin Spice Latte, sin añadir recetas ni precios nuevos.
+La Mini Clowder Pizza cuesta $3, mantiene los ingredientes de la original y es sin huevo. Reactivada el 1 de noviembre: el producto y su banner siguen disponibles sin fecha de vencimiento; únicamente el aviso de Halloween expira a medianoche. La pizza habitual se oculta durante esa jornada y conserva su precio y estado de agotado. La mini tiene ID y nombre propios para no consumir el lote antiguo de cinco pizzas del servicio de cobros; no se ha indicado un cupo para esta edición. Se destacan las bebidas existentes Jacks O’ Lantern y Pumpkin Spice Latte, sin añadir recetas ni precios nuevos.
 
 Por indicación del usuario, el fondo del menú permanece negro a toda hora, sin cambio automático ni selector de tema. Se conservan Jacks O’ Lantern y Pumpkin Spice Latte y se añaden emojis de Halloween a los avisos y destacados.
 

@@ -698,7 +698,7 @@ test('Tema negro fijo: mañana, tarde, noche y navegación de categorías', () =
   assert.equal(await page.locator('button#themeToggle').count(), 0);
 }, {time:'2026-10-31T08:00:00-05:00'}));
 
-test('Halloween: inicio, vencimiento y limpieza del carrito a medianoche de Ecuador', () => useFixture(async ({page}) => {
+test('Mini pizza: permanece visible y conserva el carrito al terminar Halloween', () => useFixture(async ({page}) => {
   assert.equal(await page.locator('#halloweenNotice').isVisible(), false);
   await page.evaluate(() => {window.__setTestTime('2026-10-31T05:00:00Z');refreshAvailability();});
   assert.equal(await page.locator('#halloweenNotice').isVisible(), true);
@@ -706,12 +706,22 @@ test('Halloween: inicio, vencimiento y limpieza del carrito a medianoche de Ecua
   assert.equal((await orderState(page)).cart['mini-clowder-pizza-halloween'].qty, 1);
   await page.evaluate(() => {window.__setTestTime('2026-11-01T05:00:00Z');refreshAvailability();});
   assert.equal(await page.locator('#halloweenNotice').isVisible(), false);
-  assert.equal(await page.locator('#menu-group-mini-clowder-pizza-halloween').count(), 0);
+  assert.equal(await page.locator('#menu-group-mini-clowder-pizza-halloween').count(), 1);
+  assert.equal(await page.evaluate(() => isItemOrderable(MENU.find(i => i.id === 'mini-clowder-pizza-halloween'))), true);
   assert.equal(await page.locator('#menu-group-clowder-pizza').count(), 1);
-  assert.deepEqual((await orderState(page)).cart, {});
+  assert.equal((await orderState(page)).cart['mini-clowder-pizza-halloween'].qty, 1);
   assert.equal(await page.evaluate(() => MENU.find(i => i.id === 'clowder-pizza').price), 5.5);
   assert.equal(await page.evaluate(() => MENU.find(i => i.id === 'clowder-pizza').soldOut), true);
-}, {time:'2026-10-31T04:59:59Z'}));
+  await page.evaluate(() => {window.__setTestTime('2026-11-01T20:00:00-05:00');refreshAvailability();});
+  let payload;
+  page.on('request', request => { if(new URL(request.url()).pathname === '/api/orders') payload = request.postDataJSON(); });
+  await prepare(page, {items:{'mini-clowder-pizza-halloween':2}});
+  assert.equal(await page.locator('#drawerTotal').textContent(), '$6.00');
+  await page.evaluate(() => sendOrder());
+  assert.equal(payload.totalCents, 600);
+  assert.match(payload.details, /2x \*Mini Clowder Pizza\*/);
+  assert.equal((await orderState(page)).destinations.length, 1);
+}, {time:'2026-10-31T04:59:59Z', pizzaStock:0}));
 
 test('Solo bebidas: oculta comida sin cambiar stock y limpia un borrador anterior', () => useFixture(async ({page}) => {
   assert.equal(await page.locator('#drinksOnlyNotice').isVisible(), true);
