@@ -165,10 +165,10 @@ test('Stock actual: helados, empanadas de pizza y queso y wachipapa disponibles;
   assert.equal(await page.locator('#menu .cat-banner-slide img[src="banners/empanadas-octubre.jpeg"]').count(), 1);
 }));
 
-test('Snack Dulce agotado: tarjetas visibles, pedidos y borradores bloqueados', () => useFixture(async ({page}) => {
+test('Snack Dulce: los productos pausados siguen bloqueados y el nuevo cupcake se puede pedir', () => useFixture(async ({page}) => {
   await page.evaluate(() => selectCat('Snack Dulce'));
   const result = await page.evaluate(() => {
-    const sweets = MENU.filter(item => item.cat === 'Snack Dulce');
+    const sweets = MENU.filter(item => item.cat === 'Snack Dulce' && item.id !== 'cupcake-chocolate-blanco');
     for(const item of sweets) changeQty(item.id,1);
     return {
       paused: sweets.every(item => item.soldOut && !isItemOrderable(item)),
@@ -181,6 +181,38 @@ test('Snack Dulce agotado: tarjetas visibles, pedidos y borradores bloqueados', 
   assert.deepEqual(result.restored,{});
   for(const id of result.visible) assert.match(await page.locator('#menu-group-'+id).textContent(),/Agotado por el momento/);
 }, {time:'2026-10-31T20:00:00-05:00'}));
+
+test('Cupcakes: banner completo en inicio, foto de producto, pedido y bebida fría conservada', () => useFixture(async ({page}) => {
+  assert.equal(await page.locator('.halloween-promo').count(), 0);
+  await page.evaluate(()=>{document.getElementById('introSkip')?.click();document.getElementById('introSplash')?.remove();});
+  const banner=page.locator('.cupcake-promo img');
+  assert.equal(await banner.getAttribute('src'), 'banners/cupcakes-alerta-antojo.jpeg');
+  await banner.evaluate(img=>img.decode());
+  await page.screenshot({path:'/tmp/clowder-cupcakes-home-mobile.png',fullPage:true});
+  assert.ok(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth+1));
+  await page.locator('.cupcake-promo-cta').click();
+  await page.locator('#menu-group-cupcake-chocolate-blanco').waitFor({state:'visible'});
+  assert.equal(await page.locator('#menu-group-cupcake-chocolate-blanco').count(),1);
+  const item=await page.evaluate(()=>MENU.find(i=>i.id==='cupcake-chocolate-blanco'));
+  assert.equal(item.img,'assets/cupcakes-chocolate-blanco.jpeg');
+  assert.equal(item.price,2.75);
+  assert.match(item.desc,/72%/);
+  assert.match(item.desc,/ganache de chocolate blanco/);
+  assert.equal(await page.evaluate(()=>isItemOrderable(MENU.find(i=>i.id==='cupcake-chocolate-blanco'))),true);
+  await page.locator('#menu-group-cupcake-chocolate-blanco img').evaluate(img=>img.decode());
+  await page.screenshot({path:'/tmp/clowder-cupcakes-product-mobile.png',fullPage:true});
+  await page.setViewportSize({width:1440,height:1000});
+  assert.ok(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth+1));
+  let payload;
+  page.on('request',request=>{if(new URL(request.url()).pathname==='/api/orders')payload=request.postDataJSON();});
+  await prepare(page,{items:{'cupcake-chocolate-blanco':2}});
+  await page.evaluate(()=>sendOrder());
+  assert.equal(payload.totalCents,Math.round(item.price*200));
+  assert.match(payload.details,/2x \*Cupcake/);
+  await page.evaluate(()=>selectCat('Bebidas Frías'));
+  assert.equal(await page.locator('#menu-group-jacks-o-lantern').count(),1);
+  assert.equal(await page.evaluate(()=>isItemOrderable(MENU.find(i=>i.id==='jacks-o-lantern'))),true);
+}, {time:'2026-11-01T20:00:00-05:00'}));
 
 test('Cambiar el sabor de empanada conserva el orden de las tarjetas', () => useFixture(async ({ page }) => {
   await page.evaluate(() => selectCat('Snack Sal'));

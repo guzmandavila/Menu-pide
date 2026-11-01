@@ -1267,3 +1267,9 @@ body.category-home .bottom-navigation:not(:has(.cartbar.show)){display:none;}
 
 .theme-toggle{cursor:default}
 .halloween-notice{font-family:system-ui,sans-serif;letter-spacing:normal;word-spacing:normal}
+
+/* Promoción de cupcakes: mostrar el arte completo, incluido su texto. */
+.cupcake-promo{display:block;width:100%;max-width:540px;margin:0 auto 22px;padding:0;border:1px solid #ff9fca;border-radius:20px;overflow:hidden;background:#ffa6d2;color:#241b20;cursor:pointer;}
+.cupcake-promo>img{display:block;width:100%;height:auto;}
+.cupcake-promo-cta{display:block;padding:14px 12px;font:700 16px/1.4 'Inter',sans-serif;text-align:center;}
+.cupcake-promo:focus-visible{outline:3px solid #fff;outline-offset:4px;}

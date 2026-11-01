@@ -47,6 +47,7 @@ const MENU = [
   { id:'blueberry-matcha', order:0, cat:'Matcha', name:'Blueberry Matcha', desc:'Matcha, leche y puré real de arándano sobre hielo.', price:4.45, milk:true, img:'assets/blueberry-matcha.jpeg' },
 
   // ---- Panadería ----
+  { id:'cupcake-chocolate-blanco', cat:'Snack Dulce', name:'Cupcake con buttercream de chocolate blanco', desc:'Hecho con harina de almendra y avena, chispas de chocolate al 72%, endulzado con azúcar de coco y panela. Topping de buttercream de ganache de chocolate blanco.', price:2.75, img:'assets/cupcakes-chocolate-blanco.jpeg', featured:true, featuredTag:'ALERTA DE ANTOJO', featuredIcon:'🧁', accent:'#FFA6D2', order:-1 },
   { id:'boo-cupcake', soldOut:true, cat:'Snack Dulce', name:'Boo Cupcake', desc:'Nuestro cupcake de Halloween, elaborado con harinas sin gluten y un toque de sabor a naranja, con buttercream.', price:2.00, img:'assets/boo-cupcake.jpeg', featured:true, featuredTag:'NUEVO', featuredIcon:'🎃', order:0 },
   { id:'galleta', cat:'Snack Dulce', name:'oChips', desc:'Galletas de almendra y avena sin gluten, con chispas de chocolate y azúcar de coco. Crocantes por fuera y suaves por dentro.', price:2.00, img:'assets/ochips.jpeg' },
   { id:'mini-ochips', soldOut:true, cat:'Snack Dulce', name:'Mini oChips', desc:'5 galletas pequeñas con harinas de avena y almendra sin gluten.', price:1.80, img:'assets/mini-ochips.jpeg' },
@@ -140,8 +141,8 @@ MENU.forEach(item => {
   }
 });
 
-// Snack Dulce pausado temporalmente; conservar tarjetas y precios.
-MENU.filter(item => item.cat === 'Snack Dulce').forEach(item => {
+// Mantener pausados los dulces anteriores; el nuevo cupcake está disponible.
+MENU.filter(item => item.cat === 'Snack Dulce' && item.id !== 'cupcake-chocolate-blanco').forEach(item => {
   item.soldOut = true;
   item.soldOutNote = 'Agotado por el momento. 👻';
 });
@@ -639,8 +640,8 @@ function renderCategoryHome(){
     const imagePosition = category === 'Snack Dulce' ? '50% 0%' : '50% 50%';
     return `<button type="button" class="category-tile" style="--tile-accent:${color};--tile-pill-text:${textColorFor(color)};--tile-image-scale:${imageScale};--tile-image-position:${imagePosition}" onclick="selectCat('${escapeHtml(category)}')" aria-label="Abrir categoría ${escapeHtml(category)}"><img src="${escapeHtml(image)}" alt="" loading="eager" decoding="async"><span class="category-tile-shade"></span><span class="category-tile-name">${escapeHtml(category)}</span></button>`;
   }).join('');
-  const halloween=MENU.find(item=>item.id==='jacks-o-lantern'&&!HIDDEN_ITEM_IDS.includes(item.id)&&isWithinAvailability(item)&&!item.soldOut);
-  const promo=halloween ? `<button type="button" class="halloween-promo" onclick="selectCat('Bebidas Frías')" aria-label="Ver Jacks O’ Lantern, dirty soda de Halloween, $${halloween.price.toFixed(2)}"><img src="${escapeHtml(halloween.img)}" alt="Jacks O’ Lantern en su vaso de calabaza" decoding="async"><span class="halloween-promo-copy"><small>🎃 EDICIÓN HALLOWEEN</small><strong>Jacks O’ Lantern</strong><span>Dirty soda · sabor retro.<br>Los que saben, saben.</span><b>$${halloween.price.toFixed(2)}</b><span class="halloween-promo-cta">🦇 Pídela aquí →</span></span></button>` : '';
+  const cupcake=MENU.find(item=>item.id==='cupcake-chocolate-blanco'&&!HIDDEN_ITEM_IDS.includes(item.id)&&isWithinAvailability(item)&&!item.soldOut);
+  const promo=cupcake ? `<button type="button" class="cupcake-promo" onclick="selectCat('Snack Dulce')" aria-label="Ver cupcakes con chispas de chocolate y buttercream de ganache de chocolate blanco, $${cupcake.price.toFixed(2)}"><img src="banners/cupcakes-alerta-antojo.jpeg" alt="Alerta de antojo: cupcakes de harina de almendra y avena, chispas de chocolate al 72%, azúcar de coco y panela, con buttercream de ganache de chocolate blanco" decoding="async"><span class="cupcake-promo-cta">Pedir cupcakes · $${cupcake.price.toFixed(2)} →</span></button>` : '';
   return `<section class="category-home-view" aria-label="Categorías del menú">${promo}<div class="category-home-grid">${tiles}</div></section>`;
 }
 function renderMenu(){
