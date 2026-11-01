@@ -132,7 +132,7 @@ test('Todos los menús se muestran en móvil sin errores ni desbordamiento horiz
   }
 }));
 
-test('Stock actual: helados y queso disponibles; pollo, pizza, wachipapas y tocipapas agotados', () => useFixture(async ({ page }) => {
+test('Stock actual: helados, queso y wachipapa disponibles; pollo, pizza y tocipapa agotados', () => useFixture(async ({ page }) => {
   const result = await page.evaluate(() => {
     const ids = ['affocato', 'milkishaki-nutella', 'milkishaki-fresa', 'milkishaki-salted-caramel'];
     changeQty('empanada-queso', 1);
@@ -148,7 +148,7 @@ test('Stock actual: helados y queso disponibles; pollo, pizza, wachipapas y toci
   assert.deepEqual(result.iceCream, [true, true, true, true]);
   assert.equal(result.cheese, true);
   assert.equal(result.chicken, false);
-  assert.deepEqual(result.potatoes, [false, false, true]);
+  assert.deepEqual(result.potatoes, [true, false, true]);
   assert.equal(result.hidden, true);
   assert.deepEqual(Object.keys(result.restored), ['empanada-queso']);
   await page.evaluate(() => selectCat('Snack Sal'));
