@@ -45,6 +45,37 @@
     for(let d=new Date(first+'T12:00:00Z');d.toISOString().slice(0,10)<=current;d.setUTCDate(d.getUTCDate()+7))row(d.toISOString().slice(0,10));
     return [...rows.values()].sort((a,b)=>a.week.localeCompare(b.week)).map((r,i,all)=>({...r,net:r.gross-r.refunds,average:r.count?Math.round(r.gross/r.count):0,change:i&&all[i-1].gross?100*(r.gross-all[i-1].gross)/all[i-1].gross:null,current:r.week===current})).reverse();
   }
-  root.ClowderLedger = {day, summarize, week, outside, cash, weekly};
+  function cashTimeline(orders,movements=[]) {
+    const events=[];
+    for(const o of orders){
+      if(o.account!=='Efectivo')continue;
+      if(o.paid_at)events.push({id:o.code+'-paid',kind:'sale',delta:o.cents,at:o.paid_at,note:o.payload?.name||o.code});
+      if(o.refunded_at)events.push({id:o.code+'-refund',kind:'refund',delta:-o.cents,at:o.refunded_at,note:o.payload?.name||o.code});
+    }
+    for(const m of movements)events.push({...m,at:m.created_at});
+    events.sort((a,b)=>a.at.localeCompare(b.at)||a.id.localeCompare(b.id));
+    let balance=0;
+    return events.map(e=>{
+      const before=balance;
+      balance+=e.delta;
+      return {...e,before,after:balance};
+    }).reverse();
+  }
+  // Referencia comprobada guardada con el conteo. No es un cobro ni un saldo calculado.
+  function bankReference(movements=[]) {
+    for(const m of [...movements].sort((a,b)=>b.created_at.localeCompare(a.created_at))){
+      if(m.kind!=='count')continue;
+      const match=String(m.note||'').match(/^\[Saldos comprobados\] Produbanco: \$(\d+\.\d{2});/);
+      if(match)return {cents:Math.round(Number(match[1])*100),at:m.created_at,id:m.id};
+    }
+    return null;
+  }
+  function clowderBank(snapshot){
+    const saved=snapshot.bankOpening,legacy=bankReference(snapshot.cashMovements);
+    const opening=saved?{cents:saved.cents,at:saved.as_of,id:saved.source_id}:legacy;
+    const movements=snapshot.bankMovements||[];
+    return {initialized:Boolean(opening),opening,balance:opening?opening.cents+movements.reduce((sum,m)=>sum+m.delta,0):null,movements};
+  }
+  root.ClowderLedger = {day, summarize, week, outside, cash, weekly, bankReference, cashTimeline, clowderBank};
   if (typeof module !== 'undefined') module.exports = root.ClowderLedger;
 })(globalThis);

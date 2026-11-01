@@ -11,7 +11,7 @@ async function api(path, data) {
   const response = await fetch((window.CLOWDER_API || '') + path,{method:data?'POST':'GET',cache:'no-store',headers:{Authorization:'Bearer '+token,...(data?{'Content-Type':'application/json'}:{})},body:data?JSON.stringify(data):undefined,signal:AbortSignal.timeout(15000)});
   const result=await response.json(); if(!response.ok) { if(response.status===401){token='';sessionStorage.removeItem(STAFF_SESSION_KEY);$('workspace').hidden=true;$('login').hidden=false;} throw new Error(result.error || 'No se pudo completar la operación.'); } return result;
 }
-async function refresh() { snapshot=await api('/api/admin'); $('signedIn').textContent='Sesión de '+snapshot.currentUser; render(); $('updated').textContent='Actualizado: '+date(new Date().toISOString()); }
+async function refresh() { snapshot=await api('/api/admin'); $('signedIn').textContent='Sesión de '+snapshot.currentUser; render(); $('updated').textContent='Actualizado: '+date(new Date().toISOString());if(location.hash==='#inventario')await ClowderInventoryUI.load(); }
 async function run(fn) {
   if(busy) return; busy=true; $('status').textContent=''; document.querySelectorAll('button').forEach(b=>b.disabled=true);
   try { await fn(); } catch(e) { $('status').textContent=e.message+' Si hubo un problema de conexión, actualiza para verificar el resultado antes de cambiar los datos.'; }
@@ -21,9 +21,10 @@ $('login').onsubmit=e=>{e.preventDefault(); run(async()=>{const session=await ap
 $('logout').onclick=()=>run(async()=>{await api('/api/logout',{});token='';snapshot=null;sessionStorage.removeItem(STAFF_SESSION_KEY);location.reload();});
 $('refresh').onclick=()=>run(refresh);
 for(const id of ['day','filter','search','operatorFilter']) $(id).oninput=()=>{if(snapshot)render();};
-$('settlement').onsubmit=e=>{e.preventDefault(); const cents=Math.round(Number($('settlementAmount').value)*100),note=$('settlementNote').value.trim(); if(!Number.isSafeInteger(cents)||cents<=0)return;
-  if(!confirm(`¿Confirmas que Fernanda ya recibió ${money(cents)}?`))return;
-  run(async()=>{const signature=JSON.stringify({cents,note}); if(!settlementAttempt||settlementAttempt.signature!==signature)settlementAttempt={signature,id:crypto.randomUUID()}; await api('/api/settlements',{cents,note,id:settlementAttempt.id}); $('settlement').reset(); settlementAttempt=null; await refresh();});
+$('settlement').onsubmit=e=>{e.preventDefault();const cents=Math.round(Number($('settlementAmount').value)*100),note=$('settlementNote').value.trim(),clowderProdubanco=$('settlementDestination').value==='clowder';if(!Number.isSafeInteger(cents)||cents<=0)return;
+  if(clowderProdubanco&&!snapshot.bankTrackingEnabled){$('status').textContent='El registro automático de Cuenta Clowder necesita que se actualice el servicio. Todavía no se guardó esta transferencia.';return;}
+  if(!confirm(clowderProdubanco?`¿Los ${money(cents)} ya llegaron a Cuenta Clowder · Produbanco? Su saldo aumentará por ese monto.`:`¿Fernanda ya recibió ${money(cents)} en otro destino? Produbanco no cambiará.`))return;
+  run(async()=>{const signature=JSON.stringify({cents,note,clowderProdubanco});if(!settlementAttempt||settlementAttempt.signature!==signature)settlementAttempt={signature,id:crypto.randomUUID()};await api('/api/settlements',{cents,note,clowderProdubanco,id:settlementAttempt.id});$('settlement').reset();settlementAttempt=null;await refresh();});
 };
 $('manual').onsubmit=e=>{
  e.preventDefault();const name=$('manualName').value.trim(),totalCents=Math.round(Number($('manualAmount').value)*100),account=$('manualAccount').value;
@@ -40,6 +41,8 @@ $('manual').onsubmit=e=>{
 function orderOperator(o){return o.payload.createdBy || (o.code.startsWith('CL-MANUAL-') ? 'Sin identificar · anterior' : 'Cliente · app');}
 function render() {
   renderFinance();
+  ClowderSalesUI.renderBalances(snapshot);
+  ClowderSalesUI.render(snapshot.orders, $('day').value);
   const sum=ClowderLedger.summarize(snapshot.orders,snapshot.settlements,$('day').value);
   $('dailySummary').replaceChildren();
   const pendingOrders=snapshot.orders.filter(o=>o.status==='pending').length;
@@ -80,14 +83,19 @@ function render() {
       select.onchange=input.oninput=receivedInput.oninput=updateChange;updateChange();form.append(label,amountLabel,tenderLabel,change,element('button','Confirmar cobro'));
       form.onsubmit=e=>{e.preventDefault();const cents=Math.round(Number(input.value)*100);if(!confirm(`¿Recibiste ${money(cents)} en ${select.value}?`))return;run(async()=>{await api(`/api/orders/${o.code}/confirm`,{account:select.value,cents,...(select.value==='Efectivo'?{tenderCents:Math.round(Number(receivedInput.value||input.value)*100)}:{})});await refresh();});};article.append(form);
     }
+    if(snapshot.inventoryEnabled&&o.status!=='cancelled'){
+      const prepared=snapshot.preparedOrders?.find(p=>p.order_code===o.code);
+      if(prepared)article.append(element('p','✓ Preparación confirmada · ingredientes descontados por '+prepared.prepared_by,'preparation-complete'));
+      else {const button=element('button','Confirmar preparación y descontar ingredientes','secondary');button.type='button';button.onclick=()=>{if(confirm('¿Este pedido ya se preparó? Se descontarán los ingredientes de sus recetas. Esto no confirma el pago.'))run(async()=>{await api('/api/inventory/prepare',{code:o.code});await refresh();});};article.append(button);}
+    }
     if(o.status!=='cancelled') { const button=element('button','Cancelar pedido','danger');button.type='button';button.onclick=()=>{if(confirm(o.status==='paid'?'¿Cancelar este pedido cobrado? Se excluirá del cierre y quedará pendiente la devolución.':'¿Cancelar este pedido? No se sumará al cierre.'))run(async()=>{await api(`/api/orders/${o.code}/cancel`,{});await refresh();});};article.append(button); }
     if(o.status==='cancelled'&&o.paid_at){article.append(element('p',o.refunded_at?'Devolución registrada: '+date(o.refunded_at):'Debes devolver '+money(o.cents)+' al cliente.'));if(!o.refunded_at){const button=element('button','Confirmar devolución realizada');button.onclick=()=>{if(confirm('¿Ya devolviste '+money(o.cents)+' al cliente?'))run(async()=>{await api(`/api/orders/${o.code}/refund`,{});await refresh();});};article.append(button);}}
     $('orders').append(article);
   }
   if(!$('orders').children.length)$('orders').append(element('p','No hay pedidos con estos filtros.'));
   $('settlements').replaceChildren(...snapshot.settlements.map(s=>{
-    const row=element('p',`${date(s.created_at)} · ${money(s.cents)} · ${s.note}${s.voided_at?' · Anulada':' · Pagado a Fernanda'}`,s.voided_at?'settlement--void':'settlement--paid');
-    if(!s.voided_at){const button=element('button','Anular registro','secondary');button.onclick=()=>{if(confirm('¿Este registro fue un error? Anularlo volverá a sumar el monto al pendiente. No uses esta acción si Fernanda conserva ese dinero.'))run(async()=>{await api(`/api/settlements/${s.id}/void`,{});await refresh();});};row.append(' ',button);}
+    const row=element('p',`${date(s.created_at)} · ${money(s.cents)} · ${s.note}${s.voided_at?' · Anulada':s.clowder_produbanco?' · Recibida en Cuenta Clowder · Produbanco':' · Entrega a Fernanda'}`,s.voided_at?'settlement--void':'settlement--paid');
+    if(!s.voided_at){const button=element('button','Anular registro','secondary');button.onclick=()=>{if(confirm(s.clowder_produbanco?'¿Este registro fue un error y el dinero nunca llegó a Cuenta Clowder? Se corregirá el saldo de Produbanco y el pendiente por entregar. No lo anules si la cuenta conserva ese dinero.':'¿Este registro fue un error? Anularlo volverá a sumar el monto al pendiente. No uses esta acción si Fernanda conserva ese dinero.'))run(async()=>{await api(`/api/settlements/${s.id}/void`,{});await refresh();});};row.append(' ',button);}
     return row;
   }));
 }
@@ -113,25 +121,29 @@ function renderFinance(){
  const c=ClowderLedger.cash(snapshot.orders,snapshot.cashMovements);$('cashSummary').replaceChildren();
  for(const [label,value] of [['Saldo de caja',c.balance],['Reservado para devoluciones',c.reserved],['Efectivo disponible',c.available]]){const card=element('div',undefined,'card card--cash');card.append(element('span',label),element('strong',money(value)));$('cashSummary').append(card);}
  $('cashHint').textContent=c.initialized?'El saldo suma los cobros y movimientos, y resta las devoluciones realizadas. El disponible también reserva las devoluciones pendientes.':'Falta contar la latita: estos valores solo incluyen el efectivo registrado. Guarda el total físico para incluir lo que ya tenías.';
- $('cashHistory').replaceChildren(...(snapshot.cashMovements||[]).map(m=>element('p',date(m.created_at)+' · '+({count:'Conteo',in:'Entrada',out:'Salida'})[m.kind]+' · '+money(m.delta)+(m.counted_cents===null?'':' · Total contado: '+money(m.counted_cents))+' · '+m.note)));
+ ClowderCashUI.render(snapshot);
  $('weeks').replaceChildren(...ClowderLedger.weekly(snapshot.orders).map(w=>{const tr=element('tr');[weekLabel(w.week)+(w.current?' · Parcial':''),money(w.cash),money(w.bank),money(w.gross),money(w.refunds),money(w.net),String(w.count),money(w.average),w.current?'En curso':w.change===null?'Sin base':(w.change>0?'+':'')+w.change.toFixed(1)+'%',money(w.outside)].forEach(v=>tr.append(element('td',v)));return tr;}));
 }
 function download(name,content,type){const url=URL.createObjectURL(new Blob([content],{type})),a=element('a');a.href=url;a.download=name;a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);}
 $('backup').onclick=()=>run(async()=>{const data=await api('/api/backup');download('clowder-respaldo-'+ClowderLedger.day(new Date().toISOString())+'.json',JSON.stringify(data,null,2),'application/json');});
 $('exportWeeks').onclick=()=>{const rows=[['Semana martes a domingo','Estado','Efectivo','Transferencias','Cobrado','Devoluciones','Neto','Pedidos','Promedio','Variación %','Lunes antes de 18:00'],...ClowderLedger.weekly(snapshot.orders).map(w=>[weekLabel(w.week),w.current?'Parcial':'Completa',...[w.cash,w.bank,w.gross,w.refunds,w.net].map(v=>(v/100).toFixed(2)),w.count,(w.average/100).toFixed(2),w.current||w.change===null?'':w.change.toFixed(1),(w.outside/100).toFixed(2)])];download('clowder-semanas.csv','\ufeff'+rows.map(r=>r.join(';')).join('\r\n'),'text/csv;charset=utf-8');};
 
-const workspaceTabs=['orders','accounting'];
+$('salesPeriod').onchange=()=>{if(snapshot)ClowderSalesUI.render(snapshot.orders,$('day').value);};
+ClowderInventoryUI.init({api:{call:api,token:()=>token},run});
+const workspaceTabs=['sales','orders','inventory','accounting'];
+const workspaceHashes={sales:'#ventas',orders:'#pedidos',accounting:'#contabilidad',inventory:'#inventario'};
 function selectWorkspaceTab(name,focus=false){
- if(!workspaceTabs.includes(name))name='orders';
+ if(!workspaceTabs.includes(name))name='sales';
  for(const key of workspaceTabs){const selected=key===name,tab=$('tab-'+key);tab.setAttribute('aria-selected',String(selected));tab.tabIndex=selected?0:-1;$('panel-'+key).hidden=!selected;}
  if(focus)$('tab-'+name).focus();
+ if(name==='inventory'&&snapshot)ClowderInventoryUI.load();
 }
 for(const [index,key] of workspaceTabs.entries()){
  const tab=$('tab-'+key);
- tab.onclick=()=>{selectWorkspaceTab(key);history.replaceState(null,'','#'+(key==='accounting'?'contabilidad':'pedidos'));};
- tab.onkeydown=e=>{let next;if(e.key==='ArrowRight'||e.key==='ArrowLeft')next=workspaceTabs[1-index];else if(e.key==='Home')next=workspaceTabs[0];else if(e.key==='End')next=workspaceTabs[1];else return;e.preventDefault();selectWorkspaceTab(next,true);history.replaceState(null,'','#'+(next==='accounting'?'contabilidad':'pedidos'));};
+ tab.onclick=()=>{selectWorkspaceTab(key);history.replaceState(null,'',workspaceHashes[key]);};
+ tab.onkeydown=e=>{let next;if(e.key==='ArrowRight'||e.key==='ArrowLeft')next=workspaceTabs[(index+(e.key==='ArrowRight'?1:workspaceTabs.length-1))%workspaceTabs.length];else if(e.key==='Home')next=workspaceTabs[0];else if(e.key==='End')next=workspaceTabs[workspaceTabs.length-1];else return;e.preventDefault();selectWorkspaceTab(next,true);history.replaceState(null,'',workspaceHashes[next]);};
 }
-function tabFromHash(){selectWorkspaceTab(location.hash==='#contabilidad'?'accounting':'orders');}
+function tabFromHash(){selectWorkspaceTab(Object.keys(workspaceHashes).find(key=>workspaceHashes[key]===location.hash)||'sales');}
 window.addEventListener('hashchange',tabFromHash);tabFromHash();
 
 try { const saved=JSON.parse(sessionStorage.getItem(STAFF_SESSION_KEY)||'null'); if(saved?.token){ token=saved.token; run(async()=>{await refresh();$('login').hidden=true;$('workspace').hidden=false;}); } } catch { sessionStorage.removeItem(STAFF_SESSION_KEY); }
