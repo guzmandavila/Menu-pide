@@ -132,7 +132,7 @@ test('Todos los menús se muestran en móvil sin errores ni desbordamiento horiz
   }
 }));
 
-test('Stock actual: helados, queso y wachipapa disponibles; pollo, pizza y tocipapa agotados', () => useFixture(async ({ page }) => {
+test('Stock actual: helados, empanadas de pizza y queso y wachipapa disponibles; pollo, capresse y tocipapa agotados', () => useFixture(async ({ page }) => {
   const result = await page.evaluate(() => {
     const ids = ['affocato', 'milkishaki-nutella', 'milkishaki-fresa', 'milkishaki-salted-caramel'];
     changeQty('empanada-queso', 1);
@@ -153,10 +153,11 @@ test('Stock actual: helados, queso y wachipapa disponibles; pollo, pizza y tocip
   assert.deepEqual(Object.keys(result.restored), ['empanada-queso']);
   await page.evaluate(() => selectCat('Snack Sal'));
   assert.doesNotMatch(await page.locator('#menu').textContent(), /Últimas 4 empanadas de pollo/);
-  assert.equal(await page.locator('#qty-empanada-capresse').count(), 1);
+  assert.equal(await page.locator('#qty-empanada-capresse').count(), 0);
+  assert.deepEqual(await page.evaluate(() => MENU.filter(item => item.group === 'empanada' && isItemOrderable(item)).map(item => item.id)), ['empanada-queso', 'empanada-pizza']);
   assert.equal(await page.evaluate(() => MENU.find(item => item.id === 'empanada-capresse').price), 1.8);
   assert.equal(await page.evaluate(() => MENU.find(item => item.id === 'empanada-pizza').price), 2.4);
-  assert.equal(await page.evaluate(() => isItemOrderable(MENU.find(item => item.id === 'empanada-pizza'))), false);
+  assert.equal(await page.evaluate(() => isItemOrderable(MENU.find(item => item.id === 'empanada-pizza'))), true);
   assert.equal(await page.evaluate(() => MENU.find(item => item.id === 'empanada-pizza').img === MENU.find(item => item.id === 'empanada-pollo').img), true);
   await page.evaluate(() => { groupView.empanada = 'empanada-pollo'; renderMenu(); });
   assert.equal(await page.locator('#qty-empanada-pollo').count(), 0);
