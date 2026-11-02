@@ -15,7 +15,7 @@ if(STAFF_MODE){
    "cat" agrupa los productos por categoría.
    ============================================================ */
 const MENU = [
-  { id:'jacks-o-lantern', cat:'Bebidas Frías', name:'Jacks O’ Lantern', classic:'Dirty soda', classicTheme:'fresh', desc:'Dirty soda de Clowder, edición Halloween y sabor retro. Los que saben, saben.', price:2.75, img:'assets/jacks-o-lantern.jpeg', featured:true, featuredTag:'EDICIÓN HALLOWEEN', featuredIcon:'🎃', accent:'#CC6425', order:-1 },
+  { id:'jacks-o-lantern', cat:'Bebidas Frías', name:'Jacks O’ Lantern', classic:'Dirty soda', classicTheme:'fresh', desc:'Dirty soda de Clowder con sabor retro. Los que saben, saben.', price:2.75, img:'assets/jacks-o-lantern.jpeg', featured:true, featuredTag:'SABOR RETRO', featuredIcon:'✨', accent:'#CC6425', order:-1 },
   { id:'combo-cafe-empanada-queso', soldOut:true, cat:'Combos', name:'Café + Empanada de queso', desc:'Un café de la casa y una empanada de queso. Disponible únicamente los lunes, todo el día.', price:3.25, originalPrice:3.75, img:'miniaturas/combo-cafe-empanada.jpg', featured:true, featuredTag:'COMBO DEL LUNES', accent:'#D8A24A', order:0, days:[1] },
   { id:'combo-bananacake-catpuccino', cat:'Combos', name:'Bananacake + Catpuccino', desc:'Bananacake con harina de almendras, panela y drizzle de vainilla, acompañado de un Catpuccino. Disponible solo los martes, todo el día.', price:4.60, originalPrice:5.20, img:'banners/cmb-banner-02.jpg', featured:true, featuredTag:'COMBO DEL MARTES', accent:'#D8A24A', order:1, days:[2] },
   { id:'pumpkin-spice-caliente', cat:'Bebida del Mes', name:'Pumpkin Spice Latte · Caliente', desc:'Jarabe pumpkin spice hecho artesanalmente en Clowder.', price:3.00, milk:true, img:'assets/pumpkin-spice-latte.jpg', featured:true, groupFeatured:true, featuredTag:'Bebida del mes', group:'pumpkin-spice-latte', flavor:'Caliente · $3.00', order:0 },
@@ -48,7 +48,7 @@ const MENU = [
 
   // ---- Panadería ----
   { id:'cupcake-chocolate-blanco', cat:'Snack Dulce', name:'Cupcake con buttercream de chocolate blanco', desc:'Hecho con harina de almendra y avena, chispas de chocolate al 72%, endulzado con azúcar de coco y panela. Topping de buttercream de ganache de chocolate blanco.', price:2.75, img:'assets/cupcakes-chocolate-blanco.jpeg', featured:true, featuredTag:'ALERTA DE ANTOJO', featuredIcon:'🧁', accent:'#FFA6D2', order:-1 },
-  { id:'boo-cupcake', soldOut:true, cat:'Snack Dulce', name:'Boo Cupcake', desc:'Nuestro cupcake de Halloween, elaborado con harinas sin gluten y un toque de sabor a naranja, con buttercream.', price:2.00, img:'assets/boo-cupcake.jpeg', featured:true, featuredTag:'NUEVO', featuredIcon:'🎃', order:0 },
+  { id:'boo-cupcake', soldOut:true, cat:'Snack Dulce', name:'Boo Cupcake', desc:'Cupcake con un toque de naranja, elaborado con harinas sin gluten y buttercream.', price:2.00, img:'assets/boo-cupcake.jpeg', featured:true, featuredTag:'NUEVO', featuredIcon:'🧁', order:0 },
   { id:'galleta', cat:'Snack Dulce', name:'oChips', desc:'Galletas de almendra y avena sin gluten, con chispas de chocolate y azúcar de coco. Crocantes por fuera y suaves por dentro.', price:2.00, img:'assets/ochips.jpeg' },
   { id:'mini-ochips', soldOut:true, cat:'Snack Dulce', name:'Mini oChips', desc:'5 galletas pequeñas con harinas de avena y almendra sin gluten.', price:1.80, img:'assets/mini-ochips.jpeg' },
   { id:'funbite', soldOut:true, cat:'Snack Dulce', name:'Funbite', desc:'Cupcake de mix de harinas sin gluten con chips de colores.', price:1.50, img:'assets/funbite.jpeg' },
@@ -62,8 +62,8 @@ const MENU = [
   { id:'milkishaki-salted-caramel', cat:'Bebidas Frías', name:'MilkiShaki - Salted Caramel', classic:'Milkshake', classicTheme:'fresh', order:4, desc:'Leche, helado premium y caramelo con un toque de sal.', price:4.9, milk:true, groupFeatured:true, img:'assets/image-861d6d271de84321.jpg', group:'milkishaki', flavor:'Salted Caramel'  },
 
   // ---- Snacks ----
-  { id:'mini-clowder-pizza-halloween', cat:'Snack Sal', name:'Mini Clowder Pizza', desc:'Versión mini de nuestra pizza: masa artesanal delgada sin gluten, hecha por nosotros con aceite de oliva y sin huevo. Pomodoro artesanal, tomate fresco, queso mozzarella, un plus de parmesano y jamón Virginia de pura carne de cerdo, sin embutidos.', price:3.00, availableFrom:'2026-10-31T00:00:00-05:00', promoNote:'Versión mini · sin huevo.', img:'assets/clowder-pizza-virginia.png', featured:true, featuredTag:'MINI PIZZA · $3', featuredIcon:'🍕', accent:'#CC6425', order:-1 },
-  { id:'clowder-pizza', soldOut:true, soldOutManual:true, soldOutNote:'¡Gracias por todo su cariño! ¡Agotado! ❤️', cat:'Snack Sal', name:'Clowder Pizza', desc:'Pizza redonda personal de masa artesanal delgada sin gluten, hecha por nosotros con aceite de oliva y sin huevo. Lleva pomodoro artesanal, tomate fresco, queso mozzarella, un plus de parmesano y jamón Virginia de pura carne de cerdo, sin embutidos.', price:5.50, img:'assets/clowder-pizza-virginia.png', featured:true, featuredTag:'NUEVO', featuredIcon:'🆕', order:0 },
+  { id:'mini-clowder-pizza-halloween', cat:'Snack Sal', name:'Mini Clowder Pizza', desc:'Versión mini de nuestra pizza: masa artesanal delgada sin gluten, hecha por nosotros con aceite de oliva y sin huevo. Pomodoro artesanal, tomate fresco, queso mozzarella, un plus de parmesano y jamón Virginia de pura carne de cerdo, sin embutidos.', price:3.00, availableFrom:'2026-10-31T00:00:00-05:00', promoNote:'Versión mini · sin huevo.', img:'assets/mini-pizza-producto.jpeg', featured:true, featuredTag:'MINI PIZZA · $3', featuredIcon:'🍕', accent:'#CC6425', order:-1 },
+  { id:'clowder-pizza', soldOut:true, soldOutManual:true, soldOutNote:'¡Gracias por todo su cariño! Vuelve pronto. ❤️', cat:'Snack Sal', name:'Clowder Pizza', desc:'Pizza redonda personal de masa artesanal delgada sin gluten, hecha por nosotros con aceite de oliva y sin huevo. Lleva pomodoro artesanal, tomate fresco, queso mozzarella, un plus de parmesano y jamón Virginia de pura carne de cerdo, sin embutidos.', price:5.50, promoNote:'Masa artesanal · sin huevo.', img:'assets/clowder-pizza-virginia.png', featured:true, featuredTag:'NUEVO', featuredIcon:'🆕', order:0 },
   { id:'tocipapa', cat:'Snack Sal', name:'Tocipapa', desc:'Papas corte recto con tocineta crocante y salsa de la casa. 120 g (20–25 g de tocineta).', price:2.5, soldOut:true, img:'assets/image-9fa7a5da9f5e3cb0.jpg' },
   { id:'papas-fritas', cat:'Snack Sal', name:'Papas fritas', desc:'Papas fritas solas, acompañadas de mayonesa de la casa.', price:2.00, img:'assets/papas-fritas-stock.jpeg', processTag:'♨️ Freidora de aire', order:0 },
   { id:'wachipapa', soldOut:false, cat:'Snack Sal', name:'Wachipapa', desc:'Papas corte recto con chorizo argentino y salsa mayochurri de la casa. 120 g (35–40 g de chorizo).', price:3.0, img:'banners/snack-papas.jpg' },
@@ -144,7 +144,7 @@ MENU.forEach(item => {
 // Mantener pausados los dulces anteriores; el nuevo cupcake está disponible.
 MENU.filter(item => item.cat === 'Snack Dulce' && item.id !== 'cupcake-chocolate-blanco').forEach(item => {
   item.soldOut = true;
-  item.soldOutNote = 'Agotado por el momento. 👻';
+  item.soldOutNote = 'Cuéntanos si lo extrañas y ayúdanos a elegir qué preparar después.';
 });
 
 /* Banners por categoría: usa img para fotos o video + poster para clips. */
@@ -160,19 +160,19 @@ const CAT_BANNERS = {
   'Snack Dulce': [
     { productId:'cake-cuadrito-limon', img:'assets/cake-cuadrito-limon.jpeg', alt:'Cake cuadrito de limón, elaborado con mix de harinas sin gluten, $2.25', title:'Cake cuadrito de limón', description:'Mix de harinas sin gluten', price:'$2.25' },
     { productId:'cupcake-banana', img:'assets/cupcake-banano-chocolate.jpeg', alt:'Cupcake de banano con chispas de chocolate y mix de harinas sin gluten' },
-    { hidden:true, productId:'boo-cupcake', img:'assets/boo-cupcake.jpeg', alt:'Boo Cupcake — nuestro cupcake de Halloween con harinas sin gluten, naranja y buttercream' },
+    { hidden:true, productId:'boo-cupcake', img:'assets/boo-cupcake.jpeg', alt:'Boo Cupcake — nuestro cupcake de naranja con harinas sin gluten, naranja y buttercream' },
     { productId:'galleta', img:'banners/ochips.jpeg', alt:'oChips — galletas de almendra y avena sin gluten, con chispas de chocolate y azúcar de coco' },
     { hidden:true, productId:'funbite', img:'assets/funbite.jpeg', alt:'Funbite — cupcake con cobertura cremosa y chips de colores' },
   ],
   'Snack Sal': [
-    { productId:'mini-clowder-pizza-halloween', img:'assets/clowder-pizza-virginia.png', alt:'Mini Clowder Pizza sin huevo por $3', title:'Mini pizza', description:'Versión mini · sin huevo', price:'$3.00' },
+    { productId:'mini-clowder-pizza-halloween', img:'banners/mini-pizza.jpeg', alt:'Mini Pizza de Clowder, masa sin huevo' },
     { img:'banners/empanadas-octubre.jpeg', alt:'Empanadas hojaldradas Clowder: Posho con pollo mechado y vegetales por $2,40; Pizza por $2,40; Capresse por $1,80. Pide por nuestra app.' },
-    { productId:'clowder-pizza', img:'assets/clowder-pizza-banner-octubre.jpeg', alt:'Clowder Pizza redonda personal con queso mozzarella y jamón Virginia de pura carne de cerdo' },
+    { productId:'clowder-pizza', img:'assets/clowder-pizza-banner-octubre.jpeg', alt:'Clowder Pizza redonda personal sin huevo con queso mozzarella y jamón Virginia de pura carne de cerdo' },
     { img:'banners/snack-papas.jpg', alt:'Papas y carne grillada en un vaso Clowder' },
     { hidden:true, video:'banners/snack-papas.mp4', poster:'banners/snack-papas-poster.jpg', alt:'Papas Clowder, recién preparadas' },
   ],
   'Bebidas Frías': [
-    { productId:'jacks-o-lantern', img:'assets/jacks-o-lantern.jpeg', alt:'Jacks O’ Lantern — dirty soda de Clowder, edición Halloween y sabor retro. Los que saben, saben.', priceBadge:'$2.75' },
+    { productId:'jacks-o-lantern', img:'assets/jacks-o-lantern.jpeg', alt:'Jacks O’ Lantern — dirty soda de Clowder con sabor retro. Los que saben, saben.', priceBadge:'$2.75' },
     { img:'banners/bf-banner-02.jpg', alt:'Berry Bloom — limonada con salsa de fresa, refrescante y sin café' },
   ],
   'Bebida del Mes': [
@@ -236,10 +236,10 @@ function pastelBg(c){ const hex = catColor(c); return hex==='transparent' ? 'tra
 let activeCat = CATS.includes('Bebida del Mes') ? 'Bebida del Mes' : (CATS.includes('Bebidas Frías') ? 'Bebidas Frías' : CATS[0]);
 let categoryHome = true;
 function applyMenuTheme(){
-  const halloweenFeature = !categoryHome && activeCat === 'Bebida del Mes';
+  const halloweenFeature = false;
   document.body.classList.toggle('halloween-feature', halloweenFeature);
-  document.body.classList.add('halloween-season');
-  document.body.classList.toggle('halloween-day', isHalloweenDay());
+  document.body.classList.remove('halloween-season');
+  document.body.classList.remove('halloween-day');
   document.body.classList.remove('light-theme');
 }
 applyMenuTheme();
@@ -718,9 +718,9 @@ function renderMenu(){
     const closedNow = !i.comingSoon && !i.soldOut && !isItemOrderable(i);
     // Fuera de horario se conserva el precio y se bloquea solo el botón "+".
     // Así la tarjeta no se llena con el estado "Cerrado" repetido.
-    const badgeText = i.comingSoon ? (i.comingSoonLabel || 'Próximamente') : (i.soldOut ? 'Agotado' : null);
+    const badgeText = i.comingSoon ? (i.comingSoonLabel || 'Próximamente') : (i.soldOut ? 'Vuelve pronto' : null);
     const badgeClass = i.comingSoon ? 'coming-soon-price' : (i.soldOut ? 'sold-out-price' : '');
-    const unavailableNote = i.comingSoon ? (i.comingSoonNote || 'Todavía no está disponible para pedir.') : (i.soldOut ? (i.soldOutNote || 'Se agotó por hoy — vuelve pronto.') : '');
+    const unavailableNote = i.comingSoon ? (i.comingSoonNote || 'Todavía no está disponible para pedir.') : (i.soldOut ? (i.soldOutNote || 'Estamos preparando su regreso.') : '');
     const variantSelect = i.__isGroup ? `
       <select class="variant-select" style="background-color:${flavorColor}; color:${flavorText}; background-image:${arrowSvg(flavorText)};" onchange="closeTouchSelector(this); selectVariant('${i.__group}', this.value)">
         ${i.__variants.map(v=>`<option value="${v.id}" ${v.id===i.id?'selected':''}>${v.flavor}${v.comingSoon ? ' — Vuelve pronto' : ''}</option>`).join('')}
@@ -728,11 +728,10 @@ function renderMenu(){
     const priceHtml = !i.comingSoon ? `<div class="item-price-col">
       ${i.originalPrice ? `<div class="item-price-was">$${i.originalPrice.toFixed(2)}</div>` : ''}
       <div class="item-price">$${i.price.toFixed(2)}</div>
-      ${i.soldOut ? `<div class="item-price ${badgeClass}">${badgeText}</div>` : ''}
     </div>` : '';
     return `
     <div id="menu-group-${i.__group || i.id}" class="item ${i.featured?'item-featured':''} ${i.cat==='Combos'?'item-combo':''}" style="background:${i.accent ? lighten(i.accent, 0.82) : (isStoreCat(i.cat) ? '#F2EEE6' : pastelBg(i.cat))}; border-left-color:${i.accent || (catColor(i.cat)==='transparent' ? 'var(--line)' : catColor(i.cat))};">
-      ${i.featured ? `<div class="item-heading"><div class="featured-ribbon">${i.featuredIcon || (i.cat==='Bebida del Mes'?'🎃':'\u{1F43E}')} ${i.featuredTag||'Destacado'}</div>${priceHtml}</div>` : ''}
+      ${i.featured ? `<div class="item-heading"><div class="featured-ribbon">${i.featuredIcon || (i.cat==='Bebida del Mes'?'☕':'\u{1F43E}')} ${i.featuredTag||'Destacado'}</div>${priceHtml}</div>` : ''}
       ${i.comingSoon ? `<div class="coming-soon-status">✦ ${badgeText}</div>` : ''}
       <div class="item-top">
         ${(() => { const currentImg = (i.imgScoop && scoop === 'si') ? i.imgScoop : i.img; if (!currentImg) return ''; const image = `<img class="item-thumb" role="button" tabindex="0" aria-label="Ampliar foto de ${escapeHtml(i.name)}" id="thumb-${i.id}" src="${escapeHtml(currentImg)}" alt="${escapeHtml(i.name)}" loading="lazy" decoding="async">`; return i.id === 'funbite' ? `<span class="funbite-photo">${image}</span>` : image; })()}
@@ -747,9 +746,11 @@ function renderMenu(){
         ${i.desc ? `<div class="item-desc">${i.desc}</div>` : ''}
         ${i.processTag ? `<div class="process-tag">${i.processTag}</div>` : ''}
       </div>
+      ${i.soldOut ? `<div class="item-price ${badgeClass} availability-label">${badgeText}</div>` : ''}
       ${i.promoNote ? `<div class="promo-note">${i.promoNote}</div>` : ''}
       ${badgeText ? `
-      <div class="coming-soon-note">${unavailableNote}</div>` : `
+      <div class="coming-soon-note">${unavailableNote}</div>
+      ${i.cat === 'Snack Dulce' && i.soldOut ? `<button type="button" class="sweet-request" onclick="requestSweetReturn('${i.id}', this)">${sweetReturnLabel(i.id)}</button><p class="sweet-request-status" role="status"></p>` : ''}` : `
       <div class="item-controls">
         <div class="stepper">
           <button onclick="changeQty('${i.id}', -1)">–</button>
@@ -779,6 +780,32 @@ function renderMenu(){
   initBannerSlider();
   initBannerVideos();
   requestAnimationFrame(syncBannerScroll);
+}
+// El servidor confirma cada voto; los reintentos conservan la misma identidad.
+function sweetReturnLabel(id){
+  try { return localStorage.getItem('clowder_sweet_requested_'+id) ? '♥ Ya pediste que vuelva' : '♡ Lo extraño, ¡que vuelva!'; }
+  catch { return '♡ Lo extraño, ¡que vuelva!'; }
+}
+const sweetRequestsPending = new Set();
+async function requestSweetReturn(id, button){
+  const item = MENU.find(item => item.id === id);
+  if(!item || item.cat !== 'Snack Dulce' || !item.soldOut || sweetRequestsPending.has(id)) return;
+  const status = button.nextElementSibling;
+  if(sweetReturnLabel(id).startsWith('♥')){ status.textContent='Tu voto ya está registrado. ¡Gracias por contarnos!'; return; }
+  sweetRequestsPending.add(id); button.disabled=true; status.textContent='Guardando tu antojo…';
+  try {
+    let visitor=localStorage.getItem('clowder_sweet_visitor');
+    if(!visitor){ visitor=crypto.randomUUID(); localStorage.setItem('clowder_sweet_visitor',visitor); }
+    const contact=await MenuContact.refresh();
+    const response=await fetch(contact.ordersApiUrl.replace(/\/$/,'')+'/api/sweet-requests', {
+      method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({productId:id,visitor}),signal:AbortSignal.timeout(10000)
+    });
+    if(!response.ok) throw new Error('request failed');
+    localStorage.setItem('clowder_sweet_requested_'+id,'1');
+    button.textContent=sweetReturnLabel(id);
+    status.textContent='¡Anotado! Tu antojo nos ayuda a elegir qué vuelve. No es una reserva.';
+  } catch { status.textContent='No pudimos guardar tu solicitud. Inténtalo de nuevo.'; }
+  finally { sweetRequestsPending.delete(id); button.disabled=false; }
 }
 // El tacto conserva el scroll nativo; el mouse permite agarrar la pista.
 function enableMouseDrag(track, onRelease){

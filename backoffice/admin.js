@@ -11,7 +11,7 @@ async function api(path, data) {
   const response = await fetch((window.CLOWDER_API || '') + path,{method:data?'POST':'GET',cache:'no-store',headers:{Authorization:'Bearer '+token,...(data?{'Content-Type':'application/json'}:{})},body:data?JSON.stringify(data):undefined,signal:AbortSignal.timeout(15000)});
   const result=await response.json(); if(!response.ok) { if(response.status===401){token='';sessionStorage.removeItem(STAFF_SESSION_KEY);$('workspace').hidden=true;$('login').hidden=false;} throw new Error(result.error || 'No se pudo completar la operación.'); } return result;
 }
-async function refresh() { snapshot=await api('/api/admin'); $('signedIn').textContent='Sesión de '+snapshot.currentUser; render(); $('updated').textContent='Actualizado: '+date(new Date().toISOString());if(location.hash==='#inventario')await ClowderInventoryUI.load(); }
+async function refresh() { snapshot=await api('/api/admin'); await renderSweetRequests(); $('signedIn').textContent='Sesión de '+snapshot.currentUser; render(); $('updated').textContent='Actualizado: '+date(new Date().toISOString());if(location.hash==='#inventario')await ClowderInventoryUI.load(); }
 async function run(fn) {
   if(busy) return; busy=true; $('status').textContent=''; document.querySelectorAll('button').forEach(b=>b.disabled=true);
   try { await fn(); } catch(e) { $('status').textContent=e.message+' Si hubo un problema de conexión, actualiza para verificar el resultado antes de cambiar los datos.'; }
@@ -147,3 +147,11 @@ function tabFromHash(){selectWorkspaceTab(Object.keys(workspaceHashes).find(key=
 window.addEventListener('hashchange',tabFromHash);tabFromHash();
 
 try { const saved=JSON.parse(sessionStorage.getItem(STAFF_SESSION_KEY)||'null'); if(saved?.token){ token=saved.token; run(async()=>{await refresh();$('login').hidden=true;$('workspace').hidden=false;}); } } catch { sessionStorage.removeItem(STAFF_SESSION_KEY); }
+
+async function renderSweetRequests(){
+ const target=$('sweetRequests');if(!target)return;
+ try{const result=await api('/api/sweet-requests');target.replaceChildren();
+ if(!result.products.length){target.textContent='Todavía no hay solicitudes.';return;}
+ for(const item of result.products){const row=document.createElement('p');row.textContent=item.name+' · '+item.votes+' solicitud'+(item.votes===1?'':'es');target.append(row);}
+ }catch{target.textContent='Las estadísticas necesitan la actualización del servicio. Vuelve a actualizar para consultar.';}
+}

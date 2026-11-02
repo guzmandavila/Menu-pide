@@ -161,7 +161,7 @@ test('Stock actual: helados, empanadas de pizza y queso y wachipapa disponibles;
   assert.equal(await page.evaluate(() => MENU.find(item => item.id === 'empanada-pizza').img === MENU.find(item => item.id === 'empanada-pollo').img), true);
   await page.evaluate(() => { groupView.empanada = 'empanada-pollo'; renderMenu(); });
   assert.equal(await page.locator('#qty-empanada-pollo').count(), 0);
-  assert.match(await page.locator('#menu-group-empanada').textContent(), /Agotado/);
+  assert.match(await page.locator('#menu-group-empanada').textContent(), /Vuelve pronto/);
   assert.equal(await page.locator('#menu .cat-banner-slide img[src="banners/empanadas-octubre.jpeg"]').count(), 1);
 }));
 
@@ -179,8 +179,30 @@ test('Snack Dulce: los productos pausados siguen bloqueados y el nuevo cupcake s
   assert.equal(result.paused,true);
   assert.deepEqual(result.cart,{});
   assert.deepEqual(result.restored,{});
-  for(const id of result.visible) assert.match(await page.locator('#menu-group-'+id).textContent(),/Agotado por el momento/);
+  for(const id of result.visible) assert.match(await page.locator('#menu-group-'+id).textContent(),/Vuelve pronto/);
 }, {time:'2026-10-31T20:00:00-05:00'}));
+
+test('Dulces: solicitudes confirmadas, reintentos y votos sin duplicados', () => useFixture(async ({page}) => {
+  let hits=0, fail=true, visitor;
+  await page.route('**/api/sweet-requests',async route=>{
+    const data=route.request().postDataJSON();hits++;assert.equal(data.productId,'galleta');
+    if(visitor)assert.equal(data.visitor,visitor);visitor=data.visitor;
+    return route.fulfill({status:fail?503:200,contentType:'application/json',body:JSON.stringify(fail?{error:'offline'}:{ok:true})});
+  });
+  await page.evaluate(()=>selectCat('Snack Dulce'));
+  const card=page.locator('#menu-group-galleta'),button=card.locator('.sweet-request');
+  await button.click();await card.getByRole('status').filter({hasText:'No pudimos'}).waitFor();
+  fail=false;await button.click();await card.getByRole('status').filter({hasText:'¡Anotado!'}).waitFor();
+  await button.click();assert.equal(hits,2);
+  await page.reload();await page.evaluate(()=>selectCat('Snack Dulce'));
+  assert.match(await page.locator('#menu-group-galleta .sweet-request').textContent(),/Ya pediste/);
+  assert.equal(await page.locator('#menu-group-cupcake-chocolate-blanco .sweet-request').count(),0);
+  await page.evaluate(()=>selectCat('Snack Sal'));assert.equal(await page.locator('.sweet-request').count(),0);
+  assert.equal(await page.locator('#introSplash').count(),0);
+  assert.equal(await page.locator('body.halloween-season').count(),0);
+  await page.evaluate(()=>selectCat('Snack Dulce'));
+  await page.screenshot({path:'/tmp/clowder-vuelve-pronto-mobile.png',fullPage:true});
+}, {time:'2026-11-02T20:00:00-05:00'}));
 
 test('Cupcakes: banner completo en inicio, foto de producto, pedido y bebida fría conservada', () => useFixture(async ({page}) => {
   assert.equal(await page.locator('.halloween-promo').count(), 0);
@@ -951,7 +973,7 @@ test('Mao Mao toma pedidos de los tres usuarios; el backoffice concentra cobros 
     assert.match(await page.locator('#virtualTicket pre').textContent(),/Cliente atendido en persona/);
     assert.ok(!calls.includes('/api/admin'));
     await page.goto(new URL('backoffice/',baseURL).href);await page.locator('#workspace').waitFor({state:'visible'});
-    assert.match(await page.locator('h1').textContent(),/Cobros y contabilidad/);
+    assert.match(await page.locator('h1').textContent(),/Así va Clowder/);
     assert.equal(await page.locator('#orders article').count(),1);
     assert.match(await page.locator('#orders article').textContent(),new RegExp('Ingresado por: '+user));
     assert.equal(await page.locator('#newStaffOrder').count(),0);

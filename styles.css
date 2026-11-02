@@ -1273,3 +1273,7 @@ body.category-home .bottom-navigation:not(:has(.cartbar.show)){display:none;}
 .cupcake-promo>img{display:block;width:100%;height:auto;}
 .cupcake-promo-cta{display:block;padding:14px 12px;font:700 16px/1.4 'Inter',sans-serif;text-align:center;}
 .cupcake-promo:focus-visible{outline:3px solid #fff;outline-offset:4px;}
+
+.sweet-request{display:block;width:100%;margin-top:12px;padding:13px 16px;border:1px solid #79492f;border-radius:14px;background:#79492f;color:#fff8ef;font:600 14px/1.4 Inter,sans-serif;cursor:pointer;min-height:46px}.sweet-request:hover{background:#603722}.sweet-request:focus-visible{outline:3px solid #da9a68;outline-offset:3px}.sweet-request:disabled{opacity:.65;cursor:wait}.sweet-request-status{font:400 12px/1.5 Inter,sans-serif;margin:8px 0 0}.sweet-request-status:empty{display:none}
+
+.item-price.availability-label{display:table;margin:10px 0 5px;white-space:nowrap;letter-spacing:normal}
