@@ -185,7 +185,7 @@ const CAT_BANNERS = {
 };
 // Categorías ocultas temporalmente: sus productos siguen en MENU (por si se reactivan),
 // pero no aparecen como pestaña hasta sacarlas de esta lista.
-const HIDDEN_CATS = ['Merch Clowder', 'Congelados y Más', 'Combos']; // categorías ocultas temporalmente
+const HIDDEN_CATS = ['Merch Clowder', 'Congelados y Más', 'Combos', 'Bebida del Mes']; // categorías ocultas temporalmente
 const CATS = [...new Set(MENU.map(i=>i.cat))].filter(c => !HIDDEN_CATS.includes(c));
 // Jornada especial: expira a medianoche en Ecuador sin cambiar el stock.
 const DRINKS_ONLY_START = Date.parse('2026-10-30T00:00:00-05:00');
@@ -232,7 +232,7 @@ function lighten(hex, amt){
 }
 function pastelBg(c){ const hex = catColor(c); return hex==='transparent' ? 'transparent' : lighten(hex, 0.45); }
 
-// La portada inicial muestra categorías; Bebida del Mes permanece como sección destacada.
+// La portada inicial muestra las categorías disponibles.
 let activeCat = CATS.includes('Bebida del Mes') ? 'Bebida del Mes' : (CATS.includes('Bebidas Frías') ? 'Bebidas Frías' : CATS[0]);
 let categoryHome = true;
 function applyMenuTheme(){
