@@ -132,7 +132,7 @@ test('Todos los menús se muestran en móvil sin errores ni desbordamiento horiz
   }
 }));
 
-test('Stock actual: helados, empanadas de pizza y queso y wachipapa disponibles; pollo, capresse y tocipapa agotados', () => useFixture(async ({ page }) => {
+test('Stock actual: queso, pizza y mini pizza disponibles; otras empanadas, papas y dos limonadas agotadas', () => useFixture(async ({ page }) => {
   const result = await page.evaluate(() => {
     const ids = ['affocato', 'milkishaki-nutella', 'milkishaki-fresa', 'milkishaki-salted-caramel'];
     changeQty('empanada-queso', 1);
@@ -141,17 +141,23 @@ test('Stock actual: helados, empanadas de pizza y queso y wachipapa disponibles;
       iceCream: ids.map(id => isItemOrderable(MENU.find(item => item.id === id))),
       cheese: !!cart['empanada-queso'], chicken: !!cart['empanada-pollo'],
       potatoes: ['wachipapa', 'tocipapa', 'papas-fritas'].map(id => isItemOrderable(MENU.find(item => item.id === id))),
-      restored: sanitizeCart({ 'empanada-pollo': { qty: 8 }, 'tocipapa': { qty: 1 }, 'tocipapa-grande': { qty: 1 }, 'empanada-queso': { qty: 1 }, 'banana-bread-latte': { qty: 1 }, 'combo-cafe-empanada-queso': { qty: 1 } }),
-      hidden: !CATS.includes('Combos') && CATS.includes('Bebida del Mes'),
+      restored: sanitizeCart({
+        'empanada-pollo': { qty: 8 }, 'tocipapa': { qty: 1 }, 'tocipapa-grande': { qty: 1 },
+        'empanada-queso': { qty: 1 }, 'banana-bread-latte': { qty: 1 }, 'combo-cafe-empanada-queso': { qty: 1 },
+        'clowder-pizza': { qty: 1 }, 'jacks-o-lantern': { qty: 1 }, berrybloom: { qty: 1 }, 'blue-lemon': { qty: 1 },
+        'mini-clowder-pizza-halloween': { qty: 1 },
+      }),
+      drinks: ['berrybloom', 'blue-lemon'].map(id => isItemOrderable(MENU.find(item => item.id === id))),
     };
   });
   assert.deepEqual(result.iceCream, [true, true, true, true]);
   assert.equal(result.cheese, true);
   assert.equal(result.chicken, false);
-  assert.deepEqual(result.potatoes, [true, false, true]);
-  assert.equal(result.hidden, true);
-  assert.deepEqual(Object.keys(result.restored), ['empanada-queso']);
+  assert.deepEqual(result.potatoes, [false, false, false]);
+  assert.deepEqual(result.drinks, [false, false]);
+  assert.deepEqual(Object.keys(result.restored), ['empanada-queso', 'mini-clowder-pizza-halloween']);
   await page.evaluate(() => selectCat('Snack Sal'));
+  assert.equal(await page.locator('#menu-group-empanada .variant-select').inputValue(), 'empanada-queso');
   assert.doesNotMatch(await page.locator('#menu').textContent(), /Últimas 4 empanadas de pollo/);
   assert.equal(await page.locator('#qty-empanada-capresse').count(), 0);
   assert.deepEqual(await page.evaluate(() => MENU.filter(item => item.group === 'empanada' && isItemOrderable(item)).map(item => item.id)), ['empanada-queso', 'empanada-pizza']);
@@ -162,8 +168,16 @@ test('Stock actual: helados, empanadas de pizza y queso y wachipapa disponibles;
   await page.evaluate(() => { groupView.empanada = 'empanada-pollo'; renderMenu(); });
   assert.equal(await page.locator('#qty-empanada-pollo').count(), 0);
   assert.match(await page.locator('#menu-group-empanada').textContent(), /Vuelve pronto/);
-  assert.equal(await page.locator('#menu .cat-banner-slide img[src="banners/empanadas-octubre.jpeg"]').count(), 1);
-}));
+  assert.equal(await page.locator('#menu-group-mini-clowder-pizza-halloween #qty-mini-clowder-pizza-halloween').count(), 1);
+  assert.equal(await page.locator('#menu-group-clowder-pizza, .cat-banner-slide img[src="assets/clowder-pizza-banner-octubre.jpeg"]').count(), 0);
+  assert.equal(await page.locator('.cat-banner-slide img[src="banners/empanadas-octubre.jpeg"], .cat-banner-slide img[src="banners/snack-papas.jpg"]').count(), 0);
+  await page.evaluate(() => selectCat('Bebidas Frías'));
+  for (const id of ['berrybloom', 'blue-lemon']) {
+    assert.match(await page.locator(`#menu-group-${id}`).textContent(), /Vuelve pronto/);
+    assert.equal(await page.locator(`#qty-${id}`).count(), 0);
+  }
+  assert.equal(await page.locator('#menu-group-jacks-o-lantern, .cat-banner-slide img[src="assets/jacks-o-lantern.jpeg"], .cat-banner-slide img[src="banners/bf-banner-02.jpg"]').count(), 0);
+}, {time:'2026-11-07T20:00:00-05:00'}));
 
 test('Snack Dulce: los productos pausados siguen bloqueados y el nuevo cupcake se puede pedir', () => useFixture(async ({page}) => {
   await page.evaluate(() => selectCat('Snack Dulce'));
@@ -204,7 +218,7 @@ test('Dulces: solicitudes confirmadas, reintentos y votos sin duplicados', () =>
   await page.screenshot({path:'/tmp/clowder-vuelve-pronto-mobile.png',fullPage:true});
 }, {time:'2026-11-02T20:00:00-05:00'}));
 
-test('Cupcakes: banner completo en inicio, foto de producto, pedido y bebida fría conservada', () => useFixture(async ({page}) => {
+test('Cupcakes: banner completo en inicio, foto de producto y pedido', () => useFixture(async ({page}) => {
   assert.equal(await page.locator('.halloween-promo').count(), 0);
   await page.evaluate(()=>{document.getElementById('introSkip')?.click();document.getElementById('introSplash')?.remove();});
   const banner=page.locator('.cupcake-promo img');
@@ -231,9 +245,6 @@ test('Cupcakes: banner completo en inicio, foto de producto, pedido y bebida fr�
   await page.evaluate(()=>sendOrder());
   assert.equal(payload.totalCents,Math.round(item.price*200));
   assert.match(payload.details,/2x \*Cupcake/);
-  await page.evaluate(()=>selectCat('Bebidas Frías'));
-  assert.equal(await page.locator('#menu-group-jacks-o-lantern').count(),1);
-  assert.equal(await page.evaluate(()=>isItemOrderable(MENU.find(i=>i.id==='jacks-o-lantern'))),true);
 }, {time:'2026-11-01T20:00:00-05:00'}));
 
 test('Cambiar el sabor de empanada conserva el orden de las tarjetas', () => useFixture(async ({ page }) => {
@@ -426,7 +437,11 @@ test('Tocipapa y Wachipapa conservan los límites de cocina de lunes y domingo',
 }));
 
 test('Un botón renderizado antes de abrir cocina permite pedir al llegar la hora', () => useFixture(async ({ page }) => {
-  await page.evaluate(() => { window.__setTestTime('2026-09-21T23:59:00Z'); selectCat('Snack Sal'); });
+  await page.evaluate(() => {
+    delete MENU.find(item => item.id === 'papas-fritas').soldOut;
+    window.__setTestTime('2026-09-21T23:59:00Z');
+    selectCat('Snack Sal');
+  });
   const plus = page.locator('#qty-papas-fritas').locator('..').locator('button').last();
   await page.evaluate(() => window.__setTestTime('2026-09-22T00:00:00Z'));
   await plus.click();
@@ -693,13 +708,21 @@ test('Transferencia sin banco, papelera y colores de leche', () => useFixture(as
 
 test('Pizza: disponibilidad compartida habilita y agotado bloquea el producto', async () => {
   for(const remaining of [5,0]) await useFixture(async ({page}) => {
-    await page.evaluate(async () => { delete MENU.find(i => i.id === 'clowder-pizza').soldOutManual; await refreshPizzaAvailability(); });
+    await page.evaluate(async () => {
+      HIDDEN_ITEM_IDS.splice(HIDDEN_ITEM_IDS.indexOf('clowder-pizza'), 1);
+      delete MENU.find(i => i.id === 'clowder-pizza').soldOutManual;
+      await refreshPizzaAvailability();
+    });
     await page.waitForFunction(remaining => MENU.find(i => i.id === 'clowder-pizza').soldOut === (remaining === 0), remaining);
     assert.equal(await page.evaluate(() => isItemOrderable(MENU.find(i => i.id === 'clowder-pizza'))), remaining > 0);
   }, {pizzaStock:remaining});
 });
 test('Pizza: rechazo del servidor conserva el pedido y no abre WhatsApp', () => useFixture(async ({page}) => {
-  await page.evaluate(async () => { delete MENU.find(i => i.id === 'clowder-pizza').soldOutManual; await refreshPizzaAvailability(); });
+  await page.evaluate(async () => {
+    HIDDEN_ITEM_IDS.splice(HIDDEN_ITEM_IDS.indexOf('clowder-pizza'), 1);
+    delete MENU.find(i => i.id === 'clowder-pizza').soldOutManual;
+    await refreshPizzaAvailability();
+  });
   await page.waitForFunction(() => !MENU.find(i => i.id === 'clowder-pizza').soldOut);
   await prepare(page,{items:{'clowder-pizza':1}});
   await page.evaluate(() => sendOrder());
@@ -716,7 +739,7 @@ test('Halloween: mini de $3 independiente del lote agotado, bebidas y pedido cor
   assert.match(mini.desc, /sin huevo/);
   for(const ingredient of ['pomodoro', 'tomate fresco', 'mozzarella', 'parmesano', 'jamón Virginia']) assert.ok(mini.desc.toLowerCase().includes(ingredient.toLowerCase()));
   assert.equal(await page.evaluate(() => isItemOrderable(MENU.find(i => i.id === 'mini-clowder-pizza-halloween'))), true);
-  for(const id of ['jacks-o-lantern', 'pumpkin-spice-caliente', 'pumpkin-spice-frio']) assert.equal(await page.evaluate(id => isItemOrderable(MENU.find(i => i.id === id)), id), true);
+  assert.equal(await page.locator('#halloweenJacksButton').isVisible(), false);
   await page.locator('#halloweenNotice button').first().click();
   assert.equal(await page.locator('#menu-group-mini-clowder-pizza-halloween').count(), 1);
   assert.equal(await page.locator('#menu-group-clowder-pizza').count(), 0);
@@ -762,7 +785,7 @@ test('Mini pizza: permanece visible y conserva el carrito al terminar Halloween'
   assert.equal(await page.locator('#halloweenNotice').isVisible(), false);
   assert.equal(await page.locator('#menu-group-mini-clowder-pizza-halloween').count(), 1);
   assert.equal(await page.evaluate(() => isItemOrderable(MENU.find(i => i.id === 'mini-clowder-pizza-halloween'))), true);
-  assert.equal(await page.locator('#menu-group-clowder-pizza').count(), 1);
+  assert.equal(await page.locator('#menu-group-clowder-pizza').count(), 0);
   assert.equal((await orderState(page)).cart['mini-clowder-pizza-halloween'].qty, 1);
   assert.equal(await page.evaluate(() => MENU.find(i => i.id === 'clowder-pizza').price), 5.5);
   assert.equal(await page.evaluate(() => MENU.find(i => i.id === 'clowder-pizza').soldOut), true);

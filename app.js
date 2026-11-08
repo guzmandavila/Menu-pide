@@ -33,8 +33,8 @@ const MENU = [
 
   // ---- Bebidas Frías ----
   { id:'affocato', cat:'Bebidas Calientes', name:'AffoCato', desc:'Helado de vainilla Madagascar con espresso doble.', price:3.00, img:'miniaturas/bf-affocato.jpg' },
-  { id:'berrybloom', cat:'Bebidas Frías', name:'BerryBloom', classic:'Limonada de fresa', classicTheme:'fresh', order:6, desc:'Fresa, limón y miel sobre hielo.', price:2.75, img:'assets/image-45bed35fc31fb6b1.jpg' },
-  { id:'blue-lemon', cat:'Bebidas Frías', name:'Blue Lemon', classic:'Limonada de arándano', classicTheme:'fresh', order:6, desc:'Arándano, limón y miel sobre hielo.', price:2.95 },
+  { id:'berrybloom', soldOut:true, cat:'Bebidas Frías', name:'BerryBloom', classic:'Limonada de fresa', classicTheme:'fresh', order:6, desc:'Fresa, limón y miel sobre hielo.', price:2.75, img:'assets/image-45bed35fc31fb6b1.jpg' },
+  { id:'blue-lemon', soldOut:true, cat:'Bebidas Frías', name:'Blue Lemon', classic:'Limonada de arándano', classicTheme:'fresh', order:6, desc:'Arándano, limón y miel sobre hielo.', price:2.95 },
   { id:'ice-koffin', cat:'Bebidas Frías', name:'Ice Koffin', classic:'Americano helado', classicTheme:'fresh', order:1, desc:'Espresso, agua y hielo.', price:2.00, img:'assets/image-cc920e9b95fa9297.jpg' },
   { id:'nara-sunset', cat:'Bebidas Frías', name:'Nara Sunset', classic:'Naranja y café', classicTheme:'fresh', order:5, desc:'Naranja y café sobre hielo.', price:3.5, img:'assets/image-564f15ba92421bf9.jpg' },
   { id:'nimbus', cat:'Bebidas Frías', name:'Ice Moccatto', classic:'Mocaccino helado', classicTheme:'fresh', order:3, desc:'Espresso, leche y chocolate, bien fríos.', price:3.25, milk:true, img:'assets/image-de2fc99b743f1564.jpg' },
@@ -65,8 +65,8 @@ const MENU = [
   { id:'mini-clowder-pizza-halloween', cat:'Snack Sal', name:'Mini Clowder Pizza', desc:'Versión mini de nuestra pizza: masa artesanal delgada sin gluten, hecha por nosotros con aceite de oliva y sin huevo. Pomodoro artesanal, tomate fresco, queso mozzarella, un plus de parmesano y jamón Virginia de pura carne de cerdo, sin embutidos.', price:3.00, availableFrom:'2026-10-31T00:00:00-05:00', promoNote:'Versión mini · sin huevo.', img:'assets/mini-pizza-producto.jpeg', featured:true, featuredTag:'MINI PIZZA · $3', featuredIcon:'🍕', accent:'#CC6425', order:-1 },
   { id:'clowder-pizza', soldOut:true, soldOutManual:true, soldOutNote:'¡Gracias por todo su cariño! Vuelve pronto. ❤️', cat:'Snack Sal', name:'Clowder Pizza', desc:'Pizza redonda personal de masa artesanal delgada sin gluten, hecha por nosotros con aceite de oliva y sin huevo. Lleva pomodoro artesanal, tomate fresco, queso mozzarella, un plus de parmesano y jamón Virginia de pura carne de cerdo, sin embutidos.', price:5.50, promoNote:'Masa artesanal · sin huevo.', img:'assets/clowder-pizza-virginia.png', featured:true, featuredTag:'NUEVO', featuredIcon:'🆕', order:0 },
   { id:'tocipapa', cat:'Snack Sal', name:'Tocipapa', desc:'Papas corte recto con tocineta crocante y salsa de la casa. 120 g (20–25 g de tocineta).', price:2.5, soldOut:true, img:'assets/image-9fa7a5da9f5e3cb0.jpg' },
-  { id:'papas-fritas', cat:'Snack Sal', name:'Papas fritas', desc:'Papas fritas solas, acompañadas de mayonesa de la casa.', price:2.00, img:'assets/papas-fritas-stock.jpeg', processTag:'♨️ Freidora de aire', order:0 },
-  { id:'wachipapa', soldOut:false, cat:'Snack Sal', name:'Wachipapa', desc:'Papas corte recto con chorizo argentino y salsa mayochurri de la casa. 120 g (35–40 g de chorizo).', price:3.0, img:'banners/snack-papas.jpg' },
+  { id:'papas-fritas', soldOut:true, cat:'Snack Sal', name:'Papas fritas', desc:'Papas fritas solas, acompañadas de mayonesa de la casa.', price:2.00, img:'assets/papas-fritas-stock.jpeg', processTag:'♨️ Freidora de aire', order:0 },
+  { id:'wachipapa', soldOut:true, cat:'Snack Sal', name:'Wachipapa', desc:'Papas corte recto con chorizo argentino y salsa mayochurri de la casa. 120 g (35–40 g de chorizo).', price:3.0, img:'banners/snack-papas.jpg' },
   { id:'empanada-capresse', soldOut:true, cat:'Snack Sal', name:'Empanada de Hojaldre', desc:'Queso mozzarella de búfala, tomates frescos y albahaca cuidadosamente trabajada, en hojaldre horneado y crocante. Acompañada de nuestra salsa pesto.', price:1.8, order:0, img:'assets/empanada-capresse.jpeg', group:'empanada', flavor:'Capresse' },
   { id:'empanada-pollo', soldOut:true, cat:'Snack Sal', name:'Empanada de Hojaldre', desc:'Pechuga de pollo con nuestra salsa de vegetales. No te pierdas nuestro aderezo de mayonesa de la casa.', price:2.4, order:0, img:'assets/image-b46285ee20adcc24.jpg', group:'empanada', flavor:'Pollo' },
   { id:'empanada-queso', cat:'Snack Sal', name:'Empanada de Hojaldre', desc:'Hojaldre horneado y crocante, relleno de queso.', price:1.5, order:0, img:'assets/image-b46285ee20adcc24.jpg', group:'empanada', flavor:'Queso' },
@@ -107,7 +107,7 @@ if (miniCake) {
   miniCake.featuredTag = 'MINICAKE DE LA SEMANA';
 }
 // Productos pausados en el menú; se pueden reactivar quitando su ID de esta lista.
-const HIDDEN_ITEM_IDS = ['boo-cupcake', 'funbite', 'mini-cake-del-dia', 'brownie', 'tocipapa', 'banana-bread-latte'];
+const HIDDEN_ITEM_IDS = ['boo-cupcake', 'funbite', 'mini-cake-del-dia', 'brownie', 'tocipapa', 'banana-bread-latte', 'clowder-pizza', 'jacks-o-lantern'];
 // Información de preparación visible en cada tarjeta.
 ['wachipapa','tocipapa'].forEach(id => {
   const item = MENU.find(product => product.id === id);
@@ -166,14 +166,14 @@ const CAT_BANNERS = {
   ],
   'Snack Sal': [
     { productId:'mini-clowder-pizza-halloween', img:'banners/mini-pizza.jpeg', alt:'Mini Pizza de Clowder, masa sin huevo' },
-    { img:'banners/empanadas-octubre.jpeg', alt:'Empanadas hojaldradas Clowder: Posho con pollo mechado y vegetales por $2,40; Pizza por $2,40; Capresse por $1,80. Pide por nuestra app.' },
+    { hidden:true, img:'banners/empanadas-octubre.jpeg', alt:'Empanadas hojaldradas Clowder: Posho con pollo mechado y vegetales por $2,40; Pizza por $2,40; Capresse por $1,80. Pide por nuestra app.' },
     { productId:'clowder-pizza', img:'assets/clowder-pizza-banner-octubre.jpeg', alt:'Clowder Pizza redonda personal sin huevo con queso mozzarella y jamón Virginia de pura carne de cerdo' },
-    { img:'banners/snack-papas.jpg', alt:'Papas y carne grillada en un vaso Clowder' },
+    { hidden:true, img:'banners/snack-papas.jpg', alt:'Papas y carne grillada en un vaso Clowder' },
     { hidden:true, video:'banners/snack-papas.mp4', poster:'banners/snack-papas-poster.jpg', alt:'Papas Clowder, recién preparadas' },
   ],
   'Bebidas Frías': [
     { productId:'jacks-o-lantern', img:'assets/jacks-o-lantern.jpeg', alt:'Jacks O’ Lantern — dirty soda de Clowder con sabor retro. Los que saben, saben.', priceBadge:'$2.75' },
-    { img:'banners/bf-banner-02.jpg', alt:'Berry Bloom — limonada con salsa de fresa, refrescante y sin café' },
+    { hidden:true, img:'banners/bf-banner-02.jpg', alt:'Berry Bloom — limonada con salsa de fresa, refrescante y sin café' },
   ],
   'Bebida del Mes': [
     { img:'assets/pumpkin-spice-latte.jpg', alt:'Pumpkin Spice Latte de Clowder, frío y caliente' },
@@ -209,6 +209,8 @@ function visibleCats(){
 function refreshDrinksOnlyNotice(){
   document.getElementById('drinksOnlyNotice').hidden = !isDrinksOnlyDay();
   document.getElementById('halloweenNotice').hidden = !isHalloweenDay();
+  const jacksButton = document.getElementById('halloweenJacksButton');
+  if(jacksButton) jacksButton.hidden = HIDDEN_ITEM_IDS.includes('jacks-o-lantern');
 }
 
 /* Colores secundarios de marca — uno por categoría de sabor */
@@ -568,7 +570,7 @@ const GROUP_NAMES = {
   'long-tail-intensity': 'Long Tail',
   'pumpkin-spice-latte': 'Pumpkin Spice Latte',
 };
-let groupView = {milkishaki:'milkishaki-fresa', 'pumpkin-spice-latte':'pumpkin-spice-frio'}; // group -> currently displayed variant id
+let groupView = {empanada:'empanada-queso', milkishaki:'milkishaki-fresa', 'pumpkin-spice-latte':'pumpkin-spice-frio'}; // group -> currently displayed variant id
 
 function closeTouchSelector(select){
   if(window.matchMedia('(hover: none) and (pointer: coarse)').matches) select.blur();
@@ -627,7 +629,7 @@ function categoryThumbnail(category){
   const productBanner = banners.find(banner => !banner.hidden && banner.img && banner.productId
     && MENU.some(product => product.id === banner.productId && !HIDDEN_ITEM_IDS.includes(product.id) && isWithinAvailability(product)));
   if(productBanner) return productBanner.img;
-  const product = MENU.find(item => item.cat === category && !HIDDEN_ITEM_IDS.includes(item.id) && item.img && isWithinAvailability(item));
+  const product = MENU.find(item => item.cat === category && !HIDDEN_ITEM_IDS.includes(item.id) && !item.soldOut && item.img && isWithinAvailability(item));
   if(product) return product.img;
   const banner = banners.find(item => !item.hidden && item.img && !item.productId);
   return banner?.img || 'assets/image-b30d7df6a35a7973.png';
@@ -683,7 +685,7 @@ function renderMenu(){
     return aPrice - bPrice;
   });
 
-  const categoryBanners = (CAT_BANNERS[activeCat] || []).filter(b => !b.hidden && (!b.productId || MENU.some(item => item.id === b.productId && isAllowedToday(item) && isWithinAvailability(item))));
+  const categoryBanners = (CAT_BANNERS[activeCat] || []).filter(b => !b.hidden && (!b.productId || items.some(item => item.id === b.productId)));
   const dailyBanner = activeCat === 'Combos' && categoryBanners.find(b=>b.day===today);
   const banners = dailyBanner ? [dailyBanner] : categoryBanners;
   let bannerHtml = '';
