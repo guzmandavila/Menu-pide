@@ -43,8 +43,8 @@ const MENU = [
 
   // ---- Matcha ----
   { id:'nekomatchalatte', cat:'Matcha', name:'NekoMatchaLatte', syrupOption:['caramelo','vainilla'], desc:'Matcha y leche bien fría. Verde, suave y cremoso. Se bebe despacio, si te acuerdas.', price:3.5, milk:true, img:'assets/image-a21806fe3017f9d8.jpg' },
-  { id:'sakuramatcha-latte', cat:'Matcha', name:'SakuraMatcha Latte', desc:'Matcha, leche y puré real de fresa sobre hielo.', price:4.15, milk:true, img:'assets/image-73038c7da3c63e99.jpg' },
-  { id:'blueberry-matcha', order:0, cat:'Matcha', name:'Blueberry Matcha', desc:'Matcha, leche y puré real de arándano sobre hielo.', price:4.45, milk:true, img:'assets/blueberry-matcha.jpeg' },
+  { id:'sakuramatcha-latte', soldOut:true, cat:'Matcha', name:'SakuraMatcha Latte', desc:'Matcha, leche y puré real de fresa sobre hielo.', price:4.15, milk:true, img:'assets/image-73038c7da3c63e99.jpg' },
+  { id:'blueberry-matcha', soldOut:true, order:0, cat:'Matcha', name:'Blueberry Matcha', desc:'Matcha, leche y puré real de arándano sobre hielo.', price:4.45, milk:true, img:'assets/blueberry-matcha.jpeg' },
 
   // ---- Panadería ----
   { id:'cupcake-chocolate-blanco', cat:'Snack Dulce', name:'Cupcake con buttercream de chocolate blanco', desc:'Hecho con harina de almendra y avena, chispas de chocolate al 72%, endulzado con azúcar de coco y panela. Topping de buttercream de ganache de chocolate blanco.', price:2.75, img:'assets/cupcakes-chocolate-blanco.jpeg', featured:true, featuredTag:'ALERTA DE ANTOJO', featuredIcon:'🧁', accent:'#FFA6D2', order:-1 },
@@ -66,7 +66,7 @@ const MENU = [
   { id:'clowder-pizza', soldOut:true, soldOutManual:true, soldOutNote:'¡Gracias por todo su cariño! Vuelve pronto. ❤️', cat:'Snack Sal', name:'Clowder Pizza', desc:'Pizza redonda personal de masa artesanal delgada sin gluten, hecha por nosotros con aceite de oliva y sin huevo. Lleva pomodoro artesanal, tomate fresco, queso mozzarella, un plus de parmesano y jamón Virginia de pura carne de cerdo, sin embutidos.', price:5.50, promoNote:'Masa artesanal · sin huevo.', img:'assets/clowder-pizza-virginia.png', featured:true, featuredTag:'NUEVO', featuredIcon:'🆕', order:0 },
   { id:'tocipapa', cat:'Snack Sal', name:'Tocipapa', desc:'Papas corte recto con tocineta crocante y salsa de la casa. 120 g (20–25 g de tocineta).', price:2.5, soldOut:true, img:'assets/image-9fa7a5da9f5e3cb0.jpg' },
   { id:'papas-fritas', soldOut:true, cat:'Snack Sal', name:'Papas fritas', desc:'Papas fritas solas, acompañadas de mayonesa de la casa.', price:2.00, img:'assets/papas-fritas-stock.jpeg', processTag:'♨️ Freidora de aire', order:0 },
-  { id:'wachipapa', soldOut:true, cat:'Snack Sal', name:'Wachipapa', desc:'Papas corte recto con chorizo argentino y salsa mayochurri de la casa. 120 g (35–40 g de chorizo).', price:3.0, img:'banners/snack-papas.jpg' },
+  { id:'wachipapa', cat:'Snack Sal', name:'Wachipapa', desc:'Papas corte recto con chorizo argentino y salsa mayochurri de la casa. 120 g (35–40 g de chorizo).', price:3.0, img:'banners/snack-papas.jpg' },
   { id:'empanada-capresse', soldOut:true, cat:'Snack Sal', name:'Empanada de Hojaldre', desc:'Queso mozzarella de búfala, tomates frescos y albahaca cuidadosamente trabajada, en hojaldre horneado y crocante. Acompañada de nuestra salsa pesto.', price:1.8, order:0, img:'assets/empanada-capresse.jpeg', group:'empanada', flavor:'Capresse' },
   { id:'empanada-pollo', soldOut:true, cat:'Snack Sal', name:'Empanada de Hojaldre', desc:'Pechuga de pollo con nuestra salsa de vegetales. No te pierdas nuestro aderezo de mayonesa de la casa.', price:2.4, order:0, img:'assets/image-b46285ee20adcc24.jpg', group:'empanada', flavor:'Pollo' },
   { id:'empanada-queso', cat:'Snack Sal', name:'Empanada de Hojaldre', desc:'Hojaldre horneado y crocante, relleno de queso.', price:1.5, order:0, img:'assets/image-b46285ee20adcc24.jpg', group:'empanada', flavor:'Queso' },
