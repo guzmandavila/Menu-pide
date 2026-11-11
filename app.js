@@ -645,8 +645,8 @@ function renderCategoryHome(){
     const imagePosition = category === 'Snack Dulce' ? '50% 0%' : '50% 50%';
     return `<button type="button" class="category-tile" style="--tile-accent:${color};--tile-pill-text:${textColorFor(color)};--tile-image-scale:${imageScale};--tile-image-position:${imagePosition}" onclick="selectCat('${escapeHtml(category)}')" aria-label="Abrir categoría ${escapeHtml(category)}"><img src="${escapeHtml(image)}" alt="" loading="eager" decoding="async"><span class="category-tile-shade"></span><span class="category-tile-name">${escapeHtml(category)}</span></button>`;
   }).join('');
-  const cupcake=MENU.find(item=>item.id==='cupcake-chocolate-blanco'&&!HIDDEN_ITEM_IDS.includes(item.id)&&isWithinAvailability(item)&&!item.soldOut);
-  const promo=cupcake ? `<button type="button" class="cupcake-promo" onclick="selectCat('Snack Dulce')" aria-label="Ver cupcakes con chispas de chocolate y buttercream de ganache de chocolate blanco, $${cupcake.price.toFixed(2)}"><img src="banners/cupcakes-alerta-antojo.jpeg" alt="Alerta de antojo: cupcakes de harina de almendra y avena, chispas de chocolate al 72%, azúcar de coco y panela, con buttercream de ganache de chocolate blanco" decoding="async"><span class="cupcake-promo-cta">Pedir cupcakes · $${cupcake.price.toFixed(2)} →</span></button>` : '';
+  const milkishaki=MENU.find(item=>item.id==='milkishaki-fresa'&&!HIDDEN_ITEM_IDS.includes(item.id)&&isWithinAvailability(item)&&!item.soldOut);
+  const promo=milkishaki ? `<button type="button" class="cupcake-promo" onclick="selectCat('Bebidas Frías')" aria-label="Ver MilkiShaki de fresa. Dos iguales por 8 dólares, 4 dólares cada uno"><img src="${escapeHtml(milkishaki.img)}" alt="MilkiShaki de fresa de Clowder" decoding="async"><span class="cupcake-promo-cta">2 MilkiShakis igualitos · $4 c/u ($8 el par) →</span></button>` : '';
   return `<section class="category-home-view" aria-label="Categorías del menú">${promo}<div class="category-home-grid">${tiles}</div></section>`;
 }
 function renderMenu(){
