@@ -57,8 +57,8 @@ const MENU = [
   { id:'mini-cake-del-dia', cat:'Snack Dulce', name:'Apple Crumble Cake', desc:'Harina de almendra, harina de coco, ghee y manzana natural, cobertura de chocolate blanco.', price:2.6, scoop:true, accent:'#C8433B', img:'miniaturas/apple-crumble.jpg', imgScoop:'miniaturas/apple-crumble-helado.jpg' },
 
   { id:'brownie', cat:'Snack Dulce', name:'Brownie', desc:'Brownie intenso y húmedo, con cacao orgánico, endulzado con alulosa y panela.', price:3.0, scoop:true, img:'assets/image-6d3c530cc30feadd.jpg' },
-  { id:'milkishaki-nutella', cat:'Bebidas Frías', name:'MilkiShaki - Chocolate de Clowder + Brownie Bites', classic:'Milkshake', classicTheme:'fresh', order:4, desc:'Chocolate de Clowder, leche, helado premium y bocados de brownie.', price:4.9, milk:true, groupFeatured:true, img:'assets/image-2b43f2fe510398fb.jpg', group:'milkishaki', flavor:'Chocolate de Clowder + Brownie Bites'  },
   { id:'milkishaki-fresa', cat:'Bebidas Frías', name:'MilkiShaki - Fresa', classic:'Milkshake', classicTheme:'fresh', order:4, desc:'Fresa, leche y helado premium.', price:4.9, milk:true, groupFeatured:true, img:'assets/image-299c9fd9ebdf031a.jpg', group:'milkishaki', flavor:'Fresa'  },
+  { id:'milkishaki-nutella', cat:'Bebidas Frías', name:'MilkiShaki - Chocolate de Clowder + Brownie Bites', classic:'Milkshake', classicTheme:'fresh', order:4, desc:'Chocolate de Clowder, leche, helado premium y bocados de brownie.', price:4.9, milk:true, groupFeatured:true, img:'assets/image-2b43f2fe510398fb.jpg', group:'milkishaki', flavor:'Chocolate de Clowder + Brownie Bites'  },
   { id:'milkishaki-salted-caramel', cat:'Bebidas Frías', name:'MilkiShaki - Salted Caramel', classic:'Milkshake', classicTheme:'fresh', order:4, desc:'Leche, helado premium y caramelo con un toque de sal.', price:4.9, milk:true, groupFeatured:true, img:'assets/image-861d6d271de84321.jpg', group:'milkishaki', flavor:'Salted Caramel'  },
 
   // ---- Snacks ----
@@ -66,7 +66,7 @@ const MENU = [
   { id:'clowder-pizza', soldOut:true, soldOutManual:true, soldOutNote:'¡Gracias por todo su cariño! Vuelve pronto. ❤️', cat:'Snack Sal', name:'Clowder Pizza', desc:'Pizza redonda personal de masa artesanal delgada sin gluten, hecha por nosotros con aceite de oliva y sin huevo. Lleva pomodoro artesanal, tomate fresco, queso mozzarella, un plus de parmesano y jamón Virginia de pura carne de cerdo, sin embutidos.', price:5.50, promoNote:'Masa artesanal · sin huevo.', img:'assets/clowder-pizza-virginia.png', featured:true, featuredTag:'NUEVO', featuredIcon:'🆕', order:0 },
   { id:'tocipapa', cat:'Snack Sal', name:'Tocipapa', desc:'Papas corte recto con tocineta crocante y salsa de la casa. 120 g (20–25 g de tocineta).', price:2.5, soldOut:true, img:'assets/image-9fa7a5da9f5e3cb0.jpg' },
   { id:'papas-fritas', soldOut:true, cat:'Snack Sal', name:'Papas fritas', desc:'Papas fritas solas, acompañadas de mayonesa de la casa.', price:2.00, img:'assets/papas-fritas-stock.jpeg', processTag:'♨️ Freidora de aire', order:0 },
-  { id:'wachipapa', cat:'Snack Sal', name:'Wachipapa', desc:'Papas corte recto con chorizo argentino y salsa mayochurri de la casa. 120 g (35–40 g de chorizo).', price:3.0, img:'banners/snack-papas.jpg' },
+  { id:'wachipapa', soldOut:true, cat:'Snack Sal', name:'Wachipapa', desc:'Papas corte recto con chorizo argentino y salsa mayochurri de la casa. 120 g (35–40 g de chorizo).', price:3.0, img:'banners/snack-papas.jpg' },
   { id:'empanada-capresse', soldOut:true, cat:'Snack Sal', name:'Empanada de Hojaldre', desc:'Queso mozzarella de búfala, tomates frescos y albahaca cuidadosamente trabajada, en hojaldre horneado y crocante. Acompañada de nuestra salsa pesto.', price:1.8, order:0, img:'assets/empanada-capresse.jpeg', group:'empanada', flavor:'Capresse' },
   { id:'empanada-pollo', soldOut:true, cat:'Snack Sal', name:'Empanada de Hojaldre', desc:'Pechuga de pollo con nuestra salsa de vegetales. No te pierdas nuestro aderezo de mayonesa de la casa.', price:2.4, order:0, img:'assets/image-b46285ee20adcc24.jpg', group:'empanada', flavor:'Pollo' },
   { id:'empanada-queso', cat:'Snack Sal', name:'Empanada de Hojaldre', desc:'Hojaldre horneado y crocante, relleno de queso.', price:1.5, order:0, img:'assets/image-b46285ee20adcc24.jpg', group:'empanada', flavor:'Queso' },
@@ -121,8 +121,11 @@ MENU.filter(item => item.group === 'empanada').forEach(item => {
 const ICE_CREAM_AVAILABLE = true;
 const ICE_CREAM_DRINK_IDS = ['milkishaki-nutella', 'milkishaki-fresa', 'milkishaki-salted-caramel', 'affocato'];
 MENU.forEach(item => {
-  if (ICE_CREAM_DRINK_IDS.includes(item.id)) item.soldOut = !ICE_CREAM_AVAILABLE;
+  if (ICE_CREAM_DRINK_IDS.includes(item.id)) item.soldOut = !ICE_CREAM_AVAILABLE || item.id === 'milkishaki-nutella';
   if (!ICE_CREAM_AVAILABLE && item.scoop) item.scoop = false;
+});
+MENU.filter(item => item.group === 'milkishaki').forEach(item => {
+  item.promoNote = '2 MilkiShakis igualitos por $8 ($4 c/u). Mismo sabor y modificaciones. Extras aparte; unidad suelta $4.90.';
 });
 // Bebidas temporalmente agotadas; se mantienen visibles en el menú.
 const SOLD_OUT_DRINK_IDS = [];
@@ -929,6 +932,14 @@ function unitPrice(id){
   if(cart[id] && cart[id].syrup) p += 0.50;
   return Math.round(p * 100) / 100;
 }
+// Cada par de la misma línea comparte sabor y modificaciones.
+function milkishakiDiscountCents(id){
+  const item = productForCartLine(id);
+  return item?.group === 'milkishaki' ? Math.floor((cart[id]?.qty || 0) / 2) * 180 : 0;
+}
+function lineTotalCents(id){
+  return Math.round(unitPrice(id) * 100) * cart[id].qty - milkishakiDiscountCents(id);
+}
 function productLabel(item){
   return item.name;
 }
@@ -1086,7 +1097,7 @@ function saveNote(id, val){
 function cartCount(){ return Object.values(cart).reduce((a,c)=>a+c.qty,0); }
 function cartTotal(){
   return Object.entries(cart).reduce((sum,[id,c])=>{
-    return sum + Math.round(unitPrice(id) * 100) * c.qty;
+    return sum + lineTotalCents(id);
   },0) / 100;
 }
 const DRINK_CATS = ['Bebidas Calientes','Bebidas Frías','Matcha'];
@@ -1363,7 +1374,7 @@ function renderCartList(){
   }
   el.innerHTML = entries.map(([id,c])=>{
     const item = productForCartLine(id);
-    const baseTotal = item.price * c.qty;
+    const baseTotal = (Math.round(item.price * 100) * c.qty - milkishakiDiscountCents(id)) / 100;
     const extrasTotal = (unitPrice(id) - item.price) * c.qty;
     const modifierChips = [];
     if(item.milk) modifierChips.push(c.milk
@@ -1753,7 +1764,7 @@ async function sendOrder(){
   msg += `\n*PRODUCTOS*\n`;
   entries.forEach(([id,c])=>{
     const item = productForCartLine(id);
-    msg += `• ${c.qty}x *${productLabel(item)}* — $${(unitPrice(id)*c.qty).toFixed(2)}\n`;
+    msg += `• ${c.qty}x *${productLabel(item)}* — $${(lineTotalCents(id)/100).toFixed(2)}\n`;
     if(item.milk) msg += `  + Leche ${c.milk ? `vegetal de ${c.milk}` : 'deslactosada'}\n`;
     if(c.scoop) msg += `  + Helado de vainilla\n`;
     if(c.syrup) msg += `  + Toque de ${SYRUP_LABELS[c.syrup]}\n`;
