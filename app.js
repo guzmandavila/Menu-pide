@@ -124,9 +124,6 @@ MENU.forEach(item => {
   if (ICE_CREAM_DRINK_IDS.includes(item.id)) item.soldOut = !ICE_CREAM_AVAILABLE || item.id === 'milkishaki-nutella';
   if (!ICE_CREAM_AVAILABLE && item.scoop) item.scoop = false;
 });
-MENU.filter(item => item.group === 'milkishaki').forEach(item => {
-  item.promoNote = '2 MilkiShakis igualitos por $8 ($4 c/u). Mismo sabor y modificaciones. Extras aparte; unidad suelta $4.90.';
-});
 // Bebidas temporalmente agotadas; se mantienen visibles en el menú.
 const SOLD_OUT_DRINK_IDS = [];
 MENU.forEach(item => {
@@ -645,9 +642,7 @@ function renderCategoryHome(){
     const imagePosition = category === 'Snack Dulce' ? '50% 0%' : '50% 50%';
     return `<button type="button" class="category-tile" style="--tile-accent:${color};--tile-pill-text:${textColorFor(color)};--tile-image-scale:${imageScale};--tile-image-position:${imagePosition}" onclick="selectCat('${escapeHtml(category)}')" aria-label="Abrir categoría ${escapeHtml(category)}"><img src="${escapeHtml(image)}" alt="" loading="eager" decoding="async"><span class="category-tile-shade"></span><span class="category-tile-name">${escapeHtml(category)}</span></button>`;
   }).join('');
-  const milkishaki=MENU.find(item=>item.id==='milkishaki-fresa'&&!HIDDEN_ITEM_IDS.includes(item.id)&&isWithinAvailability(item)&&!item.soldOut);
-  const promo=milkishaki ? `<button type="button" class="cupcake-promo" onclick="selectCat('Bebidas Frías')" aria-label="Ver MilkiShaki de fresa. Dos iguales por 8 dólares, 4 dólares cada uno"><img src="${escapeHtml(milkishaki.img)}" alt="MilkiShaki de fresa de Clowder" decoding="async"><span class="cupcake-promo-cta">2 MilkiShakis igualitos · $4 c/u ($8 el par) →</span></button>` : '';
-  return `<section class="category-home-view" aria-label="Categorías del menú">${promo}<div class="category-home-grid">${tiles}</div></section>`;
+  return `<section class="category-home-view" aria-label="Categorías del menú"><div class="category-home-grid">${tiles}</div></section>`;
 }
 function renderMenu(){
   refreshDrinksOnlyNotice();
@@ -932,13 +927,8 @@ function unitPrice(id){
   if(cart[id] && cart[id].syrup) p += 0.50;
   return Math.round(p * 100) / 100;
 }
-// Cada par de la misma línea comparte sabor y modificaciones.
-function milkishakiDiscountCents(id){
-  const item = productForCartLine(id);
-  return item?.group === 'milkishaki' ? Math.floor((cart[id]?.qty || 0) / 2) * 180 : 0;
-}
 function lineTotalCents(id){
-  return Math.round(unitPrice(id) * 100) * cart[id].qty - milkishakiDiscountCents(id);
+  return Math.round(unitPrice(id) * 100) * cart[id].qty;
 }
 function productLabel(item){
   return item.name;
@@ -1374,7 +1364,7 @@ function renderCartList(){
   }
   el.innerHTML = entries.map(([id,c])=>{
     const item = productForCartLine(id);
-    const baseTotal = (Math.round(item.price * 100) * c.qty - milkishakiDiscountCents(id)) / 100;
+    const baseTotal = Math.round(item.price * 100) * c.qty / 100;
     const extrasTotal = (unitPrice(id) - item.price) * c.qty;
     const modifierChips = [];
     if(item.milk) modifierChips.push(c.milk
